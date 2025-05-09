@@ -1,0 +1,165 @@
+The source code for social diary app that allows users to log their daily activities,thoughts and social interactions.This web based application built with HTML,LSS,JAVASCRIPT.
+index.thml
+html
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport"content="width=device-width,initial-scale=1.0">
+<title>my social diary</title>
+<link rel="stylesheet"href="styles.css">
+<link rel="stylesheet"href="https://cdnjs.cloudflare.com/ajax//ibs/font-awesome/6.0.0-beta3/css/all.min.css">
+</head>
+<body>
+<div class="app-container">
+<header>
+<h1><i class="fas fa-book-open"></i>my social diary</h1>
+<div class="date-display"id="current date"></div>
+</header>
+<div class="main-content">
+<aside class="sidebar">
+<div class="user-profile">
+<div class="avatar">sy</div>
+< h3id="username">user</h3>
+</div>
+<nav>
+<ul>
+<li class="active"><ahref="#"id="newentrybtn"><i class="fas fa-plus"></i>new entry</a></li>
+<li><a href="#"id="viewentriesbtn"><i class="fas fa-list"></i>view entries</a></li>
+<li><a href="#"id="statsbtn"><i class="fas fa-chart-bar"></i>statistics</a></li>
+<li><ahref="#"id="settingsbtn"><i class="fas fa-cog"></i>settings</a></li>
+</ul>
+</nav>
+<div class="mood-tracker">
+<h3>today's mood</h3>
+<div class="mood-options">
+<span class="mood-option" data-mood="happy">sy</span>
+<span class="mood-option"data-mood="neutral">sy</span>
+<span class="mood-option"data-mood="sad">sy</span>
+<span class="mood-option"data-mood="angry">sy</span>
+<span class="mood-option"data-mood="excited">sy</span>
+<?div>
+<div id="selected mood"></div>
+</div>
+<?aside>
+<main class="content-area">
+<div id="new entry section"class="active-section">
+<h2>new diary entry</h2>
+<form id="diary form">
+<div class="form-group">
+<label for="entrydate">date:</label>
+<input type="date"id="entrydate"required>
+</div>
+<div class="form-group">
+<label for="entrytitle">title:</label>
+<input type="text"id="entrytitle"placehodler="what's the highlight of your day?"required>
+</div>
+<div class="form-group">
+<label for="entry content">your entry:</label>
+<text area id="entry content"rows="10"placeholder="write about your day,your thoughts,and social interactions..."required></textarea>
+</div>
+<div class="form-group">
+<label>tags:</label>
+<div class="tags-container">
+<input type="text"id="tag input"placeholder="addtags(friends,events,etc.,)">
+<button type="button"id="addtagbtn">add</button>
+</div>
+<div id="tagsdisplay"></div>
+</div>
+<button type="submit"id="save entry btn">save entry</button>
+</form>
+</div>
+<div id="viewentriessection"class="section">
+<h2>your diary entries</h2>
+<div class="search-filter">
+<input type+"text"id=searchentries"placeholder+"searchentries...">
+<selectid="filterbymood">
+<option value="">all moods</option>
+<option value="happy">happy</option>
+<option value="neutral">neutral</option>
+<option value="sad">sad</option>
+<option value="angry"</option></option>
+<option value="excited">excited</option>
+</select>
+,select id="filterbydate">
+<option value="">all dates</option>
+<option value="today">today</option>
+<option value="week">this week</option>
+<option value="month">this month</option>
+</select>
+</div>
+<div id="entrieslist"></div>
+</div>
+<div id="stats section"class="section">
+<h2>your diary statistics</h2>
+<divclass="stats-container">
+<div class="stat-card">
+<h3>total entries</h3>
+<pid="total entries">0</p>
+</div>
+<div class="stat-card">
+<h3>most active day</h3>
+<pid="most active day">-</p>
+</div>
+<div class="stat-card">
+<h3>mood distribution</h3>
+<div id="moodchart"></div>
+</div>
+<.div>
+<div class="word-cloud-container">
+<h3>frequently used words</h3>
+<div id="word cloud"></div>
+</div>
+</div>
+<div id="settings section"class="section">
+<h2>settings</h2>
+<form id='settings form">
+<div class="form-group">
+<label for="username">yourname:</label>
+<input type="text"id="username"placeholder="enter your name">
+</div>
+<div class="form-group">
+<label for="diarytheme">theme:</label>
+<select id="diarytheme">
+,option value="light">light</option>
+<option value="dark">dark</option>
+<option value"blue">blue</option>
+<option valu="green">green</option>
+</select>
+</div>
+<div class="form-group">
+<label for="notifications">enable notifications:</label>
+<input type="checkbox"id="notifications">
+</div>
+<div class="form-group">
+<label for="remindertime">daily remindertime:</label>
+<input type="time"id=remindertime">
+</div>
+<button type="submit"id="savesettingsbtn">savesettings</button>
+<button type="button"id="exportdatabtn">exportdiarydata</button>
+<button type="button"id="importdatabtn">importdiarydata</button>
+<input type="file"id="importantdatainput"accept=".json"style="display:none;">
+</form>
+</div>
+<div id="entrydetailsection"class="section">
+<buttonid="backtolistbtn"class="back-button"><iclass="fas-fa-arrow-left"></i>backtolist</button>
+<h2 id="detailentrytitle"></h2>
+<div class="entry-meta">
+<spanid="detailentrydate"></span>
+<spanid="detailentrymood"></span>
+</div>
+<divid="detailentrycontent"class="entry-content"></div>
+<divid="detailentrytags"class="entry-tags">/div>
+<divclass="entry-actions"
+<buttonid="editentrybtn">edit</button>
+<buttonid="deleteentrybtn">delete</button>
+</div>
+</div>
+</main>
+</div>
+<div class="notifications"id="notification"></div>
+</div>
+<scriptsrc="script.js"></script>
+</body>
+</html>
+
