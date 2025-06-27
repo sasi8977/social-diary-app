@@ -174,3 +174,50 @@ button:hover {
     padding: 0.8rem;
   }
 }
+/* New App Header */
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--primary-color);
+  color: #fff;
+  padding: 1rem 1.5rem;
+  box-shadow: var(--box-shadow);
+  border-radius: 0 0 20px 20px;
+}
+
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.avatar-circle {
+  background: #fff;
+  color: var(--primary-color);
+  font-weight: bold;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  font-size: 1.2rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.greeting-text h2 {
+  margin: 0;
+  font-size: 1.2rem;
+}
+
+.greeting-text p {
+  margin: 0;
+  font-size: 0.9rem;
+  opacity: 0.8;
+}
+
+.header-right .app-brand {
+  font-size: 1rem;
+  font-weight: bold;
+  letter-spacing: 0.5px;
+}
