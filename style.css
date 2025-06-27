@@ -1,0 +1,176 @@
+
+:root {
+  --primary-color: #5e60ce;
+  --secondary-color: #6930c3;
+  --accent-color: #f72585;
+  --bg-color: #f1f1f1;
+  --text-color: #333;
+  --card-bg: #fff;
+  --border-radius: 1rem;
+  --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  --font-main: 'Segoe UI', sans-serif;
+}
+
+/* Reset */
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: var(--font-main);
+  background-color: var(--bg-color);
+  color: var(--text-color);
+  line-height: 1.6;
+}
+
+header {
+  background-color: var(--primary-color);
+  color: #fff;
+  padding: 1rem 2rem;
+  text-align: center;
+  font-size: 1.5rem;
+  box-shadow: var(--shadow);
+}
+
+main {
+  padding: 1rem;
+}
+
+/* Mood Picker */
+.mood-tracker {
+  margin: 1.5rem 0;
+  text-align: center;
+}
+
+.mood-options {
+  display: flex;
+  justify-content: center;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-top: 0.5rem;
+}
+
+.mood-option {
+  font-size: 2rem;
+  padding: 0.5rem;
+  cursor: pointer;
+  border-radius: 50%;
+  transition: transform 0.2s ease;
+  background-color: var(--card-bg);
+  box-shadow: var(--shadow);
+}
+
+.mood-option:hover {
+  transform: scale(1.2);
+}
+
+#selected-mood {
+  margin-top: 0.5rem;
+  font-weight: bold;
+  font-size: 1.1rem;
+}
+
+/* Diary Form */
+form {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-group label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+}
+
+input[type="text"],
+input[type="date"],
+textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border-radius: 0.5rem;
+  border: 1px solid #ccc;
+  font-size: 1rem;
+}
+
+textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+button {
+  padding: 0.6rem 1.2rem;
+  background-color: var(--accent-color);
+  color: white;
+  border: none;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+button:hover {
+  background-color: #d61e70;
+}
+
+/* Entries */
+.entries-list {
+  display: grid;
+  gap: 1rem;
+}
+
+.entry-card {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.entry-card h3 {
+  margin-bottom: 0.3rem;
+  color: var(--primary-color);
+}
+
+.entry-meta {
+  font-size: 0.8rem;
+  color: gray;
+  margin-bottom: 0.5rem;
+}
+
+.entry-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}
+
+.entry-tags span {
+  background-color: var(--secondary-color);
+  color: #fff;
+  padding: 0.3rem 0.5rem;
+  border-radius: 1rem;
+  font-size: 0.75rem;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  header {
+    font-size: 1.2rem;
+    padding: 1rem;
+  }
+
+  .mood-option {
+    font-size: 1.5rem;
+  }
+
+  form {
+    padding: 0.8rem;
+  }
+}
