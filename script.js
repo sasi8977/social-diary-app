@@ -39,6 +39,7 @@ document.addEventListener("DOMContentLoaded", () => {
     entries.push(newEntry);
     saveEntries();
     displayEntries();
+    renderstats();
     document.getElementById("diary-form").reset();
     document.getElementById("selected-mood").textContent = "";
     selectedMood = "";
@@ -132,4 +133,51 @@ function renderEntry(entry) {
 
   card.append(title, meta, content, tags);
   document.getElementById('entrieslist').appendChild(card);
+}
+function renderStats() {
+  const total = entries.length;
+  document.getElementById("totalEntries").textContent = total;
+
+  // Mood count
+  const counts = {};
+  entries.forEach(e => {
+    counts[e.mood] = (counts[e.mood] || 0) + 1;
+  });
+
+  // Most frequent mood
+  const frequent = Object.entries(counts).sort((a,b) => b[1] - a[1])[0];
+  document.getElementById("frequentMood").textContent = frequent ? frequent[0] : "-";
+
+  // Mood chart bars
+  const chart = document.getElementById("moodChart");
+  chart.innerHTML = "";
+  Object.entries(counts).forEach(([mood, count]) => {
+    const pct = Math.round((count/total) * 100);
+    const row = document.createElement("div");
+    row.className = "mood-bar";
+    row.innerHTML = `
+      <span>${mood.charAt(0).toUpperCase()+mood.slice(1)}</span>
+      <div style="width:${pct}%;"></div>
+      <span style="margin-left:0.5rem">${pct}%</span>
+    `;
+    chart.appendChild(row);
+  });
+
+  // Word cloud
+  const wc = document.getElementById("wordCloud");
+  wc.innerHTML = "";
+  const freq = {};
+  entries.forEach(e => {
+    e.content.toLowerCase().split(/\W+/).forEach(w => {
+      if (w.length > 3) freq[w] = (freq[w] || 0) + 1;
+    });
+  });
+  const sorted = Object.entries(freq).sort((a,b) => b[1] - a[1]).slice(0, 30);
+  sorted.forEach(([word, count]) => {
+    const span = document.createElement("span");
+    const size = 12 + count * 2;
+    span.textContent = word;
+    span.style.fontSize = size + "px";
+    wc.appendChild(span);
+  });
 }
