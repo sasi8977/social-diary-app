@@ -59,7 +59,19 @@ function loadEntries() {
 }
 
 // Display entries on the page
-function displayEntries() {
+entries.forEach(entry=> {
+renderEntry(entry);
+});
+  // clear the old list
+  document.getElementById('entrieslist').innerHTML = '';
+
+  // loop through entries
+  entries.forEach(entry => {
+    // OLD CODE: build entry HTML (probably as a list or basic div)
+
+    // 🔥 Replace that block with the new renderEntry(entry)
+  });
+}
   loadEntries();
   const list = document.getElementById("entries-list");
   list.innerHTML = "";
@@ -93,4 +105,31 @@ const today = new Date().toLocaleDateString(undefined, {
 });
 dateDisplay.textContent = `Today is ${today}`;
  });
+}
+function renderEntry(entry) {
+  const card = document.createElement('div');
+  card.classList.add('entry-card');
+
+  const title = document.createElement('h3');
+  title.textContent = entry.title;
+
+  const meta = document.createElement('div');
+  meta.classList.add('entry-meta');
+  meta.textContent = `${entry.date} • ${entry.mood}`;
+
+  const content = document.createElement('div');
+  content.classList.add('entry-content-preview');
+  content.textContent = entry.content;
+
+  const tags = document.createElement('div');
+  tags.classList.add('entry-tags');
+  entry.tags.forEach(tag => {
+    const tagEl = document.createElement('span');
+    tagEl.classList.add('entry-tag');
+    tagEl.textContent = tag;
+    tags.appendChild(tagEl);
+  });
+
+  card.append(title, meta, content, tags);
+  document.getElementById('entrieslist').appendChild(card);
 }
