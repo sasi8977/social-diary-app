@@ -52,7 +52,20 @@
 
       <main class="content-area">
         <section id="newEntrySection" class="section active">
-          <h2>New Diary Entry</h2>
+        <h2>New Diary Entry</h2>
+          <section class="stats-section section" id="stats-section">
+  <h2>Your Stats</h2>
+  <div class="stats-container">
+    <div>Total Entries: <span id="totalEntries">0</span></div>
+    <div>Most Frequent Mood: <span id="frequentMood">-</span></div>
+  </div>
+  <div id="moodChart"></div>
+</section>
+
+<section class="word-cloud-section section" id="wordcloud-section">
+  <h2>Word Cloud</h2>
+  <div id="wordCloud" class="word-cloud"></div>
+</section>
           <form id="diaryForm">
             <div class="form-group">
               <label for="entryDate">Date:</label>
