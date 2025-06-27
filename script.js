@@ -85,5 +85,12 @@ function displayEntries() {
     \`;
 
     list.appendChild(card);
-  });
+    const dateDisplay = document.getElementById("today-date");
+const today = new Date().toLocaleDateString(undefined, {
+  weekday: "long",
+  month: "short",
+  day: "numeric"
+});
+dateDisplay.textContent = `Today is ${today}`;
+ });
 }
