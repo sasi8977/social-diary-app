@@ -1,6 +1,9 @@
-
 let selectedMood = '';
 let entries = [];
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js')
+    .then(() => console.log("Service Worker Registered"));
+}
 
 document.addEventListener("DOMContentLoaded", () => {
   // Mood selection
