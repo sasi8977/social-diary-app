@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Social Diary</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="user-profile">
+        <div class="avatar">SY</div>
+        <h3 id="username">User</h3>
+      </div>
+      <nav>
+        <ul>
+          <li class="active"><a href="#" id="newentrybtn"><i class="fas fa-plus"></i> New Entry</a></li>
+          <li><a href="#" id="viewentriesbtn"><i class="fas fa-list"></i> View Entries</a></li>
+          <li><a href="#" id="statsbtn"><i class="fas fa-chart-bar"></i> Statistics</a></li>
+          <li><a href="#" id="settingsbtn"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+      </nav>
+      <div class="mood-tracker">
+        <h3>Today's Mood</h3>
+        <div class="mood-options">
+          <span class="mood-option" data-mood="happy">😊</span>
+          <span class="mood-option" data-mood="neutral">😐</span>
+          <span class="mood-option" data-mood="sad">😢</span>
+          <span class="mood-option" data-mood="angry">😠</span>
+          <span class="mood-option" data-mood="excited">😄</span>
+        </div>
+        <div id="selected-mood"></div>
+      </div>
+    </aside>
+
+    <main class="content-area">
+      <section id="newentrysection" class="section active-section">
+        <h2>New Diary Entry</h2>
+        <form id="diaryform">
+          <div class="form-group">
+            <label for="entrydate">Date:</label>
+            <input type="date" id="entrydate" required />
+          </div>
+          <div class="form-group">
+            <label for="entrytitle">Title:</label>
+            <input type="text" id="entrytitle" placeholder="What's the highlight of your day?" required />
+          </div>
+          <div class="form-group">
+            <label for="entrycontent">Your Entry:</label>
+            <textarea id="entrycontent" rows="10" placeholder="Write about your day, your thoughts, and social interactions..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Tags:</label>
+            <div class="tags-container">
+              <input type="text" id="taginput" placeholder="Add tags (friends, events, etc.)" />
+              <button type="button" id="addtagbtn">Add</button>
+            </div>
+            <div id="tagsdisplay"></div>
+          </div>
+          <button type="submit" id="saveentrybtn">Save Entry</button>
+        </form>
+      </section>
+
+      <section id="viewentriessection" class="section">
+        <h2>Your Diary Entries</h2>
+        <div class="search-filter">
+          <input type="text" id="searchentries" placeholder="Search entries..." />
+          <select id="filterbymood">
+            <option value="">All Moods</option>
+            <option value="happy">Happy</option>
+            <option value="neutral">Neutral</option>
+            <option value="sad">Sad</option>
+            <option value="angry">Angry</option>
+            <option value="excited">Excited</option>
+          </select>
+          <select id="filterbydate">
+            <option value="">All Dates</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+          </select>
+        </div>
+        <div id="entrieslist"></div>
+      </section>
+
+      <section id="statssection" class="section">
+        <h2>Your Diary Statistics</h2>
+        <div class="stats-container">
+          <div class="stat-card">
+            <h3>Total Entries</h3>
+            <p id="totalentries">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Most Active Day</h3>
+            <p id="mostactiveday">-</p>
+          </div>
+          <div class="stat-card">
+            <h3>Mood Distribution</h3>
+            <div id="moodchart"></div>
+          </div>
+        </div>
+        <div class="word-cloud-container">
+          <h3>Frequently Used Words</h3>
+          <div id="wordcloud"></div>
+        </div>
+      </section>
+
+      <section id="settingssection" class="section">
+        <h2>Settings</h2>
+        <form id="settingsform">
+          <div class="form-group">
+            <label for="username">Your Name:</label>
+            <input type="text" id="usernameinput" placeholder="Enter your name" />
+          </div>
+          <div class="form-group">
+            <label for="diarytheme">Theme:</label>
+            <select id="diarytheme">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="blue">Blue</option>
+              <option value="green">Green</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="notifications">Enable Notifications:</label>
+            <input type="checkbox" id="notifications" />
+          </div>
+          <div class="form-group">
+            <label for="remindertime">Daily Reminder Time:</label>
+            <input type="time" id="remindertime" />
+          </div>
+          <button type="submit" id="savesettingsbtn">Save Settings</button>
+          <button type="button" id="exportdatabtn">Export Diary Data</button>
+          <button type="button" id="importdatabtn">Import Diary Data</button>
+          <input type="file" id="importdatainput" accept=".json" style="display: none;" />
+        </form>
+      </section>
+
+      <section id="entrydetailsection" class="section">
+        <button id="backtolistbtn" class="back-button"><i class="fas fa-arrow-left"></i> Back to List</button>
+        <h2 id="detailentrytitle"></h2>
+        <div class="entry-meta">
+          <span id="detailentrydate"></span>
+          <span id="detailentrymood"></span>
+        </div>
+        <div id="detailentrycontent" class="entry-content"></div>
+        <div id="detailentrytags" class="entry-tags"></div>
+        <div class="entry-actions">
+          <button id="editentrybtn">Edit</button>
+          <button id="deleteentrybtn">Delete</button>
+        </div>
+      </section>
+    </main>
+  </div>
+  <div class="notification" id="notification"></div>
+  <script src="script.js" defer></script>
+</body>
+</html>
