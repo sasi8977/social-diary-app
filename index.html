@@ -1,188 +1,191 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <link rel="manifest" href="manifest.json" />
-<link rel="icon" type="image/png" href="icons/icon-192.png" />
-<meta name="theme-color" content="#3f51b5" />
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Social Diary</title>
+
+  <!-- PWA Essentials -->
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <meta name="theme-color" content="#3f51b5" />
+
+  <!-- Styles -->
   <link rel="stylesheet" href="style.css" />
+
+  <!-- Icons -->
   <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
 </head>
-  <link rel="manifest" href="manifest.json" />
-<link rel="icon" href="icons/icon-192.png" />
-<meta name="theme-color" content="#5e60ce" />
 <body>
+  <!-- Header -->
   <header class="app-header">
-  <div class="header-left">
-    <div class="avatar-circle">SY</div>
-    <div class="greeting-text">
-      <h2>Hi, Sasidhar 👋</h2>
-      <p id="today-date"></p>
+    <div class="header-left">
+      <div class="avatar-circle">SY</div>
+      <div class="greeting-text">
+        <h2>Hi, Sasidhar 👋</h2>
+        <p id="today-date"></p>
+      </div>
     </div>
-  </div>
-  <div class="header-right">
-    <span class="app-brand">Social Diary</span>
-  </div>
-</header>
-   <div class="app">
-    <h1><i class="fas fa-book-heart"></i> Social Diary</h1>
-      <div class="date-display" id="currentDate"></div>
-     <div class="main">
-      <aside class="sidebar">
-        <div class="user-profile">
-          <div class="avatar">SY</div>
-          <h3 id="usernameDisplay">User</h3>
-        </div>
-        <nav>
-          <ul>
-            <li><a href="#" id="newEntryBtn"><i class="fas fa-plus"></i> New Entry</a></li>
-            <li><a href="#" id="viewEntriesBtn"><i class="fas fa-list"></i> View Entries</a></li>
-            <li><a href="#" id="statsBtn"><i class="fas fa-chart-bar"></i> Statistics</a></li>
-            <li><a href="#" id="settingsBtn"><i class="fas fa-cog"></i> Settings</a></li>
-          </ul>
-        </nav>
-        <div class="mood-tracker">
-          <h3>Today's Mood</h3>
-          <div class="mood-options">
-            <span class="mood-option" data-mood="happy">😊</span>
-            <span class="mood-option" data-mood="neutral">😐</span>
-            <span class="mood-option" data-mood="sad">😢</span>
-            <span class="mood-option" data-mood="angry">😠</span>
-            <span class="mood-option" data-mood="excited">🤩</span>
-          </div>
-          <div id="selectedMood"></div>
-        </div>
-      </aside>
+    <div class="header-right">
+      <span class="app-brand">Social Diary</span>
+    </div>
+  </header>
 
-      <main class="content-area">
-        <section id="newEntrySection" class="section active">
+  <!-- App Container -->
+  <div class="app">
+    <aside class="sidebar">
+      <div class="user-profile">
+        <div class="avatar">SY</div>
+        <h3 id="usernameDisplay">User</h3>
+      </div>
+      <nav>
+        <ul>
+          <li><a href="#" id="newEntryBtn"><i class="fas fa-plus"></i> New Entry</a></li>
+          <li><a href="#" id="viewEntriesBtn"><i class="fas fa-list"></i> View Entries</a></li>
+          <li><a href="#" id="statsBtn"><i class="fas fa-chart-bar"></i> Statistics</a></li>
+          <li><a href="#" id="settingsBtn"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+      </nav>
+
+      <!-- Mood Picker -->
+      <div class="mood-tracker">
+        <h3>Today's Mood</h3>
+        <div class="mood-options">
+          <span class="mood-option" data-mood="happy">😊</span>
+          <span class="mood-option" data-mood="neutral">😐</span>
+          <span class="mood-option" data-mood="sad">😢</span>
+          <span class="mood-option" data-mood="angry">😠</span>
+          <span class="mood-option" data-mood="excited">🤩</span>
+        </div>
+        <div id="selectedMood"></div>
+      </div>
+    </aside>
+
+    <main class="content-area">
+      <!-- New Entry Section -->
+      <section id="newEntrySection" class="section active">
         <h2>New Diary Entry</h2>
-          <section class="stats-section section" id="stats-section">
-  <h2>Your Stats</h2>
-  <div class="stats-container">
-    <div>Total Entries: <span id="totalEntries">0</span></div>
-    <div>Most Frequent Mood: <span id="frequentMood">-</span></div>
-  </div>
-  <div id="moodChart"></div>
-</section>
+        <form id="diaryForm">
+          <div class="form-group">
+            <label for="entryDate">Date:</label>
+            <input type="date" id="entryDate" required />
+          </div>
+          <div class="form-group">
+            <label for="entryTitle">Title:</label>
+            <input type="text" id="entryTitle" placeholder="Highlight of your day..." required />
+          </div>
+          <div class="form-group">
+            <label for="entryContent">Your Entry:</label>
+            <textarea id="entryContent" rows="8" placeholder="Write about your day..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label for="tagsInput">Tags:</label>
+            <div class="tags-container">
+              <input type="text" id="tagsInput" placeholder="e.g., friends, events..." />
+              <button type="button" id="addTagBtn">Add</button>
+            </div>
+            <div id="tagsDisplay"></div>
+          </div>
+          <button type="submit" id="saveEntryBtn">Save Entry</button>
+        </form>
+      </section>
 
-<section class="word-cloud-section section" id="wordcloud-section">
-  <h2>Word Cloud</h2>
-  <div id="wordCloud" class="word-cloud"></div>
-</section>
-          <form id="diaryForm">
-            <div class="form-group">
-              <label for="entryDate">Date:</label>
-              <input type="date" id="entryDate" required />
-            </div>
-            <div class="form-group">
-              <label for="entryTitle">Title:</label>
-              <input type="text" id="entryTitle" placeholder="Highlight of your day..." required />
-            </div>
-            <div class="form-group">
-              <label for="entryContent">Your Entry:</label>
-              <textarea id="entryContent" rows="8" placeholder="Write about your day..." required></textarea>
-            </div>
-            <div class="form-group">
-              <label for="tagsInput">Tags:</label>
-              <div class="tags-container">
-                <input type="text" id="tagsInput" placeholder="e.g., friends, events..." />
-                <button type="button" id="addTagBtn">Add</button>
-              </div>
-              <div id="tagsDisplay"></div>
-            </div>
-            <button type="submit" id="saveEntryBtn">Save Entry</button>
-          </form>
-        </section>
+      <!-- View Entries Section -->
+      <section id="viewEntriesSection" class="section">
+        <h2>Your Entries</h2>
+        <div class="search-filter">
+          <input type="text" id="searchEntries" placeholder="Search entries..." />
+          <select id="filterMood">
+            <option value="">All Moods</option>
+            <option value="happy">Happy</option>
+            <option value="neutral">Neutral</option>
+            <option value="sad">Sad</option>
+            <option value="angry">Angry</option>
+            <option value="excited">Excited</option>
+          </select>
+        </div>
+        <div id="entriesList" class="entries-list"></div>
+      </section>
 
-        <section id="viewEntriesSection" class="section">
-          <h2>Your Entries</h2>
-          <div class="search-filter">
-            <input type="text" id="searchEntries" placeholder="Search entries..." />
-            <select id="filterMood">
-              <option value="">All Moods</option>
-              <option value="happy">Happy</option>
-              <option value="neutral">Neutral</option>
-              <option value="sad">Sad</option>
-              <option value="angry">Angry</option>
-              <option value="excited">Excited</option>
+      <!-- Statistics Section -->
+      <section id="statsSection" class="section">
+        <h2>Statistics</h2>
+        <div class="stats">
+          <div class="stat-card">
+            <h3>Total Entries</h3>
+            <p id="totalEntries">0</p>
+          </div>
+          <div class="stat-card">
+            <h3>Most Active Day</h3>
+            <p id="mostActiveDay">-</p>
+          </div>
+          <div class="stat-card">
+            <h3>Mood Distribution</h3>
+            <canvas id="moodChart"></canvas>
+          </div>
+        </div>
+      </section>
+
+      <!-- Word Cloud Section -->
+      <section id="wordcloud-section" class="section">
+        <h2>Word Cloud</h2>
+        <div id="wordCloud" class="word-cloud"></div>
+      </section>
+
+      <!-- Settings Section -->
+      <section id="settingsSection" class="section">
+        <h2>Settings</h2>
+        <form id="settingsForm">
+          <div class="form-group">
+            <label for="username">Your Name:</label>
+            <input type="text" id="username" placeholder="Enter your name" />
+          </div>
+          <div class="form-group">
+            <label for="themeSelect">Theme:</label>
+            <select id="themeSelect">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="blue">Blue</option>
+              <option value="green">Green</option>
             </select>
           </div>
-          <div id="entriesList"
-            class="entries-list"></div>
-        </section>
-
-        <section id="statsSection" class="section">
-          <h2>Statistics</h2>
-          <div class="stats">
-            <div class="stat-card">
-              <h3>Total Entries</h3>
-              <p id="totalEntries">0</p>
-            </div>
-            <div class="stat-card">
-              <h3>Most Active Day</h3>
-              <p id="mostActiveDay">-</p>
-            </div>
-            <div class="stat-card">
-              <h3>Mood Distribution</h3>
-              <canvas id="moodChart"></canvas>
-            </div>
+          <div class="form-group">
+            <label for="notifications">Enable Notifications:</label>
+            <input type="checkbox" id="notifications" />
           </div>
-        </section>
-
-        <section id="settingsSection" class="section">
-          <h2>Settings</h2>
-          <form id="settingsForm">
-            <div class="form-group">
-              <label for="username">Your Name:</label>
-              <input type="text" id="username" placeholder="Enter your name" />
-            </div>
-            <div class="form-group">
-              <label for="themeSelect">Theme:</label>
-              <select id="themeSelect">
-                <option value="light">Light</option>
-                <option value="dark">Dark</option>
-                <option value="blue">Blue</option>
-                <option value="green">Green</option>
-              </select>
-            </div>
-            <div class="form-group">
-              <label for="notifications">Enable Notifications:</label>
-              <input type="checkbox" id="notifications" />
-            </div>
-            <div class="form-group">
-              <label for="reminderTime">Daily Reminder Time:</label>
-              <input type="time" id="reminderTime" />
-            </div>
-            <button type="submit" id="saveSettingsBtn">Save Settings</button>
-            <button type="button" id="exportDataBtn">Export Data</button>
-            <button type="button" id="importDataBtn">Import Data</button>
-            <input type="file" id="importDataInput" accept=".json" style="display:none;" />
-          </form>
-        </section>
-
-        <section id="entryDetailSection" class="section">
-          <button id="backToListBtn" class="back-button"><i class="fas fa-arrow-left"></i> Back</button>
-          <h2 id="detailTitle"></h2>
-          <div class="entry-meta">
-            <span id="detailDate"></span>
-            <span id="detailMood"></span>
+          <div class="form-group">
+            <label for="reminderTime">Daily Reminder Time:</label>
+            <input type="time" id="reminderTime" />
           </div>
-          <div id="detailContent" class="entry-content"></div>
-          <div id="detailTags" class="entry-tags"></div>
-          <div class="entry-actions">
-            <button id="editEntryBtn">Edit</button>
-            <button id="deleteEntryBtn">Delete</button>
-          </div>
-        </section>
-      </main>
-    </div>
+          <button type="submit" id="saveSettingsBtn">Save Settings</button>
+          <button type="button" id="exportDataBtn">Export Data</button>
+          <button type="button" id="importDataBtn">Import Data</button>
+          <input type="file" id="importDataInput" accept=".json" style="display:none;" />
+        </form>
+      </section>
 
-    <div class="notification" id="notification"></div>
+      <!-- Entry Details Section -->
+      <section id="entryDetailSection" class="section">
+        <button id="backToListBtn" class="back-button"><i class="fas fa-arrow-left"></i> Back</button>
+        <h2 id="detailTitle"></h2>
+        <div class="entry-meta">
+          <span id="detailDate"></span>
+          <span id="detailMood"></span>
+        </div>
+        <div id="detailContent" class="entry-content"></div>
+        <div id="detailTags" class="entry-tags"></div>
+        <div class="entry-actions">
+          <button id="editEntryBtn">Edit</button>
+          <button id="deleteEntryBtn">Delete</button>
+        </div>
+      </section>
+    </main>
   </div>
 
+  <!-- Notification -->
+  <div class="notification" id="notification"></div>
+
+  <!-- JS Logic -->
   <script src="script.js" defer></script>
 </body>
 </html>
