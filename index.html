@@ -1,0 +1,91 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Social Diary</title>
+  <link rel="stylesheet" href="style.css" />
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+</head>
+<body>
+  <div class="app-container">
+    <aside class="sidebar">
+      <div class="user-profile">
+        <div class="avatar">sy</div>
+        <h3 id="username">User</h3>
+      </div>
+      <nav>
+        <ul>
+          <li class="active"><a href="#" id="newentrybtn"><i class="fas fa-plus"></i> New Entry</a></li>
+          <li><a href="#" id="viewentriesbtn"><i class="fas fa-list"></i> View Entries</a></li>
+          <li><a href="#" id="statsbtn"><i class="fas fa-chart-bar"></i> Statistics</a></li>
+          <li><a href="#" id="settingsbtn"><i class="fas fa-cog"></i> Settings</a></li>
+        </ul>
+      </nav>
+      <div class="mood-tracker">
+        <h3>Today's Mood</h3>
+        <div class="mood-options">
+          <span class="mood-option" data-mood="happy">😊</span>
+          <span class="mood-option" data-mood="neutral">😐</span>
+          <span class="mood-option" data-mood="sad">😢</span>
+          <span class="mood-option" data-mood="angry">😡</span>
+          <span class="mood-option" data-mood="excited">🤩</span>
+        </div>
+        <div id="selected-mood"></div>
+      </div>
+    </aside>
+    <main class="content-area">
+      <section id="new-entry-section" class="active-section">
+        <h2>New Diary Entry</h2>
+        <form id="diary-form">
+          <div class="form-group">
+            <label for="entrydate">Date:</label>
+            <input type="date" id="entrydate" required>
+          </div>
+          <div class="form-group">
+            <label for="entrytitle">Title:</label>
+            <input type="text" id="entrytitle" placeholder="What's the highlight of your day?" required>
+          </div>
+          <div class="form-group">
+            <label for="entrycontent">Your Entry:</label>
+            <textarea id="entrycontent" rows="10" placeholder="Write about your day..." required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Tags:</label>
+            <div class="tags-container">
+              <input type="text" id="taginput" placeholder="Add tags (friends, events...)">
+              <button type="button" id="addtagbtn">Add</button>
+            </div>
+            <div id="tagsdisplay"></div>
+          </div>
+          <button type="submit" id="saveentrybtn">Save Entry</button>
+        </form>
+      </section>
+      <section id="viewentriessection" class="section">
+        <h2>Your Diary Entries</h2>
+        <div class="search-filter">
+          <input type="text" id="searchentries" placeholder="Search entries...">
+          <select id="filterbymood">
+            <option value="">All moods</option>
+            <option value="happy">Happy</option>
+            <option value="neutral">Neutral</option>
+            <option value="sad">Sad</option>
+            <option value="angry">Angry</option>
+            <option value="excited">Excited</option>
+          </select>
+          <select id="filterbydate">
+            <option value="">All dates</option>
+            <option value="today">Today</option>
+            <option value="week">This Week</option>
+            <option value="month">This Month</option>
+          </select>
+        </div>
+        <div id="entrieslist"></div>
+      </section>
+    </main>
+  </div>
+  <div class="notifications" id="notification"></div>
+  <script src="script.js" defer></script>
+</body>
+</html>
