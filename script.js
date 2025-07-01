@@ -214,3 +214,17 @@ if (navigator.share) {
     });
   });
 }
+const correctPIN = "1234"; // Change this PIN if needed
+const pinScreen = document.getElementById("pin-lock");
+const pinInput = document.getElementById("pinInput");
+const unlockBtn = document.getElementById("unlockBtn");
+const pinError = document.getElementById("pinError");
+
+unlockBtn.addEventListener("click", () => {
+  const enteredPIN = pinInput.value.trim();
+  if (enteredPIN === correctPIN) {
+    pinScreen.style.display = "none";
+  } else {
+    pinError.textContent = "Incorrect PIN. Try again.";
+  }
+});
