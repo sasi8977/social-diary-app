@@ -94,17 +94,33 @@ function updateEntriesList() {
     .forEach(entry => {
       const card = document.createElement("div");
       card.className = "entry-card";
+
       card.innerHTML = `
-        <h3>${entry.title}</h3>
-        <p><strong>Date:</strong> ${entry.date}</p>
-        <p><strong>Mood:</strong> ${entry.mood}</p>
-        <p>${entry.content}</p>
-        <div class="tags">
+        <div class="entry-card-header">
+          <div class="entry-date">${entry.date}</div>
+          <div class="entry-mood">${getMoodEmoji(entry.mood)} ${entry.mood}</div>
+        </div>
+        <h3 class="entry-title">${entry.title}</h3>
+        <p class="entry-content">${entry.content}</p>
+        <div class="entry-tags">
           ${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join(" ")}
         </div>
       `;
+
       list.appendChild(card);
     });
+}
+
+// Helper to show emoji for mood
+function getMoodEmoji(mood) {
+  const moodMap = {
+    happy: "😊",
+    neutral: "😐",
+    sad: "😢",
+    angry: "😠",
+    excited: "🤩"
+  };
+  return moodMap[mood] || "😐";
 }
 
 // Stats
