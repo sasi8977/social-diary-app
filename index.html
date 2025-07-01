@@ -13,19 +13,20 @@
   <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Font Awesome -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" 
-      integrity="sha512-HRXm8i+8EJGePL0mZ6d/NuBqvUce2cYeJdRnkkA9+L3iRUpci2mwsy7Hcc7cKdxD6Ab3X1AyX+M+HLRco92mA==" 
-      crossorigin="anonymous" 
-      referrerpolicy="no-referrer" />
+  <!-- Font Awesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"
+        integrity="sha512-HRXm8i+8EJGePL0mZ6d/NuBqvUce2cYeJdRnkkA9+L3iRUpci2mwsy7Hcc7cKdxD6Ab3X1AyX+M+HLRco92mA=="
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer" />
 </head>
 
 <body>
   <!-- Install & Share Buttons -->
-<div class="top-actions">
-  <button id="installBtn" style="display: none;" class="action-btn">📲 Install App</button>
-  <button id="shareBtn" style="display: none;" class="action-btn">🔗 Share This App</button>
-</div>
+  <div class="top-actions">
+    <button id="installBtn" style="display: none;" class="action-btn">📲 Install App</button>
+    <button id="shareBtn" style="display: none;" class="action-btn">🔗 Share This App</button>
+  </div>
+
   <!-- Header -->
   <header class="app-header">
     <div class="header-left">
@@ -196,13 +197,8 @@
 
   <!-- JavaScript -->
   <script src="script.js" defer></script>
-  <!-- Install Prompt -->
-<button id="installBtn" class="install-btn">📲 Install App</button>
 
-<!-- Share Entry (optional enhancement) -->
-<button id="shareBtn" class="share-btn" style="display:none;">🔗 Share This App</button>
-
-<script src="script.js" defer></script>
+  <!-- Register Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js', { scope: './' })
@@ -214,9 +210,5 @@
         });
     }
   </script>
-</body>
-</html>
-</body>
-</html>
 </body>
 </html>
