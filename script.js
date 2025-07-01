@@ -1,191 +1,154 @@
-let selectedMood = '';
+let selectedMood = "";
 let entries = [];
-if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js')
-    .then(() => console.log("Service Worker Registered"));
-}
 
 document.addEventListener("DOMContentLoaded", () => {
+  // Show today's date
+  const today = new Date();
+  document.getElementById("today-date").textContent = today.toDateString();
+
+  // Load saved entries from localStorage
+  if (localStorage.getItem("entries")) {
+    entries = JSON.parse(localStorage.getItem("entries"));
+    updateEntriesList();
+    updateStats();
+  }
+
   // Mood selection
   document.querySelectorAll(".mood-option").forEach(option => {
     option.addEventListener("click", () => {
       selectedMood = option.dataset.mood;
-      document.getElementById("selected-mood").textContent = \`You feel: \${selectedMood}\`;
+      document.getElementById("selectedMood").textContent = `You feel: ${selectedMood}`;
     });
   });
 
-  // Handle entry form submission
-  document.getElementById("diary-form").addEventListener("submit", e => {
+  // Save diary entry
+  document.getElementById("diaryForm").addEventListener("submit", e => {
     e.preventDefault();
 
-    const title = document.getElementById("entry-title").value.trim();
-    const content = document.getElementById("entry-content").value.trim();
-    const date = document.getElementById("entry-date").value;
-    const tagsInput = document.getElementById("tag-input").value.trim();
-
-    if (!title || !content || !date || !selectedMood) {
-      alert("Please fill in all fields and select a mood.");
-      return;
-    }
-
-    const tags = tagsInput ? tagsInput.split(",").map(tag => tag.trim()) : [];
-
-    const newEntry = {
-      id: Date.now(),
-      title,
-      content,
-      date,
-      mood: selectedMood,
-      tags
+    const entry = {
+      date: document.getElementById("entryDate").value,
+      title: document.getElementById("entryTitle").value,
+      content: document.getElementById("entryContent").value,
+      mood: selectedMood || "neutral",
+      tags: getTagsFromDisplay()
     };
 
-    entries.push(newEntry);
-    saveEntries();
-    displayEntries();
-    renderstats();
-    document.getElementById("diary-form").reset();
-    document.getElementById("selected-mood").textContent = "";
+    entries.push(entry);
+    localStorage.setItem("entries", JSON.stringify(entries));
+    updateEntriesList();
+    updateStats();
+    e.target.reset();
+    document.getElementById("tagsDisplay").innerHTML = "";
     selectedMood = "";
+    document.getElementById("selectedMood").textContent = "";
+    alert("Entry saved!");
   });
 
-  displayEntries();
-});
-
-// Save entries to localStorage
-function saveEntries() {
-  localStorage.setItem("diaryEntries", JSON.stringify(entries));
-}
-
-// Load entries from localStorage
-function loadEntries() {
-  const saved = localStorage.getItem("diaryEntries");
-  if (saved) entries = JSON.parse(saved);
-}
-
-// Display entries on the page
-entries.forEach(entry=> {
-renderEntry(entry);
-});
-  // clear the old list
-  document.getElementById('entrieslist').innerHTML = '';
-
-  // loop through entries
-  entries.forEach(entry => {
-    // OLD CODE: build entry HTML (probably as a list or basic div)
-
-    // 🔥 Replace that block with the new renderEntry(entry)
+  // Add tag
+  document.getElementById("addTagBtn").addEventListener("click", () => {
+    const tagInput = document.getElementById("tagsInput");
+    const tag = tagInput.value.trim();
+    if (tag) {
+      const tagSpan = document.createElement("span");
+      tagSpan.textContent = tag;
+      tagSpan.className = "tag";
+      document.getElementById("tagsDisplay").appendChild(tagSpan);
+      tagInput.value = "";
+    }
   });
+
+  // Search + filter entries
+  document.getElementById("searchEntries").addEventListener("input", updateEntriesList);
+  document.getElementById("filterMood").addEventListener("change", updateEntriesList);
+});
+
+// Utility: Extract tags
+function getTagsFromDisplay() {
+  return Array.from(document.querySelectorAll("#tagsDisplay .tag")).map(tag => tag.textContent);
 }
-  loadEntries();
-  const list = document.getElementById("entries-list");
+
+// Render entries
+function updateEntriesList() {
+  const list = document.getElementById("entriesList");
+  const search = document.getElementById("searchEntries").value.toLowerCase();
+  const filterMood = document.getElementById("filterMood").value;
   list.innerHTML = "";
 
-  if (entries.length === 0) {
-    list.innerHTML = "<p>No entries yet.</p>";
-    return;
+  entries
+    .filter(entry =>
+      (entry.title.toLowerCase().includes(search) ||
+        entry.content.toLowerCase().includes(search)) &&
+      (!filterMood || entry.mood === filterMood)
+    )
+    .forEach(entry => {
+      const card = document.createElement("div");
+      card.className = "entry-card";
+      card.innerHTML = `
+        <h3>${entry.title}</h3>
+        <p><strong>Date:</strong> ${entry.date}</p>
+        <p><strong>Mood:</strong> ${entry.mood}</p>
+        <p>${entry.content}</p>
+        <div class="tags">
+          ${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join(" ")}
+        </div>
+      `;
+      list.appendChild(card);
+    });
+}
+
+// Stats
+function updateStats() {
+  document.getElementById("totalEntries").textContent = entries.length;
+
+  const moodCount = {};
+  entries.forEach(entry => {
+    moodCount[entry.mood] = (moodCount[entry.mood] || 0) + 1;
+  });
+
+  let mostFrequentMood = "-";
+  let max = 0;
+  for (const mood in moodCount) {
+    if (moodCount[mood] > max) {
+      max = moodCount[mood];
+      mostFrequentMood = mood;
+    }
   }
 
-  entries.forEach(entry => {
-    const card = document.createElement("div");
-    card.className = "entry-card";
+  const frequentMoodEl = document.getElementById("frequentMood");
+  if (frequentMoodEl) frequentMoodEl.textContent = mostFrequentMood;
 
-    card.innerHTML = \`
-      <h3>\${entry.title}</h3>
-      <div class="entry-meta">
-        <span>\${entry.date}</span> • <span>Mood: \${entry.mood}</span>
-      </div>
-      <p>\${entry.content.substring(0, 150)}...</p>
-      <div class="entry-tags">
-        \${entry.tags.map(tag => \`<span>#\${tag}</span>\`).join("")}
-      </div>
-    \`;
-
-    list.appendChild(card);
-    const dateDisplay = document.getElementById("today-date");
-const today = new Date().toLocaleDateString(undefined, {
-  weekday: "long",
-  month: "short",
-  day: "numeric"
-});
-dateDisplay.textContent = `Today is ${today}`;
- });
+  drawMoodChart(moodCount);
 }
-function renderEntry(entry) {
-  const card = document.createElement('div');
-  card.classList.add('entry-card');
 
-  const title = document.createElement('h3');
-  title.textContent = entry.title;
+// Mood chart
+function drawMoodChart(data) {
+  const ctx = document.getElementById("moodChart");
+  if (!ctx) return;
 
-  const meta = document.createElement('div');
-  meta.classList.add('entry-meta');
-  meta.textContent = `${entry.date} • ${entry.mood}`;
+  const labels = Object.keys(data);
+  const values = Object.values(data);
 
-  const content = document.createElement('div');
-  content.classList.add('entry-content-preview');
-  content.textContent = entry.content;
+  if (window.moodChartInstance) {
+    window.moodChartInstance.destroy();
+  }
 
-  const tags = document.createElement('div');
-  tags.classList.add('entry-tags');
-  entry.tags.forEach(tag => {
-    const tagEl = document.createElement('span');
-    tagEl.classList.add('entry-tag');
-    tagEl.textContent = tag;
-    tags.appendChild(tagEl);
+  window.moodChartInstance = new Chart(ctx, {
+    type: "bar",
+    data: {
+      labels,
+      datasets: [{
+        label: "Mood Count",
+        data: values,
+        backgroundColor: "#5e60ce"
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: {
+        y: {
+          beginAtZero: true
+        }
+      }
+    }
   });
-
-  card.append(title, meta, content, tags);
-  document.getElementById('entrieslist').appendChild(card);
-}
-function renderStats() {
-  const total = entries.length;
-  document.getElementById("totalEntries").textContent = total;
-
-  // Mood count
-  const counts = {};
-  entries.forEach(e => {
-    counts[e.mood] = (counts[e.mood] || 0) + 1;
-  });
-
-  // Most frequent mood
-  const frequent = Object.entries(counts).sort((a,b) => b[1] - a[1])[0];
-  document.getElementById("frequentMood").textContent = frequent ? frequent[0] : "-";
-
-  // Mood chart bars
-  const chart = document.getElementById("moodChart");
-  chart.innerHTML = "";
-  Object.entries(counts).forEach(([mood, count]) => {
-    const pct = Math.round((count/total) * 100);
-    const row = document.createElement("div");
-    row.className = "mood-bar";
-    row.innerHTML = `
-      <span>${mood.charAt(0).toUpperCase()+mood.slice(1)}</span>
-      <div style="width:${pct}%;"></div>
-      <span style="margin-left:0.5rem">${pct}%</span>
-    `;
-    chart.appendChild(row);
-  });
-
-  // Word cloud
-  const wc = document.getElementById("wordCloud");
-  wc.innerHTML = "";
-  const freq = {};
-  entries.forEach(e => {
-    e.content.toLowerCase().split(/\W+/).forEach(w => {
-      if (w.length > 3) freq[w] = (freq[w] || 0) + 1;
-    });
-  });
-  const sorted = Object.entries(freq).sort((a,b) => b[1] - a[1]).slice(0, 30);
-  sorted.forEach(([word, count]) => {
-    const span = document.createElement("span");
-    const size = 12 + count * 2;
-    span.textContent = word;
-    span.style.fontSize = size + "px";
-    wc.appendChild(span);
-  });
-}
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("service-worker.js")
-    .then(reg => console.log("✅ Service Worker Registered"))
-    .catch(err => console.error("❌ Service Worker Failed", err));
 }
