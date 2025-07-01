@@ -177,3 +177,43 @@ button:hover {
   text-align: center;
   margin-top: 10px;
 }
+/* GENERAL */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background-color: #f4f4f4;
+  color: #333;
+}
+
+.app-header, .section, .entry-card, .stat-card, .form-group {
+  border-radius: 1rem;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+  background-color: #fff;
+  margin: 1rem;
+  padding: 1rem;
+}
+
+/* Responsive Layout */
+@media (max-width: 768px) {
+  .app {
+    flex-direction: column;
+  }
+
+  .sidebar {
+    width: 100%;
+    order: 2;
+  }
+
+  .content-area {
+    width: 100%;
+    order: 1;
+  }
+
+  .form-group input,
+  .form-group textarea,
+  .form-group select {
+    width: 100%;
+    font-size: 1rem;
+    padding: 0.75rem;
+  }
+}
