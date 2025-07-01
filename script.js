@@ -214,17 +214,25 @@ if (navigator.share) {
     });
   });
 }
-const correctPIN = "1234"; // Change this PIN if needed
-const pinScreen = document.getElementById("pin-lock");
-const pinInput = document.getElementById("pinInput");
-const unlockBtn = document.getElementById("unlockBtn");
-const pinError = document.getElementById("pinError");
+document.addEventListener("DOMContentLoaded", () => {
+  // ... your existing DOMContentLoaded code ...
 
-unlockBtn.addEventListener("click", () => {
-  const enteredPIN = pinInput.value.trim();
-  if (enteredPIN === correctPIN) {
-    pinScreen.style.display = "none";
-  } else {
-    pinError.textContent = "Incorrect PIN. Try again.";
-  }
+  // 🔐 PIN Lock Setup
+  const correctPIN = "1234";
+  const pinScreen = document.getElementById("pin-lock");
+  const pinInput = document.getElementById("pinInput");
+  const unlockBtn = document.getElementById("unlockBtn");
+  const pinError = document.getElementById("pinError");
+
+  pinScreen.style.display = "flex"; // Show PIN screen initially
+
+  unlockBtn.addEventListener("click", () => {
+    const enteredPIN = pinInput.value.trim();
+    if (enteredPIN === correctPIN) {
+      pinScreen.style.display = "none";
+    } else {
+      pinError.textContent = "Incorrect PIN. Try again.";
+      pinInput.value = "";
+    }
+  });
 });
