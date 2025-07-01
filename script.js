@@ -152,3 +152,38 @@ function drawMoodChart(data) {
     }
   });
 }
+// Install PWA Prompt
+let deferredPrompt;
+const installBtn = document.getElementById("installBtn");
+
+window.addEventListener("beforeinstallprompt", (e) => {
+  e.preventDefault();
+  deferredPrompt = e;
+  installBtn.style.display = "block";
+});
+
+installBtn.addEventListener("click", () => {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then((choiceResult) => {
+      if (choiceResult.outcome === "accepted") {
+        console.log("User accepted the A2HS prompt");
+      }
+      deferredPrompt = null;
+      installBtn.style.display = "none";
+    });
+  }
+});
+
+// Web Share API
+const shareBtn = document.getElementById("shareBtn");
+if (navigator.share) {
+  shareBtn.style.display = "block";
+  shareBtn.addEventListener("click", () => {
+    navigator.share({
+      title: "Social Diary",
+      text: "Track your daily mood and thoughts!",
+      url: window.location.href,
+    });
+  });
+}
