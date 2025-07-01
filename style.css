@@ -1,82 +1,87 @@
+/* Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 :root {
   --primary-color: #5e60ce;
-  --secondary-color: #6930c3;
-  --accent-color: #f72585;
-  --bg-color: #f1f1f1;
+  --secondary-color: #4361ee;
+  --accent-color: #7209b7;
+  --bg-color: #f8f9fa;
   --text-color: #333;
-  --card-bg: #fff;
+  --card-bg: #ffffff;
   --border-radius: 1rem;
-  --shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  --font-main: 'Segoe UI', sans-serif;
-}
-
-/* Reset */
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
 body {
-  font-family: var(--font-main);
-  background-color: var(--bg-color);
+  font-family: 'Poppins', sans-serif;
+  margin: 0;
+  background: var(--bg-color);
   color: var(--text-color);
-  line-height: 1.6;
 }
 
-header {
-  background-color: var(--primary-color);
+/* Header */
+.app-header {
+  background: var(--primary-color);
   color: #fff;
-  padding: 1rem 2rem;
-  text-align: center;
-  font-size: 1.5rem;
-  box-shadow: var(--shadow);
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
-main {
+.app-brand {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* Avatar + Greeting */
+.avatar-circle {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+  color: var(--primary-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  margin-right: 10px;
+}
+
+/* Main App Layout */
+.app {
+  display: flex;
+  flex-direction: column;
   padding: 1rem;
 }
 
-/* Mood Picker */
+.sidebar {
+  margin-bottom: 2rem;
+}
+
 .mood-tracker {
-  margin: 1.5rem 0;
-  text-align: center;
+  margin-top: 2rem;
 }
 
 .mood-options {
-  display: flex;
-  justify-content: center;
-  gap: 1rem;
-  flex-wrap: wrap;
-  margin-top: 0.5rem;
+  font-size: 1.5rem;
 }
 
 .mood-option {
-  font-size: 2rem;
-  padding: 0.5rem;
+  margin: 0 0.5rem;
   cursor: pointer;
-  border-radius: 50%;
-  transition: transform 0.2s ease;
-  background-color: var(--card-bg);
-  box-shadow: var(--shadow);
+  transition: transform 0.2s;
 }
 
 .mood-option:hover {
-  transform: scale(1.2);
+  transform: scale(1.3);
 }
 
-#selected-mood {
-  margin-top: 0.5rem;
-  font-weight: bold;
-  font-size: 1.1rem;
-}
-
-/* Diary Form */
+/* Entry Form */
 form {
   background: var(--card-bg);
+  padding: 1.5rem;
   border-radius: var(--border-radius);
-  padding: 1rem;
   box-shadow: var(--shadow);
   margin-bottom: 2rem;
 }
@@ -85,262 +90,70 @@ form {
   margin-bottom: 1rem;
 }
 
-.form-group label {
-  display: block;
-  font-weight: bold;
-  margin-bottom: 0.3rem;
-}
-
-input[type="text"],
-input[type="date"],
-textarea {
+input, textarea, select, button {
   width: 100%;
-  padding: 0.6rem;
-  border-radius: 0.5rem;
+  padding: 0.75rem;
   border: 1px solid #ccc;
-  font-size: 1rem;
-}
-
-textarea {
-  resize: vertical;
-  min-height: 120px;
+  border-radius: var(--border-radius);
+  font-family: inherit;
 }
 
 button {
-  padding: 0.6rem 1.2rem;
-  background-color: var(--accent-color);
-  color: white;
+  background: var(--primary-color);
+  color: #fff;
   border: none;
-  border-radius: 0.5rem;
-  font-size: 1rem;
   cursor: pointer;
-  transition: background 0.2s ease;
+  margin-top: 1rem;
+  transition: background 0.3s;
 }
 
 button:hover {
-  background-color: #d61e70;
+  background: var(--accent-color);
 }
 
-/* Entries */
+/* Diary Entry Cards */
 .entries-list {
-  display: grid;
+  display: flex;
+  flex-direction: column;
   gap: 1rem;
 }
 
 .entry-card {
   background: var(--card-bg);
-  border-radius: var(--border-radius);
   padding: 1rem;
+  border-radius: var(--border-radius);
   box-shadow: var(--shadow);
 }
 
 .entry-card h3 {
-  margin-bottom: 0.3rem;
-  color: var(--primary-color);
+  margin-top: 0;
 }
 
-.entry-meta {
-  font-size: 0.8rem;
-  color: gray;
-  margin-bottom: 0.5rem;
-}
-
-.entry-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.3rem;
-}
-
-.entry-tags span {
-  background-color: var(--secondary-color);
+.tags .tag {
+  background: var(--secondary-color);
   color: #fff;
-  padding: 0.3rem 0.5rem;
-  border-radius: 1rem;
-  font-size: 0.75rem;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  display: inline-block;
+  margin-right: 5px;
+  font-size: 0.8rem;
+}
+
+/* Statistics & Word Cloud */
+.stats, .word-cloud {
+  background: var(--card-bg);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
 }
 
 /* Responsive */
-@media (max-width: 600px) {
-  header {
-    font-size: 1.2rem;
-    padding: 1rem;
-  }
-
-  .mood-option {
-    font-size: 1.5rem;
+@media (max-width: 768px) {
+  .app {
+    padding: 0.5rem;
   }
 
   form {
-    padding: 0.8rem;
+    padding: 1rem;
   }
-}
-/* New App Header */
-.app-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  background: var(--primary-color);
-  color: #fff;
-  padding: 1rem 1.5rem;
-  box-shadow: var(--box-shadow);
-  border-radius: 0 0 20px 20px;
-}
-
-.header-left {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.avatar-circle {
-  background: #fff;
-  color: var(--primary-color);
-  font-weight: bold;
-  border-radius: 50%;
-  width: 50px;
-  height: 50px;
-  font-size: 1.2rem;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.greeting-text h2 {
-  margin: 0;
-  font-size: 1.2rem;
-}
-
-.greeting-text p {
-  margin: 0;
-  font-size: 0.9rem;
-  opacity: 0.8;
-}
-
-.header-right .app-brand {
-  font-size: 1rem;
-  font-weight: bold;
-  letter-spacing: 0.5px;
-}
-.entries-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  padding-bottom: 2rem;
-}
-
-.entry-card {
-  background: #fff;
-  border-radius: 16px;
-  box-shadow: 0 2px 10px rgba(0,0,0,0.06);
-  padding: 1.25rem;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
-  border-left: 6px solid var(--accent-color);
-}
-
-.entry-card:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.08);
-}
-
-.entry-card h3 {
-  margin: 0 0 0.5rem;
-  font-size: 1.25rem;
-  color: var(--primary-color);
-  font-weight: 600;
-}
-
-.entry-meta {
-  font-size: 0.85rem;
-  color: #777;
-  margin-bottom: 0.75rem;
-}
-
-.entry-content-preview {
-  color: #444;
-  font-size: 1rem;
-  line-height: 1.5;
-  overflow: hidden;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-}
-
-.entry-tags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 0.75rem;
-}
-
-.entry-tag {
-  background-color: var(--accent-color);
-  color: white;
-  font-size: 0.75rem;
-  padding: 0.3rem 0.6rem;
-  border-radius: 20px;
-}
-.stats-container {
-  display: flex;
-  gap: 2rem;
-  flex-wrap: wrap;
-  margin-bottom: 1rem;
-}
-
-#moodChart {
-  background: white;
-  padding: 1rem;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-}
-
-.mood-bar {
-  display: flex;
-  align-items: center;
-  margin-bottom: 0.5rem;
-}
-
-.mood-bar span {
-  width: 100px;
-}
-
-.mood-bar div {
-  height: 10px;
-  border-radius: 5px;
-  background-color: var(--accent-color);
-}
-
-.word-cloud {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.5rem;
-  padding: 1rem;
-  background: white;
-  border-radius: var(--border-radius);
-  box-shadow: var(--box-shadow);
-}
-
-.word-cloud span {
-  font-weight: bold;
-  color: var(--primary-color);
-  opacity: 0.7;
-}
-.install-btn, .share-btn {
-  position: fixed;
-  bottom: 16px;
-  right: 16px;
-  padding: 10px 14px;
-  background-color: var(--primary-color, #5e60ce);
-  color: white;
-  border: none;
-  border-radius: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
-  font-size: 16px;
-  cursor: pointer;
-  z-index: 1000;
-}
-.install-btn {
-  right: 16px;
-}
-.share-btn {
-  right: 130px;
 }
