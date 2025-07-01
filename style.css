@@ -324,3 +324,23 @@ button:hover {
   color: var(--primary-color);
   opacity: 0.7;
 }
+.install-btn, .share-btn {
+  position: fixed;
+  bottom: 16px;
+  right: 16px;
+  padding: 10px 14px;
+  background-color: var(--primary-color, #5e60ce);
+  color: white;
+  border: none;
+  border-radius: 1rem;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 1000;
+}
+.install-btn {
+  right: 16px;
+}
+.share-btn {
+  right: 130px;
+}
