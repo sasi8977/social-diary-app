@@ -173,3 +173,7 @@ button:hover {
 .action-btn:hover {
   background-color: var(--secondary-color);
 }
+.top-action {
+  text-align: center;
+  margin-top: 10px;
+}
