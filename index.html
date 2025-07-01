@@ -27,7 +27,13 @@
     <button id="installBtn" style="display: none;" class="action-btn">📲 Install App</button>
     <button id="shareBtn" style="display: none;" class="action-btn">🔗 Share This App</button>
   </div>
-
+<!-- PIN Lock Screen -->
+<div id="pin-lock" class="pin-lock-screen">
+  <h2>Enter PIN to Unlock</h2>
+  <input type="password" id="pinInput" maxlength="4" placeholder="Enter 4-digit PIN" />
+  <button id="unlockBtn">Unlock</button>
+  <p id="pinError" class="error-msg"></p>
+</div>
   <!-- Header -->
   <header class="app-header">
     <div class="header-left">
