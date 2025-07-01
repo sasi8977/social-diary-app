@@ -1,36 +1,22 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <!-- Required Meta Tags -->
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Social Diary</title>
 
-  <!-- PWA Support -->
+  <!-- Manifest and Icons -->
   <link rel="manifest" href="manifest.json" />
-  <link rel="icon" type="image/png" href="icons/icon-192.png" />
+  <link rel="icon" href="icons/icon-192.png" type="image/png" />
   <meta name="theme-color" content="#3f51b5" />
 
   <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Font Awesome Icons -->
-  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous"></script>
+  <!-- Font Awesome -->
+  <script src="https://kit.fontawesome.com/a076d05399.js" crossorigin="anonymous" defer></script>
 </head>
 
-  <!-- PWA Essentials -->
-  <link rel="manifest" href="manifest.json" />
-  <meta name="theme-color" content="#3f51b5" />
-  <link rel="icon" type="image/png" href="icons/icon-192.png" />
-
-  <!-- Styles -->
-  <link rel="stylesheet" href="style.css" />
-
-  <!-- Icons -->
-  <script src="https://kit.fontawesome.com/a076d05399.js"
-    crossorigin="anonymous"></
-    script>
-</head>
 <body>
   <!-- Header -->
   <header class="app-header">
@@ -200,17 +186,7 @@
   <!-- Notification -->
   <div class="notification" id="notification"></div>
 
-  <!-- JS Logic -->
-  <script>
-  if ('serviceWorker' in navigator) {
-    window.addEventListener('load', function () {
-      navigator.serviceWorker.register('sw.js')
-        .then(function (registration) {
-          console.log('✅ Service Worker registered:', registration.scope);
-        })
-        .catch(function (error) {
-          console.log('❌ Service Worker registration failed:', error);
-        });
-    });
-  }
-</script>
+  <!-- JavaScript -->
+  <script src="script.js" defer></script>
+</body>
+</html>
