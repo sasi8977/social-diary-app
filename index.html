@@ -200,6 +200,19 @@
 <button id="shareBtn" class="share-btn" style="display:none;">🔗 Share This App</button>
 
 <script src="script.js" defer></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js', { scope: './' })
+        .then(reg => {
+          console.log('✅ Service Worker registered with scope:', reg.scope);
+        })
+        .catch(err => {
+          console.error('❌ Service Worker registration failed:', err);
+        });
+    }
+  </script>
+</body>
+</html>
 </body>
 </html>
 </body>
