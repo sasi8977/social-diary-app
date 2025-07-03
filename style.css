@@ -292,3 +292,29 @@ textarea#entryContent {
   text-align: center;
   margin-top: 10px;
 }
+.emoji-picker {
+  margin-top: 1rem;
+}
+
+#emojiList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  background: #f1f1f1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+#emojiList span {
+  font-size: 1.5rem;
+  cursor: pointer;
+}
+
+.entry-gif {
+  max-width: 100%;
+  margin-top: 1rem;
+  border-radius: 10px;
+}
