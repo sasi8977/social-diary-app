@@ -1,5 +1,5 @@
 let selectedMood = '';
-let entries = [];
+let entries = JSON.parse(localStorage.getItem("entries")) || [];
 
 // 🔐 PIN Lock Logic
 window.addEventListener('DOMContentLoaded', () => {
@@ -21,6 +21,26 @@ window.addEventListener('DOMContentLoaded', () => {
       pinError.textContent = 'Incorrect PIN. Try again.';
     }
   });
+
+  // === Emoji Picker ===
+  const emojiPickerBtn = document.getElementById("toggleEmojiPicker");
+  const emojiList = document.getElementById("emojiList");
+  const entryContent = document.getElementById("entryContent");
+
+  const emojis = ["😊", "😢", "😂", "😍", "😠", "😎", "👍", "🎉", "💖", "🙏", "🌈", "🔥"];
+
+  emojiPickerBtn?.addEventListener("click", () => {
+    emojiList.style.display = emojiList.style.display === "none" ? "flex" : "none";
+  });
+
+  if (emojiList) {
+    emojiList.innerHTML = emojis.map(e => `<span>${e}</span>`).join("");
+    emojiList.addEventListener("click", (e) => {
+      if (e.target.tagName === "SPAN") {
+        entryContent.value += e.target.textContent;
+      }
+    });
+  }
 });
 
 // 📅 Date Display
@@ -41,13 +61,16 @@ const diaryForm = document.getElementById('diaryForm');
 if (diaryForm) {
   diaryForm.addEventListener('submit', e => {
     e.preventDefault();
+
     const entry = {
       date: document.getElementById('entryDate').value,
       title: document.getElementById('entryTitle').value,
       content: document.getElementById('entryContent').value,
       mood: selectedMood,
-      tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(tag => tag.textContent)
+      tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(tag => tag.textContent),
+      gifUrl: document.getElementById('gifUrl')?.value || ""
     };
+
     entries.push(entry);
     localStorage.setItem('entries', JSON.stringify(entries));
     alert('Diary entry saved!');
@@ -91,7 +114,7 @@ window.addEventListener('beforeinstallprompt', e => {
   installBtn.style.display = 'inline-block';
 });
 
-installBtn.addEventListener('click', () => {
+installBtn?.addEventListener('click', () => {
   deferredPrompt.prompt();
   deferredPrompt.userChoice.then(choice => {
     if (choice.outcome === 'accepted') {
@@ -117,7 +140,7 @@ if (navigator.share) {
 const profilePicInput = document.getElementById('profilePicInput');
 const profilePic = document.getElementById('profilePic');
 
-profilePicInput.addEventListener('change', function () {
+profilePicInput?.addEventListener('change', function () {
   const file = this.files[0];
   if (file) {
     const reader = new FileReader();
