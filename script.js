@@ -1,19 +1,9 @@
 let selectedMood = "";
 let entries = [];
-// Register Service Worker
-if ('serviceWorker' in navigator) {
-  window.addEventListener('load', () => {
-    navigator.serviceWorker.register('sw.js')
-      .then(reg => {
-        console.log("✅ Service Worker registered:", reg);
-      })
-      .catch(err => {
-        console.error("❌ Service Worker registration failed:", err);
-      });
-  });
-}
+
 // Redirect to login if not logged in
-if (!localStorage.getItem("loggedInUser")) {
+const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+if (!loggedInUser) {
   window.location.href = "login.html";
 }
 
@@ -22,14 +12,14 @@ document.addEventListener("DOMContentLoaded", () => {
   const today = new Date();
   document.getElementById("today-date").textContent = today.toDateString();
 
-  // Load saved entries from localStorage
+  // Load entries
   if (localStorage.getItem("entries")) {
     entries = JSON.parse(localStorage.getItem("entries"));
     updateEntriesList();
     updateStats();
   }
 
-  // Mood selection
+  // Mood picker
   document.querySelectorAll(".mood-option").forEach(option => {
     option.addEventListener("click", () => {
       selectedMood = option.dataset.mood;
@@ -37,10 +27,9 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // Save diary entry
+  // Save entry
   document.getElementById("diaryForm").addEventListener("submit", e => {
     e.preventDefault();
-
     const entry = {
       date: document.getElementById("entryDate").value,
       title: document.getElementById("entryTitle").value,
@@ -48,7 +37,6 @@ document.addEventListener("DOMContentLoaded", () => {
       mood: selectedMood || "neutral",
       tags: getTagsFromDisplay()
     };
-
     entries.push(entry);
     localStorage.setItem("entries", JSON.stringify(entries));
     updateEntriesList();
@@ -73,17 +61,100 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
-  // Search + filter entries
+  // Search and filter
   document.getElementById("searchEntries").addEventListener("input", updateEntriesList);
   document.getElementById("filterMood").addEventListener("change", updateEntriesList);
+
+  // Avatar and name
+  document.getElementById("usernameDisplay").textContent = loggedInUser.name;
+  const avatarEls = document.querySelectorAll(".avatar, .avatar-circle");
+  avatarEls.forEach(el => el.textContent = loggedInUser.name.slice(0, 2).toUpperCase());
+
+  // PIN LOCK screen
+  const pinScreen = document.getElementById("pin-lock");
+  const pinInput = document.getElementById("pinInput");
+  const unlockBtn = document.getElementById("unlockBtn");
+  const pinError = document.getElementById("pinError");
+
+  unlockBtn.addEventListener("click", () => {
+    const enteredPIN = pinInput.value.trim();
+    if (enteredPIN === "1234") {
+      pinScreen.style.display = "none";
+    } else {
+      pinError.textContent = "Incorrect PIN. Try again.";
+    }
+  });
+
+  // Profile Pic Load
+  const profilePic = document.getElementById("profilePic");
+  if (localStorage.getItem("profilePic")) {
+    profilePic.src = localStorage.getItem("profilePic");
+  }
+
+  // Profile Pic Save
+  const profilePicInput = document.getElementById("profilePicInput");
+  profilePicInput.addEventListener("change", () => {
+    const file = profilePicInput.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      const imgData = e.target.result;
+      profilePic.src = imgData;
+      localStorage.setItem("profilePic", imgData);
+    };
+    reader.readAsDataURL(file);
+  });
+
+  // Logout
+  const logoutBtn = document.getElementById("logoutBtn");
+  if (logoutBtn) {
+    logoutBtn.addEventListener("click", () => {
+      localStorage.removeItem("loggedInUser");
+      window.location.href = "login.html";
+    });
+  }
+
+  // Install App
+  let deferredPrompt;
+  const installBtn = document.getElementById("installBtn");
+  window.addEventListener("beforeinstallprompt", (e) => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = "block";
+  });
+  installBtn.addEventListener("click", () => {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(choiceResult => {
+        if (choiceResult.outcome === "accepted") {
+          console.log("User accepted the A2HS prompt");
+        }
+        deferredPrompt = null;
+        installBtn.style.display = "none";
+      });
+    }
+  });
+
+  // Share App
+  const shareBtn = document.getElementById("shareBtn");
+  if (navigator.share) {
+    shareBtn.style.display = "block";
+    shareBtn.addEventListener("click", () => {
+      navigator.share({
+        title: "Social Diary",
+        text: "Track your daily mood and thoughts!",
+        url: window.location.href,
+      });
+    });
+  }
 });
 
-// Utility: Extract tags
+// Tags utility
 function getTagsFromDisplay() {
   return Array.from(document.querySelectorAll("#tagsDisplay .tag")).map(tag => tag.textContent);
 }
 
-// Render entries
+// Entry display
 function updateEntriesList() {
   const list = document.getElementById("entriesList");
   const search = document.getElementById("searchEntries").value.toLowerCase();
@@ -99,7 +170,6 @@ function updateEntriesList() {
     .forEach(entry => {
       const card = document.createElement("div");
       card.className = "entry-card";
-
       card.innerHTML = `
         <div class="entry-card-header">
           <div class="entry-date">${entry.date}</div>
@@ -111,12 +181,11 @@ function updateEntriesList() {
           ${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join(" ")}
         </div>
       `;
-
       list.appendChild(card);
     });
 }
 
-// Helper to show emoji for mood
+// Mood emoji mapping
 function getMoodEmoji(mood) {
   const moodMap = {
     happy: "😊",
@@ -128,7 +197,7 @@ function getMoodEmoji(mood) {
   return moodMap[mood] || "😐";
 }
 
-// Stats
+// Stats calculation
 function updateStats() {
   document.getElementById("totalEntries").textContent = entries.length;
 
@@ -152,11 +221,10 @@ function updateStats() {
   drawMoodChart(moodCount);
 }
 
-// Mood chart
+// Chart.js mood chart
 function drawMoodChart(data) {
   const ctx = document.getElementById("moodChart");
   if (!ctx) return;
-
   const labels = Object.keys(data);
   const values = Object.values(data);
 
@@ -184,64 +252,3 @@ function drawMoodChart(data) {
     }
   });
 }
-// Install PWA Prompt
-let deferredPrompt;
-const installBtn = document.getElementById("installBtn");
-
-window.addEventListener("beforeinstallprompt", (e) => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.style.display = "block";
-});
-
-installBtn.addEventListener("click", () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then((choiceResult) => {
-      if (choiceResult.outcome === "accepted") {
-        console.log("User accepted the A2HS prompt");
-      }
-      deferredPrompt = null;
-      installBtn.style.display = "none";
-    });
-  }
-});
-
-// Web Share API
-const shareBtn = document.getElementById("shareBtn");
-if (navigator.share) {
-  shareBtn.style.display = "block";
-  shareBtn.addEventListener("click", () => {
-    navigator.share({
-      title: "Social Diary",
-      text: "Track your daily mood and thoughts!",
-      url: window.location.href,
-    });
-  });
-}
-  // ... your existing DOMContentLoaded code ...
-document.addEventListener("DOMContentLoaded", () => {
-  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-if (loggedInUser) {
-  document.getElementById("usernameDisplay").textContent = loggedInUser.name;
-  const avatarEls = document.querySelectorAll(".avatar, .avatar-circle");
-  avatarEls.forEach(el => el.textContent = loggedInUser.name.slice(0, 2).toUpperCase());
-}
-  // 🔐 PIN Lock Setup
-const pinScreen = document.getElementById("pin-lock");
-const pinInput = document.getElementById("pinInput");
-const unlockBtn = document.getElementById("unlockBtn");
-const pinError = document.getElementById("pinError");
-
-if (pinScreen && pinInput && unlockBtn) {
-  pinScreen.style.display = "flex"; // Show pin screen by default
-
-  unlockBtn.addEventListener("click", () => {
-    const enteredPIN = pinInput.value.trim();
-    if (enteredPIN === "1234") {
-      pinScreen.style.display = "none"; // unlock
-      pinError.textContent = "";
-    } else {
-      pinError.textContent = "❌ Incorrect PIN. Try again.";
-    }
-  });
