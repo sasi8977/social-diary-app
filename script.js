@@ -12,6 +12,11 @@ if ('serviceWorker' in navigator) {
       });
   });
 }
+// Redirect to login if not logged in
+if (!localStorage.getItem("loggedInUser")) {
+  window.location.href = "login.html";
+}
+
 document.addEventListener("DOMContentLoaded", () => {
   // Show today's date
   const today = new Date();
@@ -225,23 +230,22 @@ if (loggedInUser) {
 
   // 🔐 PIN Lock Setup
   const correctPIN = "1234";
+ const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+if (loggedInUser) {
   const pinScreen = document.getElementById("pin-lock");
   const pinInput = document.getElementById("pinInput");
   const unlockBtn = document.getElementById("unlockBtn");
   const pinError = document.getElementById("pinError");
 
-  pinScreen.style.display = "flex"; // Show PIN screen initially
-
   unlockBtn.addEventListener("click", () => {
     const enteredPIN = pinInput.value.trim();
-    if (enteredPIN === correctPIN) {
+    if (enteredPIN === "1234") {
       pinScreen.style.display = "none";
     } else {
       pinError.textContent = "Incorrect PIN. Try again.";
-      pinInput.value = "";
     }
   });
-});
+}
 // Logout handler
 const logoutBtn = document.getElementById("logoutBtn");
 if (logoutBtn) {
