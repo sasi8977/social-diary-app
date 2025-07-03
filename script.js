@@ -219,6 +219,7 @@ if (navigator.share) {
     });
   });
 }
+  // ... your existing DOMContentLoaded code ...
 document.addEventListener("DOMContentLoaded", () => {
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
 if (loggedInUser) {
@@ -226,51 +227,21 @@ if (loggedInUser) {
   const avatarEls = document.querySelectorAll(".avatar, .avatar-circle");
   avatarEls.forEach(el => el.textContent = loggedInUser.name.slice(0, 2).toUpperCase());
 }
-  // ... your existing DOMContentLoaded code ...
-
   // 🔐 PIN Lock Setup
-  const correctPIN = "1234";
- const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-if (loggedInUser) {
-  const pinScreen = document.getElementById("pin-lock");
-  const pinInput = document.getElementById("pinInput");
-  const unlockBtn = document.getElementById("unlockBtn");
-  const pinError = document.getElementById("pinError");
+const pinScreen = document.getElementById("pin-lock");
+const pinInput = document.getElementById("pinInput");
+const unlockBtn = document.getElementById("unlockBtn");
+const pinError = document.getElementById("pinError");
+
+if (pinScreen && pinInput && unlockBtn) {
+  pinScreen.style.display = "flex"; // Show pin screen by default
 
   unlockBtn.addEventListener("click", () => {
     const enteredPIN = pinInput.value.trim();
     if (enteredPIN === "1234") {
-      pinScreen.style.display = "none";
+      pinScreen.style.display = "none"; // unlock
+      pinError.textContent = "";
     } else {
-      pinError.textContent = "Incorrect PIN. Try again.";
+      pinError.textContent = "❌ Incorrect PIN. Try again.";
     }
   });
-}
-// Logout handler
-const logoutBtn = document.getElementById("logoutBtn");
-if (logoutBtn) {
-  logoutBtn.addEventListener("click", () => {
-    localStorage.removeItem("loggedInUser");
-    window.location.href = "login.html";
-  });
-}
-// Profile Picture Upload + Save
-const profilePicInput = document.getElementById("profilePicInput");
-const profilePic = document.getElementById("profilePic");
-
-if (localStorage.getItem("profilePic")) {
-  profilePic.src = localStorage.getItem("profilePic");
-}
-
-profilePicInput.addEventListener("change", () => {
-  const file = profilePicInput.files[0];
-  if (!file) return;
-
-  const reader = new FileReader();
-  reader.onload = function(e) {
-    const imgData = e.target.result;
-    profilePic.src = imgData;
-    localStorage.setItem("profilePic", imgData);
-  };
-  reader.readAsDataURL(file);
-});
