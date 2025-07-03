@@ -254,3 +254,23 @@ if (logoutBtn) {
     window.location.href = "login.html";
   });
 }
+// Profile Picture Upload + Save
+const profilePicInput = document.getElementById("profilePicInput");
+const profilePic = document.getElementById("profilePic");
+
+if (localStorage.getItem("profilePic")) {
+  profilePic.src = localStorage.getItem("profilePic");
+}
+
+profilePicInput.addEventListener("change", () => {
+  const file = profilePicInput.files[0];
+  if (!file) return;
+
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    const imgData = e.target.result;
+    profilePic.src = imgData;
+    localStorage.setItem("profilePic", imgData);
+  };
+  reader.readAsDataURL(file);
+});
