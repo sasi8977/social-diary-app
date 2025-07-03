@@ -18,6 +18,7 @@
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
+
 <body>
   <!-- Install & Share Buttons -->
   <div class="top-actions">
@@ -83,6 +84,7 @@
 
     <main class="content-area diary-container">
       <div class="diary-binding"></div>
+
       <!-- New Entry Section -->
       <section id="newEntrySection" class="section active">
         <h2>New Diary Entry</h2>
@@ -99,14 +101,6 @@
             <label for="entryContent">Your Entry:</label>
             <textarea id="entryContent" rows="8" placeholder="Write about your day..." required></textarea>
           </div>
-        <div class="emoji-picker">
-       <button type="button" id="toggleEmojiPicker">😊 Emoji</button>
-       <div id="emojiList" class="emoji-list" style="display: none;"></div>
-        </div>
-          <div class="form-group">
-  <label for="gifUrl">GIF URL (Optional):</label>
-  <input type="text" id="gifUrl" placeholder="Paste Giphy URL here..." />
-</div>
           <div class="form-group">
             <label for="tagsInput">Tags:</label>
             <div class="tags-container">
@@ -115,6 +109,21 @@
             </div>
             <div id="tagsDisplay"></div>
           </div>
+
+          <!-- 🌟 Step 5b: GIF & Emoji Picker -->
+          <div class="form-group">
+            <label for="gifUrl">Add a GIF:</label>
+            <input type="url" id="gifUrl" placeholder="Paste GIF URL" />
+          </div>
+
+          <div class="form-group">
+            <label>Add Emojis:</label>
+            <div id="emojiPicker">
+              <button type="button" id="toggleEmojiPicker">😀 Emoji</button>
+              <div id="emojiList" style="display: none;"></div>
+            </div>
+          </div>
+
           <button type="submit" id="saveEntryBtn">Save Entry</button>
         </form>
       </section>
@@ -217,12 +226,6 @@
   <!-- JavaScript -->
   <script src="script.js" defer></script>
   <script>
-    <input type="url" id="gifUrl" placeholder="Paste GIF URL" />
-<div id="emojiPicker">
-  <button type="button" id="toggleEmojiPicker">😀 Emoji</button>
-  <div id="emojiList" style="display: none;"></div>
-</div>
-
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js', { scope: './' })
         .then(reg => console.log('Service Worker registered:', reg.scope))
