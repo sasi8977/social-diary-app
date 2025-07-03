@@ -203,8 +203,13 @@
   <div class="notification" id="notification"></div>
 
   <!-- JavaScript -->
-  <script src="script.js" defer></script>
-
+  <script>
+  const currentUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  if (!currentUser) {
+    window.location.href = "login.html";
+  }
+</script>
+<script src="script.js" defer></script>
   <!-- Register Service Worker -->
   <script>
     if ('serviceWorker' in navigator) {
