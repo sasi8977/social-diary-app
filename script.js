@@ -216,7 +216,12 @@ if (navigator.share) {
 }
 document.addEventListener("DOMContentLoaded", () => {
   // ... your existing DOMContentLoaded code ...
-
+const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
+if (loggedInUser) {
+  document.getElementById("usernameDisplay").textContent = loggedInUser.name;
+  const avatarEls = document.querySelectorAll(".avatar, .avatar-circle");
+  avatarEls.forEach(el => el.textContent = loggedInUser.name.slice(0, 2).toUpperCase());
+}
   // 🔐 PIN Lock Setup
   const correctPIN = "1234";
   const pinScreen = document.getElementById("pin-lock");
