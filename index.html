@@ -217,6 +217,12 @@
   <!-- JavaScript -->
   <script src="script.js" defer></script>
   <script>
+    <input type="url" id="gifUrl" placeholder="Paste GIF URL" />
+<div id="emojiPicker">
+  <button type="button" id="toggleEmojiPicker">😀 Emoji</button>
+  <div id="emojiList" style="display: none;"></div>
+</div>
+
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js', { scope: './' })
         .then(reg => console.log('Service Worker registered:', reg.scope))
