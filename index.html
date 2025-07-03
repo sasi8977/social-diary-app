@@ -6,34 +6,33 @@
   <title>Social Diary</title>
 
   <!-- PWA Setup -->
- <link rel="manifest" href="manifest.json" />
-<link rel="icon" href="icons/icon-192.png" type="image/png" />
-<link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png" />
-<link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png" />
-<meta name="theme-color" content="#5e60ce" />
-
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="icons/icon-192.png" type="image/png" />
+  <link rel="apple-touch-icon" sizes="192x192" href="icons/icon-192.png" />
+  <link rel="apple-touch-icon" sizes="512x512" href="icons/icon-512.png" />
+  <meta name="theme-color" content="#5e60ce" />
 
   <!-- CSS -->
   <link rel="stylesheet" href="style.css" />
 
   <!-- Font Awesome Icons -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
 </head>
-
 <body>
   <!-- Install & Share Buttons -->
   <div class="top-actions">
     <button id="installBtn" style="display: none;" class="action-btn">📲 Install App</button>
     <button id="shareBtn" style="display: none;" class="action-btn">🔗 Share This App</button>
   </div>
-<!-- PIN Lock Screen -->
-<div id="pin-lock" class="pin-lock-screen">
-  <h2>Enter PIN to Unlock</h2>
-  <input type="password" id="pinInput" maxlength="4" placeholder="Enter 4-digit PIN" />
-  <button id="unlockBtn">Unlock</button>
-  <p id="pinError" class="error-msg"></p>
-</div>
+
+  <!-- PIN Lock Screen -->
+  <div id="pin-lock" class="pin-lock-screen">
+    <h2>Enter PIN to Unlock</h2>
+    <input type="password" id="pinInput" maxlength="4" placeholder="Enter 4-digit PIN" />
+    <button id="unlockBtn">Unlock</button>
+    <p id="pinError" class="error-msg"></p>
+  </div>
+
   <!-- Header -->
   <header class="app-header">
     <div class="header-left">
@@ -52,12 +51,12 @@
   <div class="app">
     <aside class="sidebar">
       <div class="user-profile">
-  <label for="profilePicInput">
-    <img id="profilePic" src="images/default-avatar.png" alt="Avatar" class="avatar-img" />
-  </label>
-  <input type="file" id="profilePicInput" accept="image/*" style="display: none;" />
-  <h3 id="usernameDisplay">User</h3>
-</div>
+        <label for="profilePicInput">
+          <img id="profilePic" src="images/default-avatar.png" alt="Avatar" class="avatar-img" />
+        </label>
+        <input type="file" id="profilePicInput" accept="image/*" style="display: none;" />
+        <h3 id="usernameDisplay">User</h3>
+      </div>
       <nav>
         <ul>
           <li><a href="#" id="newEntryBtn"><i class="fas fa-plus"></i> New Entry</a></li>
@@ -65,7 +64,7 @@
           <li><a href="#" id="statsBtn"><i class="fas fa-chart-bar"></i> Statistics</a></li>
           <li><a href="#" id="settingsBtn"><i class="fas fa-cog"></i> Settings</a></li>
           <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-       </ul>
+        </ul>
       </nav>
 
       <!-- Mood Picker -->
@@ -208,24 +207,14 @@
   <div class="notification" id="notification"></div>
 
   <!-- JavaScript -->
-  <script>
-  const currentUser = JSON.parse(localStorage.getItem("loggedInUser"));
-  if (!currentUser) {
-    window.location.href = "login.html";
-  }
-</script>
-<script src="script.js" defer></script>
-  <!-- Register Service Worker -->
+  <script src="script.js" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
       navigator.serviceWorker.register('sw.js', { scope: './' })
-        .then(reg => {
-          console.log('✅ Service Worker registered with scope:', reg.scope);
-        })
-        .catch(err => {
-          console.error('❌ Service Worker registration failed:', err);
-        });
+        .then(reg => console.log('Service Worker registered:', reg.scope))
+        .catch(err => console.error('Service Worker registration failed:', err));
     }
   </script>
 </body>
 </html>
+
