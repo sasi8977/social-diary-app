@@ -1,54 +1,51 @@
-let selectedMood = '';
-let entries = [];
-let loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-
-// Redirect if not logged in
-if (!loggedInUser) {
-  window.location.href = "login.html";
-}
-
-// Display name
+// Check if user is logged in before showing main app
 document.addEventListener("DOMContentLoaded", () => {
-  // ================= PIN LOCK SCREEN =================
-  const pinScreen = document.getElementById("pin-lock");
-  const unlockBtn = document.getElementById("unlockBtn");
-  const pinInput = document.getElementById("pinInput");
-  const pinError = document.getElementById("pinError");
-
-  if (pinScreen && unlockBtn) {
-    if (!sessionStorage.getItem("pinUnlocked")) {
-      pinScreen.style.display = "flex";
-    } else {
-      pinScreen.style.display = "none";
-    }
-
-    unlockBtn.addEventListener("click", () => {
-      const pin = pinInput.value;
-      if (pin === "1234") {
-        sessionStorage.setItem("pinUnlocked", "true");
-        pinScreen.style.display = "none";
-        pinError.textContent = "";
-      } else {
-        pinError.textContent = "â Œ Incorrect PIN. Try again.";
-      }
-    });
-  }
-
-  // ================= AUTH CHECK =================
-  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser"));
-  if (!loggedInUser) {
+  const currentUser = JSON.parse(localStorage.getItem("loggedInUser"));
+  if (!currentUser) {
     window.location.href = "login.html";
     return;
   }
 
-  // ================= DATE DISPLAY =================
-  const todayDate = document.getElementById("today-date");
-  if (todayDate) {
-    const options = { weekday: "long", year: "numeric", month: "long", day: "numeric" };
-    todayDate.textContent = new Date().toLocaleDateString(undefined, options);
-  }
+  // Show PIN lock
+  const pinLockScreen = document.getElementById("pin-lock");
+  pinLockScreen.style.display = "flex";
 
-  // ================= MOOD TRACKER =================
+  const unlockBtn = document.getElementById("unlockBtn");
+  const pinInput = document.getElementById("pinInput");
+  const pinError = document.getElementById("pinError");
+
+  unlockBtn.addEventListener("click", () => {
+    const enteredPin = pinInput.value.trim();
+    if (enteredPin === "1234") {
+      pinLockScreen.style.display = "none";
+    } else {
+      pinError.textContent = "Incorrect PIN. Try again.";
+    }
+  });
+
+  // Show user name
+  document.getElementById("usernameDisplay").textContent = currentUser.name || "User";
+
+  // Profile pic handling
+  const profilePicInput = document.getElementById("profilePicInput");
+  const profilePic = document.getElementById("profilePic");
+
+  profilePicInput.addEventListener("change", (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = () => {
+        profilePic.src = reader.result;
+        localStorage.setItem("profilePic", reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
+
+  const savedPic = localStorage.getItem("profilePic");
+  if (savedPic) profilePic.src = savedPic;
+
+  // Mood selection
   let selectedMood = "";
   document.querySelectorAll(".mood-option").forEach(option => {
     option.addEventListener("click", () => {
@@ -57,49 +54,39 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   });
 
-  // ================= ENTRY FORM =================
+  // Entries
+  let entries = JSON.parse(localStorage.getItem("entries")) || [];
+
   const diaryForm = document.getElementById("diaryForm");
-  const entriesList = document.getElementById("entriesList");
-  let entries = JSON.parse(localStorage.getItem("entries") || "[]");
-
-  function saveEntries() {
+  diaryForm.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const entry = {
+      date: document.getElementById("entryDate").value,
+      title: document.getElementById("entryTitle").value,
+      content: document.getElementById("entryContent").value,
+      tags: Array.from(document.querySelectorAll(".tag")).map(tag => tag.textContent),
+      mood: selectedMood
+    };
+    entries.push(entry);
     localStorage.setItem("entries", JSON.stringify(entries));
-  }
+    alert("Diary entry saved!");
+    diaryForm.reset();
+    document.getElementById("tagsDisplay").innerHTML = "";
+  });
 
-  function renderEntries() {
-    if (!entriesList) return;
-    entriesList.innerHTML = "";
-    entries.forEach((entry, index) => {
-      const card = document.createElement("div");
-      card.className = "entry-card";
-      card.innerHTML = `
-        <h3>${entry.title}</h3>
-        <p><strong>Date:</strong> ${entry.date}</p>
-        <p>${entry.content}</p>
-        <p><strong>Mood:</strong> ${entry.mood}</p>
-        <div class="tags">${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join(" ")}</div>
-      `;
-      entriesList.appendChild(card);
-    });
-  }
+  // Tags
+  document.getElementById("addTagBtn").addEventListener("click", () => {
+    const tagInput = document.getElementById("tagsInput");
+    const tag = tagInput.value.trim();
+    if (tag) {
+      const span = document.createElement("span");
+      span.className = "tag";
+      span.textContent = tag;
+      document.getElementById("tagsDisplay").appendChild(span);
+      tagInput.value = "";
+    }
+  });
 
-  renderEntries();
-
-  if (diaryForm) {
-    diaryForm.addEventListener("submit", (e) => {
-      e.preventDefault();
-      const newEntry = {
-        date: document.getElementById("entryDate").value,
-        title: document.getElementById("entryTitle").value,
-        content: document.getElementById("entryContent").value,
-        tags: document.getElementById("tagsInput").value.split(",").map(tag => tag.trim()),
-        mood: selectedMood
-      };
-      entries.push(newEntry);
-      saveEntries();
-      renderEntries();
-      diaryForm.reset();
-      document.getElementById("selectedMood").textContent = "";
-    });
-  }
+  // Date
+  document.getElementById("today-date").textContent = new Date().toDateString();
 });
