@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Sign Up - Social Diary</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css"> <!-- reuse your existing style -->
+  <style>
+    body {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      background: #f1f1f1;
+      font-family: sans-serif;
+    }
+    .signup-box {
+      background: white;
+      padding: 2rem;
+      border-radius: 1rem;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      width: 90%;
+      max-width: 400px;
+    }
+    input {
+      width: 100%;
+      padding: 10px;
+      margin: 10px 0;
+      border-radius: 0.5rem;
+      border: 1px solid #ccc;
+    }
+    button {
+      padding: 10px;
+      background: #5e60ce;
+      color: white;
+      border: none;
+      border-radius: 0.5rem;
+      width: 100%;
+      font-size: 1rem;
+    }
+    a {
+      display: block;
+      margin-top: 1rem;
+      text-align: center;
+      color: #5e60ce;
+    }
+  </style>
+</head>
+<body>
+  <div class="signup-box">
+    <h2>Create Account</h2>
+    <input type="text" id="newUsername" placeholder="Username" required>
+    <input type="password" id="newPassword" placeholder="Password" required>
+    <button onclick="register()">Sign Up</button>
+    <a href="login.html">Already have an account? Login</a>
+  </div>
+
+  <script>
+    function register() {
+      const user = document.getElementById("newUsername").value;
+      const pass = document.getElementById("newPassword").value;
+
+      if (!user || !pass) {
+        alert("Please enter both username and password.");
+        return;
+      }
+
+      const users = JSON.parse(localStorage.getItem("users") || "{}");
+      if (users[user]) {
+        alert("User already exists. Please login.");
+        return;
+      }
+
+      users[user] = pass;
+      localStorage.setItem("users", JSON.stringify(users));
+      localStorage.setItem("loggedInUser", user);
+      alert("Account created!");
+      window.location.href = "index.html"; // redirect to main app
+    }
+  </script>
+</body>
+</html>
