@@ -52,10 +52,12 @@
   <div class="app">
     <aside class="sidebar">
       <div class="user-profile">
-        <div class="avatar">SY</div>
-        <div class="avatar">SY</div>
-        <h3 id="usernameDisplay">user</h3>
-      </div>
+  <label for="profilePicInput">
+    <img id="profilePic" src="images/default-avatar.png" alt="Profile Picture" class="avatar-img" />
+  </label>
+  <input type="file" id="profilePicInput" accept="image/*" style="display: none;" />
+  <h3 id="usernameDisplay">User</h3>
+</div>
       <nav>
         <ul>
           <li><a href="#" id="newEntryBtn"><i class="fas fa-plus"></i> New Entry</a></li>
