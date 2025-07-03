@@ -1,109 +1,136 @@
-// === USER LOGIN & PIN ===
-const currentUser = JSON.parse(localStorage.getItem("loggedInUser"));
-if (!currentUser) {
-  window.location.href = "login.html";
-} else {
-  document.getElementById("usernameDisplay").textContent = currentUser.name || "User";
-}
+let selectedMood = '';
+let entries = [];
 
-// === PIN LOCK ===
-const pinLockScreen = document.getElementById("pin-lock");
-const pinInput = document.getElementById("pinInput");
-const unlockBtn = document.getElementById("unlockBtn");
-const pinError = document.getElementById("pinError");
+// 🔐 PIN Lock Logic
+window.addEventListener('DOMContentLoaded', () => {
+  const pinLock = document.getElementById('pin-lock');
+  const unlockBtn = document.getElementById('unlockBtn');
+  const pinInput = document.getElementById('pinInput');
+  const pinError = document.getElementById('pinError');
 
-unlockBtn.addEventListener("click", () => {
-  if (pinInput.value === "1234") {
-    pinLockScreen.style.display = "none";
-  } else {
-    pinError.textContent = "Incorrect PIN. Please try again.";
+  const savedPinUnlocked = localStorage.getItem('pinUnlocked');
+  if (!savedPinUnlocked) {
+    pinLock.style.display = 'flex';
   }
-});
 
-// Show today's date
-const todayDate = document.getElementById("today-date");
-const today = new Date();
-todayDate.textContent = today.toDateString();
-
-// === Mood Selection ===
-let selectedMood = "";
-document.querySelectorAll(".mood-option").forEach(option => {
-  option.addEventListener("click", () => {
-    selectedMood = option.dataset.mood;
-    document.getElementById("selectedMood").textContent = `You feel: ${selectedMood}`;
+  unlockBtn.addEventListener('click', () => {
+    if (pinInput.value === '1234') {
+      localStorage.setItem('pinUnlocked', 'true');
+      pinLock.style.display = 'none';
+    } else {
+      pinError.textContent = 'Incorrect PIN. Try again.';
+    }
   });
 });
 
-// === Diary Form Logic ===
-const diaryForm = document.getElementById("diaryForm");
-const entries = JSON.parse(localStorage.getItem("entries") || "[]");
+// 📅 Date Display
+const today = new Date();
+document.getElementById('today-date').textContent = today.toDateString();
 
-function saveEntries() {
-  localStorage.setItem("entries", JSON.stringify(entries));
+// 😊 Mood Picker
+const moodOptions = document.querySelectorAll('.mood-option');
+moodOptions.forEach(option => {
+  option.addEventListener('click', () => {
+    selectedMood = option.dataset.mood;
+    document.getElementById('selectedMood').textContent = `You feel: ${selectedMood}`;
+  });
+});
+
+// 📝 Save Diary Entry
+const diaryForm = document.getElementById('diaryForm');
+if (diaryForm) {
+  diaryForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const entry = {
+      date: document.getElementById('entryDate').value,
+      title: document.getElementById('entryTitle').value,
+      content: document.getElementById('entryContent').value,
+      mood: selectedMood,
+      tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(tag => tag.textContent)
+    };
+    entries.push(entry);
+    localStorage.setItem('entries', JSON.stringify(entries));
+    alert('Diary entry saved!');
+    diaryForm.reset();
+    document.getElementById('tagsDisplay').innerHTML = '';
+    selectedMood = '';
+    document.getElementById('selectedMood').textContent = '';
+  });
 }
 
-diaryForm.addEventListener("submit", (e) => {
-  e.preventDefault();
-  const newEntry = {
-    date: document.getElementById("entryDate").value,
-    title: document.getElementById("entryTitle").value,
-    content: document.getElementById("entryContent").value,
-    tags: [...document.querySelectorAll(".tag")].map(tag => tag.textContent),
-    mood: selectedMood
-  };
-  entries.push(newEntry);
-  saveEntries();
-  diaryForm.reset();
-  selectedMood = "";
-  document.getElementById("selectedMood").textContent = "";
-  alert("Entry saved!");
-});
+// 🔖 Tag Management
+const tagsInput = document.getElementById('tagsInput');
+const addTagBtn = document.getElementById('addTagBtn');
+const tagsDisplay = document.getElementById('tagsDisplay');
+if (addTagBtn) {
+  addTagBtn.addEventListener('click', () => {
+    const tagText = tagsInput.value.trim();
+    if (tagText) {
+      const tag = document.createElement('span');
+      tag.className = 'tag';
+      tag.textContent = tagText;
+      tagsDisplay.appendChild(tag);
+      tagsInput.value = '';
+    }
+  });
+}
 
-// === Tag Adding Logic ===
-const addTagBtn = document.getElementById("addTagBtn");
-const tagsInput = document.getElementById("tagsInput");
-const tagsDisplay = document.getElementById("tagsDisplay");
+// 👤 Username Display from localStorage
+const usernameDisplay = document.getElementById('usernameDisplay');
+const currentUser = JSON.parse(localStorage.getItem("loggedInUser"));
+if (currentUser && currentUser.username) {
+  usernameDisplay.textContent = currentUser.username;
+}
 
-addTagBtn.addEventListener("click", () => {
-  const tagText = tagsInput.value.trim();
-  if (tagText) {
-    const span = document.createElement("span");
-    span.className = "tag";
-    span.textContent = tagText;
-    tagsDisplay.appendChild(span);
-    tagsInput.value = "";
-  }
-});
-
-// === Install PWA ===
+// 📲 PWA Install Button
 let deferredPrompt;
-const installBtn = document.getElementById("installBtn");
-window.addEventListener("beforeinstallprompt", (e) => {
+const installBtn = document.getElementById('installBtn');
+window.addEventListener('beforeinstallprompt', e => {
   e.preventDefault();
   deferredPrompt = e;
-  installBtn.style.display = "inline-block";
+  installBtn.style.display = 'inline-block';
 });
 
-installBtn.addEventListener("click", async () => {
-  if (deferredPrompt) {
-    deferredPrompt.prompt();
-    const choice = await deferredPrompt.userChoice;
-    if (choice.outcome === "accepted") {
-      installBtn.style.display = "none";
+installBtn.addEventListener('click', () => {
+  deferredPrompt.prompt();
+  deferredPrompt.userChoice.then(choice => {
+    if (choice.outcome === 'accepted') {
+      installBtn.style.display = 'none';
     }
-  }
+  });
 });
 
-// === Share App ===
-const shareBtn = document.getElementById("shareBtn");
+// 🔗 Share Button
+const shareBtn = document.getElementById('shareBtn');
 if (navigator.share) {
-  shareBtn.style.display = "inline-block";
-  shareBtn.addEventListener("click", async () => {
+  shareBtn.style.display = 'inline-block';
+  shareBtn.addEventListener('click', async () => {
     await navigator.share({
-      title: "Social Diary",
-      text: "Check out this Social Diary app!",
+      title: 'Social Diary',
+      text: 'Check out my digital diary!',
       url: window.location.href
     });
   });
 }
 
+// 🖼️ Avatar Upload
+const profilePicInput = document.getElementById('profilePicInput');
+const profilePic = document.getElementById('profilePic');
+
+profilePicInput.addEventListener('change', function () {
+  const file = this.files[0];
+  if (file) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      profilePic.src = e.target.result;
+      localStorage.setItem('avatarImage', e.target.result);
+    };
+    reader.readAsDataURL(file);
+  }
+});
+
+// Load saved avatar
+const savedAvatar = localStorage.getItem('avatarImage');
+if (savedAvatar) {
+  profilePic.src = savedAvatar;
+}
