@@ -277,3 +277,40 @@ textarea#entryContent {
   margin: 0 auto;
   display: block;
 }
+/* 📒 Real Diary Look */
+body {
+  background: url('images/diary-bg.png') no-repeat center center fixed;
+  background-size: cover;
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.diary-container {
+  position: relative;
+  background: #fffef9;
+  border-radius: 20px;
+  padding: 2rem;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  margin: 2rem auto;
+  max-width: 900px;
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  border: 3px solid #e0c3fc;
+  border-left: 30px solid #9d4edd;
+}
+
+.diary-binding {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 30px;
+  background: repeating-linear-gradient(
+    #5e60ce,
+    #5e60ce 5px,
+    #4ea8de 5px,
+    #4ea8de 10px
+  );
+  border-right: 2px solid #3a0ca3;
+  border-radius: 15px 0 0 15px;
+}
