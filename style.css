@@ -13,9 +13,10 @@
 }
 
 body {
+  background: url('images/diary-bg.png') no-repeat center center fixed;
+  background-size: cover;
   font-family: 'Poppins', sans-serif;
   margin: 0;
-  background: var(--bg-color);
   color: var(--text-color);
 }
 
@@ -151,51 +152,6 @@ button:hover {
 @media (max-width: 768px) {
   .app {
     padding: 0.5rem;
-  }
-
-  form {
-    padding: 1rem;
-  }
-}
-.action-btn {
-  padding: 12px 20px;
-  margin: 10px;
-  font-size: 1rem;
-  border: none;
-  border-radius: 10px;
-  background-color: var(--primary-color);
-  color: white;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.action-btn:hover {
-  background-color: var(--secondary-color);
-}
-.top-action {
-  text-align: center;
-  margin-top: 10px;
-}
-/* GENERAL */
-body {
-  margin: 0;
-  font-family: 'Segoe UI', sans-serif;
-  background-color: #f4f4f4;
-  color: #333;
-}
-
-.app-header, .section, .entry-card, .stat-card, .form-group {
-  border-radius: 1rem;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-  background-color: #fff;
-  margin: 1rem;
-  padding: 1rem;
-}
-
-/* Responsive Layout */
-@media (max-width: 768px) {
-  .app {
     flex-direction: column;
   }
 
@@ -217,6 +173,31 @@ body {
     padding: 0.75rem;
   }
 }
+
+/* Install/Share Buttons */
+.action-btn {
+  padding: 12px 20px;
+  margin: 10px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.action-btn:hover {
+  background-color: var(--secondary-color);
+}
+
+.top-action {
+  text-align: center;
+  margin-top: 10px;
+}
+
+/* PIN Screen */
 .pin-lock-screen {
   position: fixed;
   top: 0;
@@ -254,13 +235,20 @@ body {
   color: red;
   margin-top: 0.5rem;
 }
+
+/* Avatar Image */
 .avatar-img {
-  width: 80px;
-  height: 80px;
+  width: 64px;
+  height: 64px;
   border-radius: 50%;
-  cursor: pointer;
+  object-fit: cover;
+  margin: 0 auto;
+  display: block;
   border: 2px solid var(--primary-color);
+  cursor: pointer;
 }
+
+/* Entry Textarea - Notebook Feel */
 textarea#entryContent {
   background: url('https://www.transparenttextures.com/patterns/notebook.png') repeat;
   font-family: 'Georgia', serif;
@@ -269,20 +257,8 @@ textarea#entryContent {
   border: 2px solid #ccc;
   border-radius: 10px;
 }
-.avatar-img {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin: 0 auto;
-  display: block;
-}
-/* === REAL DIARY LOOK & FEEL === */
-body {
-  background: url('images/diary-bg.png') no-repeat center center fixed;
-  background-size: cover;
-}
 
+/* === REAL DIARY LOOK === */
 .diary-container {
   position: relative;
   background: #fffef9;
@@ -299,6 +275,7 @@ body {
   z-index: 10;
 }
 
+/* Spiral Binding */
 .diary-binding {
   position: absolute;
   left: 0;
