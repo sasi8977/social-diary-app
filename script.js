@@ -157,3 +157,39 @@ const savedAvatar = localStorage.getItem('avatarImage');
 if (savedAvatar) {
   profilePic.src = savedAvatar;
 }
+// 🎉 Emoji Picker Logic
+const emojiList = ['😀', '😅', '😍', '😢', '😠', '🤔', '🎉', '❤️', '👍', '👎'];
+const emojiListDiv = document.getElementById('emojiList');
+const toggleEmojiPicker = document.getElementById('toggleEmojiPicker');
+const entryContent = document.getElementById('entryContent');
+
+emojiList.forEach(emoji => {
+  const btn = document.createElement('button');
+  btn.textContent = emoji;
+  btn.className = 'emoji-btn';
+  btn.addEventListener('click', () => {
+    entryContent.value += emoji;
+  });
+  emojiListDiv.appendChild(btn);
+});
+
+toggleEmojiPicker.addEventListener('click', () => {
+  emojiListDiv.style.display = emojiListDiv.style.display === 'none' ? 'flex' : 'none';
+});
+
+// 🖼️ Show GIF in entry
+const gifUrlInput = document.getElementById('gifUrl');
+const saveEntryBtn = document.getElementById('saveEntryBtn');
+
+if (saveEntryBtn) {
+  saveEntryBtn.addEventListener('click', () => {
+    const gifUrl = gifUrlInput.value.trim();
+    if (gifUrl) {
+      const img = document.createElement('img');
+      img.src = gifUrl;
+      img.alt = "GIF";
+      img.style.maxWidth = "100%";
+      entryContent.value += `\n[GIF]: ${gifUrl}`;
+    }
+  });
+}
