@@ -277,11 +277,10 @@ textarea#entryContent {
   margin: 0 auto;
   display: block;
 }
-/* 📒 Real Diary Look */
+/* === REAL DIARY LOOK & FEEL === */
 body {
   background: url('images/diary-bg.png') no-repeat center center fixed;
   background-size: cover;
-  font-family: 'Segoe UI', sans-serif;
 }
 
 .diary-container {
@@ -289,14 +288,15 @@ body {
   background: #fffef9;
   border-radius: 20px;
   padding: 2rem;
-  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
   margin: 2rem auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   max-width: 900px;
   min-height: 80vh;
   display: flex;
   flex-direction: column;
   border: 3px solid #e0c3fc;
   border-left: 30px solid #9d4edd;
+  z-index: 10;
 }
 
 .diary-binding {
@@ -313,4 +313,5 @@ body {
   );
   border-right: 2px solid #3a0ca3;
   border-radius: 15px 0 0 15px;
+  z-index: 20;
 }
