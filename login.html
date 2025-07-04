@@ -98,70 +98,74 @@
       </div>
       <button type="submit">Login</button>
     </form>
+
     <hr>
-<button id="googleLoginBtn" style="margin-top: 1rem; background: #db4437;">
-  Continue with Google
-</button>
+    <button type="button" id="googleLoginBtn" style="margin-top: 1rem; background: #db4437;">
+      Continue with Google
+    </button>
+
     <div class="bottom-text">
       Don't have an account? <a href="signup.html">Sign Up</a>
     </div>
   </div>
 
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
+
   <script>
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      e.preventDefault();
+    // Initialize Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyDsnJWkninWVCts0sy4qnRCzW8swC6fBQQ",
+      authDomain: "social-diary-b6754.firebaseapp.com",
+      projectId: "social-diary-b6754",
+      storageBucket: "social-diary-b6754.appspot.com",
+      messagingSenderId: "324502889073",
+      appId: "1:324502889073:web:05b3f162f18dc7f14bbc84",
+      measurementId: "G-6NSE7QK8LB"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const auth = firebase.auth();
+  </script>
 
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      // Local login
+      document.getElementById("loginForm").addEventListener("submit", function(e) {
+        e.preventDefault();
+        const username = document.getElementById("username").value.trim();
+        const password = document.getElementById("password").value.trim();
+        const users = JSON.parse(localStorage.getItem("users") || "{}");
 
-      const users = JSON.parse(localStorage.getItem("users") || "{}");
+        if (users[username] && users[username] === password) {
+          localStorage.setItem("loggedInUser", JSON.stringify({ username }));
+          alert("Login successful!");
+          window.location.href = "index.html";
+        } else {
+          alert("Invalid username or password.");
+        }
+      });
 
-      if (users[username] && users[username] === password) {
-        localStorage.setItem("loggedInUser", JSON.stringify({ username }));
-        alert("Login successful!");
-        window.location.href = "index.html";
-      } else {
-        alert("Invalid username or password.");
-      }
+      // Google login
+      document.getElementById("googleLoginBtn").addEventListener("click", function () {
+        const provider = new firebase.auth.GoogleAuthProvider();
+        auth.signInWithPopup(provider)
+          .then((result) => {
+            const user = result.user;
+            localStorage.setItem("loggedInUser", JSON.stringify({
+              username: user.displayName || "User",
+              email: user.email,
+              photoURL: user.photoURL
+            }));
+            alert("Google Login successful!");
+            window.location.href = "index.html";
+          })
+          .catch((error) => {
+            console.error("Google Login error:", error);
+            alert("Login failed: " + error.message);
+          });
+      });
     });
   </script>
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDsnJWkninWVCts0sy4qnRCzW8swC6fBQQ",
-    authDomain: "social-diary-b6754.firebaseapp.com",
-    projectId: "social-diary-b6754",
-    storageBucket: "social-diary-b6754.appspot.com",
-    messagingSenderId: "324502889073",
-    appId: "1:324502889073:web:05b3f162f18dc7f14bbc84",
-    measurementId: "G-6NSE7QK8LB"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-</script>
-  <script>
-  document.getElementById("googleLoginBtn").addEventListener("click", function () {
-    const provider = new firebase.auth.GoogleAuthProvider();
-
-    firebase.auth().signInWithPopup(provider)
-      .then((result) => {
-        const user = result.user;
-        localStorage.setItem("loggedInUser", JSON.stringify({
-          username: user.displayName || "User",
-          email: user.email,
-          photoURL: user.photoURL
-        }));
-        alert("Google Login successful!");
-        window.location.href = "index.html";
-      })
-      .catch((error) => {
-        console.error("Google Login error:", error);
-        alert("Login failed: " + error.message);
-      });
-  });
-</script>
 </body>
 </html>
