@@ -98,6 +98,10 @@
       </div>
       <button type="submit">Login</button>
     </form>
+    <hr>
+<button id="googleLoginBtn" style="margin-top: 1rem; background: #db4437;">
+  Continue with Google
+</button>
     <div class="bottom-text">
       Don't have an account? <a href="signup.html">Sign Up</a>
     </div>
@@ -137,6 +141,27 @@
   };
 
   firebase.initializeApp(firebaseConfig);
+</script>
+  <script>
+  document.getElementById("googleLoginBtn").addEventListener("click", function () {
+    const provider = new firebase.auth.GoogleAuthProvider();
+
+    firebase.auth().signInWithPopup(provider)
+      .then((result) => {
+        const user = result.user;
+        localStorage.setItem("loggedInUser", JSON.stringify({
+          username: user.displayName || "User",
+          email: user.email,
+          photoURL: user.photoURL
+        }));
+        alert("Google Login successful!");
+        window.location.href = "index.html";
+      })
+      .catch((error) => {
+        console.error("Google Login error:", error);
+        alert("Login failed: " + error.message);
+      });
+  });
 </script>
 </body>
 </html>
