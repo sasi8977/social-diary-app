@@ -1,6 +1,7 @@
-// 📘 Social Diary JavaScript File
+// ✅ Full JavaScript for Social Diary App
+
 let selectedMood = '';
-let entries = JSON.parse(localStorage.getItem("entries")) || [];
+let entries = JSON.parse(localStorage.getItem('entries')) || [];
 
 // 🔐 PIN Lock Logic
 window.addEventListener('DOMContentLoaded', () => {
@@ -22,9 +23,13 @@ window.addEventListener('DOMContentLoaded', () => {
       pinError.textContent = 'Incorrect PIN. Try again.';
     }
   });
+
+  showSection('newEntrySection');
+  loadEntries();
+  updateStats();
 });
 
-// 📅 Date Display
+// 📅 Show Today’s Date
 const today = new Date();
 document.getElementById('today-date').textContent = today.toDateString();
 
@@ -47,17 +52,17 @@ if (diaryForm) {
       title: document.getElementById('entryTitle').value,
       content: document.getElementById('entryContent').value,
       mood: selectedMood,
-      tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(tag => tag.textContent),
-      gif: document.getElementById('gifUrl')?.value || ""
+      tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(tag => tag.textContent)
     };
     entries.push(entry);
     localStorage.setItem('entries', JSON.stringify(entries));
     alert('Diary entry saved!');
     diaryForm.reset();
     document.getElementById('tagsDisplay').innerHTML = '';
-    document.getElementById('gifUrl').value = '';
     selectedMood = '';
     document.getElementById('selectedMood').textContent = '';
+    loadEntries();
+    updateStats();
   });
 }
 
@@ -78,14 +83,134 @@ if (addTagBtn) {
   });
 }
 
-// 👤 Username Display from localStorage
-const usernameDisplay = document.getElementById('usernameDisplay');
-const currentUser = JSON.parse(localStorage.getItem("loggedInUser"));
-if (currentUser && currentUser.username) {
-  usernameDisplay.textContent = currentUser.username;
+// 📂 Load Entries
+function loadEntries() {
+  const entriesList = document.getElementById('entriesList');
+  if (!entriesList) return;
+  entriesList.innerHTML = '';
+  entries.forEach((entry, index) => {
+    const card = document.createElement('div');
+    card.className = 'entry-card';
+    card.innerHTML = `
+      <h3>${entry.title}</h3>
+      <p>${entry.date} — Mood: ${entry.mood}</p>
+      <p>${entry.content}</p>
+      <div class="tags">${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
+      <div class="entry-actions">
+        <button onclick="editEntry(${index})">Edit</button>
+        <button onclick="deleteEntry(${index})">Delete</button>
+      </div>
+    `;
+    entriesList.appendChild(card);
+  });
 }
 
-// 📲 PWA Install Button
+function editEntry(index) {
+  const entry = entries[index];
+  document.getElementById('entryDate').value = entry.date;
+  document.getElementById('entryTitle').value = entry.title;
+  document.getElementById('entryContent').value = entry.content;
+  selectedMood = entry.mood;
+  document.getElementById('selectedMood').textContent = `You feel: ${selectedMood}`;
+  document.getElementById('tagsDisplay').innerHTML = entry.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
+  entries.splice(index, 1);
+  localStorage.setItem('entries', JSON.stringify(entries));
+  showSection('newEntrySection');
+}
+
+function deleteEntry(index) {
+  if (confirm('Are you sure you want to delete this entry?')) {
+    entries.splice(index, 1);
+    localStorage.setItem('entries', JSON.stringify(entries));
+    loadEntries();
+    updateStats();
+  }
+}
+
+// 📊 Update Stats
+function updateStats() {
+  document.getElementById('totalEntries').textContent = entries.length;
+  // Add more logic for mostActiveDay and chart later
+}
+
+// 🎨 Theme Switching
+const themeSelect = document.getElementById('themeSelect');
+if (themeSelect) {
+  themeSelect.addEventListener('change', () => {
+    document.documentElement.setAttribute('data-theme', themeSelect.value);
+    localStorage.setItem('theme', themeSelect.value);
+  });
+  const savedTheme = localStorage.getItem('theme');
+  if (savedTheme) {
+    document.documentElement.setAttribute('data-theme', savedTheme);
+    themeSelect.value = savedTheme;
+  }
+}
+
+// ⚙ Save Settings
+const saveSettingsBtn = document.getElementById('saveSettingsBtn');
+if (saveSettingsBtn) {
+  saveSettingsBtn.addEventListener('click', e => {
+    e.preventDefault();
+    const username = document.getElementById('username').value;
+    const currentUser = JSON.parse(localStorage.getItem("loggedInUser")) || {};
+    currentUser.username = username;
+    localStorage.setItem("loggedInUser", JSON.stringify(currentUser));
+    document.getElementById('usernameDisplay').textContent = username;
+    alert('Settings saved!');
+  });
+}
+
+// 🔁 Export Data
+const exportDataBtn = document.getElementById('exportDataBtn');
+if (exportDataBtn) {
+  exportDataBtn.addEventListener('click', () => {
+    const dataStr = JSON.stringify(entries);
+    const blob = new Blob([dataStr], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'diary-entries.json';
+    a.click();
+  });
+}
+
+// 🔁 Import Data
+const importDataBtn = document.getElementById('importDataBtn');
+const importDataInput = document.getElementById('importDataInput');
+if (importDataBtn && importDataInput) {
+  importDataBtn.addEventListener('click', () => importDataInput.click());
+  importDataInput.addEventListener('change', () => {
+    const file = importDataInput.files[0];
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      entries = JSON.parse(e.target.result);
+      localStorage.setItem('entries', JSON.stringify(entries));
+      loadEntries();
+      updateStats();
+    };
+    reader.readAsText(file);
+  });
+}
+
+// 🚪 Logout
+const logoutBtn = document.getElementById('logoutBtn');
+if (logoutBtn) {
+  logoutBtn.addEventListener('click', () => {
+    localStorage.removeItem("loggedInUser");
+    localStorage.removeItem("pinUnlocked");
+    window.location.href = "login.html";
+  });
+}
+
+// 🔄 Section Switching
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
+  const section = document.getElementById(id);
+  if (section) section.classList.add('active');
+}
+
+// 📲 PWA Install
 let deferredPrompt;
 const installBtn = document.getElementById('installBtn');
 window.addEventListener('beforeinstallprompt', e => {
@@ -93,19 +218,20 @@ window.addEventListener('beforeinstallprompt', e => {
   deferredPrompt = e;
   installBtn.style.display = 'inline-block';
 });
-
-installBtn?.addEventListener('click', () => {
-  deferredPrompt.prompt();
-  deferredPrompt.userChoice.then(choice => {
-    if (choice.outcome === 'accepted') {
-      installBtn.style.display = 'none';
-    }
+if (installBtn) {
+  installBtn.addEventListener('click', () => {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(choice => {
+      if (choice.outcome === 'accepted') {
+        installBtn.style.display = 'none';
+      }
+    });
   });
-});
+}
 
-// 🔗 Share Button
+// 🔗 Share App
 const shareBtn = document.getElementById('shareBtn');
-if (navigator.share) {
+if (navigator.share && shareBtn) {
   shareBtn.style.display = 'inline-block';
   shareBtn.addEventListener('click', async () => {
     await navigator.share({
@@ -120,65 +246,38 @@ if (navigator.share) {
 const profilePicInput = document.getElementById('profilePicInput');
 const profilePic = document.getElementById('profilePic');
 
-profilePicInput?.addEventListener('change', function () {
-  const file = this.files[0];
-  if (file) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      profilePic.src = e.target.result;
-      localStorage.setItem('avatarImage', e.target.result);
-    };
-    reader.readAsDataURL(file);
-  }
-});
+if (profilePicInput && profilePic) {
+  profilePicInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        profilePic.src = e.target.result;
+        localStorage.setItem('avatarImage', e.target.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  });
 
-// Load saved avatar
-const savedAvatar = localStorage.getItem('avatarImage');
-if (savedAvatar) {
-  profilePic.src = savedAvatar;
+  const savedAvatar = localStorage.getItem('avatarImage');
+  if (savedAvatar) {
+    profilePic.src = savedAvatar;
+  }
 }
 
-// 😀 Emoji Picker
-const emojiList = document.getElementById('emojiList');
-const toggleEmojiPicker = document.getElementById('toggleEmojiPicker');
-const entryContent = document.getElementById('entryContent');
-const emojis = ['😀','😢','❤️','🎉','😡','😍','🌟','😭','🤩','✌️'];
+// 👤 Show Username
+const usernameDisplay = document.getElementById('usernameDisplay');
+const currentUser = JSON.parse(localStorage.getItem("loggedInUser"));
+if (currentUser && currentUser.username) {
+  usernameDisplay.textContent = currentUser.username;
+}
 
-toggleEmojiPicker?.addEventListener('click', () => {
-  emojiList.style.display = emojiList.style.display === 'none' ? 'flex' : 'none';
-  emojiList.innerHTML = emojis.map(emoji => `<span class="emoji">${emoji}</span>`).join('');
-});
-
-emojiList?.addEventListener('click', e => {
-  if (e.target.classList.contains('emoji')) {
-    entryContent.value += e.target.textContent;
-  }
-});
-// 🌟 Sticker Picker
-const stickerList = document.getElementById("stickerList");
-const toggleStickerPicker = document.getElementById("toggleStickerPicker");
-
-const stickers = [
-  "stickers/sticker1.png",
-  "stickers/sticker2.png",
-  "stickers/sticker3.png",
-  "stickers/sticker4.png",
-  "stickers/sticker5.png"
-];
-
-stickers.forEach(url => {
-  const img = document.createElement("img");
-  img.src = url;
-  img.alt = "Sticker";
-  img.addEventListener("click", () => {
-    const entryContent = document.getElementById("entryContent");
-    entryContent.value += `\n[Sticker: ${url}]`;
+// 🔙 Back Button
+const backToListBtn = document.getElementById('backToListBtn');
+if (backToListBtn) {
+  backToListBtn.addEventListener('click', () => {
+    showSection('viewEntriesSection');
   });
-  stickerList.appendChild(img);
-});
-
-toggleStickerPicker.addEventListener("click", () => {
-  stickerList.style.display = stickerList.style.display === "none" ? "flex" : "none";
-});
+}
 
 
