@@ -42,8 +42,7 @@
       margin-bottom: 0.25rem;
     }
 
-    input[type="text"],
-    input[type="password"] {
+    input {
       width: 100%;
       padding: 0.75rem;
       border-radius: 0.5rem;
@@ -87,6 +86,8 @@
 
   <div class="login-container">
     <h2>Login to Social Diary</h2>
+    
+    <!-- Username/Password Login -->
     <form id="loginForm">
       <div class="form-group">
         <label for="username">Username:</label>
@@ -100,21 +101,49 @@
     </form>
 
     <hr>
-    <button type="button" id="googleLoginBtn" style="margin-top: 1rem; background: #db4437;">
+
+    <!-- Google Login -->
+    <button id="googleLoginBtn" style="margin-top: 1rem; background: #db4437;">
       Continue with Google
     </button>
+
+    <hr>
+
+    <!-- Phone Number Login -->
+    <div class="form-group">
+      <label for="phone">Phone Number:</label>
+      <input type="tel" id="phoneNumber" placeholder="+91xxxxxxxxxx" />
+    </div>
+    <div class="form-group">
+      <button type="button" id="sendOtpBtn" style="background: #34a853;">Send OTP</button>
+    </div>
+    <div class="form-group" style="display: none;" id="otpSection">
+      <label for="otp">Enter OTP:</label>
+      <input type="text" id="otpCode" />
+      <button type="button" id="verifyOtpBtn">Verify OTP</button>
+    </div>
 
     <div class="bottom-text">
       Don't have an account? <a href="signup.html">Sign Up</a>
     </div>
   </div>
 
+  <!-- Scripts -->
+  <script src="script.js" defer></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js', { scope: './' })
+        .then(reg => console.log('Service Worker registered:', reg.scope))
+        .catch(err => console.error('Service Worker registration failed:', err));
+    }
+  </script>
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
 
+  <!-- Firebase Config -->
   <script>
-    // Initialize Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyDsnJWkninWVCts0sy4qnRCzW8swC6fBQQ",
       authDomain: "social-diary-b6754.firebaseapp.com",
@@ -125,47 +154,103 @@
       measurementId: "G-6NSE7QK8LB"
     };
     firebase.initializeApp(firebaseConfig);
-    const auth = firebase.auth();
   </script>
 
+  <!-- LocalStorage Username/Password Auth -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      // Local login
-      document.getElementById("loginForm").addEventListener("submit", function(e) {
-        e.preventDefault();
-        const username = document.getElementById("username").value.trim();
-        const password = document.getElementById("password").value.trim();
-        const users = JSON.parse(localStorage.getItem("users") || "{}");
+    document.getElementById("loginForm").addEventListener("submit", function(e) {
+      e.preventDefault();
+      const username = document.getElementById("username").value.trim();
+      const password = document.getElementById("password").value.trim();
+      const users = JSON.parse(localStorage.getItem("users") || "{}");
 
-        if (users[username] && users[username] === password) {
-          localStorage.setItem("loggedInUser", JSON.stringify({ username }));
-          alert("Login successful!");
-          window.location.href = "index.html";
-        } else {
-          alert("Invalid username or password.");
-        }
-      });
-
-      // Google login
-      document.getElementById("googleLoginBtn").addEventListener("click", function () {
-        const provider = new firebase.auth.GoogleAuthProvider();
-        auth.signInWithPopup(provider)
-          .then((result) => {
-            const user = result.user;
-            localStorage.setItem("loggedInUser", JSON.stringify({
-              username: user.displayName || "User",
-              email: user.email,
-              photoURL: user.photoURL
-            }));
-            alert("Google Login successful!");
-            window.location.href = "index.html";
-          })
-          .catch((error) => {
-            console.error("Google Login error:", error);
-            alert("Login failed: " + error.message);
-          });
-      });
+      if (users[username] && users[username] === password) {
+        localStorage.setItem("loggedInUser", JSON.stringify({ username }));
+        alert("Login successful!");
+        window.location.href = "index.html";
+      } else {
+        alert("Invalid username or password.");
+      }
     });
   </script>
+
+  <!-- Google Login Script -->
+  <script>
+    document.getElementById("googleLoginBtn").addEventListener("click", function () {
+      const provider = new firebase.auth.GoogleAuthProvider();
+
+      firebase.auth().signInWithPopup(provider)
+        .then((result) => {
+          const user = result.user;
+          localStorage.setItem("loggedInUser", JSON.stringify({
+            username: user.displayName || "User",
+            email: user.email,
+            photoURL: user.photoURL
+          }));
+          alert("Google Login successful!");
+          window.location.href = "index.html";
+        })
+        .catch((error) => {
+          console.error("Google Login error:", error);
+          alert("Login failed: " + error.message);
+        });
+    });
+  </script>
+
+  <!-- Phone Number OTP Script -->
+  <script>
+    let confirmationResult;
+
+    document.getElementById("sendOtpBtn").addEventListener("click", () => {
+      const phoneNumber = document.getElementById("phoneNumber").value.trim();
+      if (!phoneNumber.startsWith("+")) {
+        alert("Phone number must start with country code (e.g., +91)");
+        return;
+      }
+
+      const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+        size: 'invisible'
+      });
+
+      firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+        .then((result) => {
+          confirmationResult = result;
+          alert("OTP sent!");
+          document.getElementById("otpSection").style.display = "block";
+        })
+        .catch((error) => {
+          console.error("OTP error:", error);
+          alert("Failed to send OTP: " + error.message);
+        });
+    });
+
+    document.getElementById("verifyOtpBtn").addEventListener("click", () => {
+      const code = document.getElementById("otpCode").value.trim();
+      if (!code) {
+        alert("Enter the OTP code.");
+        return;
+      }
+
+      confirmationResult.confirm(code)
+        .then((result) => {
+          const user = result.user;
+          localStorage.setItem("loggedInUser", JSON.stringify({
+            username: user.phoneNumber,
+            phone: user.phoneNumber
+          }));
+          alert("Phone login successful!");
+          window.location.href = "index.html";
+        })
+        .catch((error) => {
+          console.error("OTP verification error:", error);
+          alert("Incorrect OTP. Try again.");
+        });
+    });
+  </script>
+
+  <!-- reCAPTCHA container -->
+  <div id="recaptcha-container"></div>
+
 </body>
 </html>
+
