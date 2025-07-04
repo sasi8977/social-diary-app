@@ -318,3 +318,33 @@ textarea#entryContent {
   margin-top: 1rem;
   border-radius: 10px;
 }
+#emojiList {
+  margin-top: 0.5rem;
+  font-size: 1.5rem;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.emoji {
+  cursor: pointer;
+  padding: 4px;
+  border-radius: 6px;
+  transition: transform 0.2s;
+}
+
+.emoji:hover {
+  transform: scale(1.3);
+  background: #f0f0f0;
+}
+
+.sticker {
+  width: 50px;
+  margin: 5px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.sticker:hover {
+  transform: scale(1.3);
+}
