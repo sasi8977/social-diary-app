@@ -113,12 +113,8 @@ function showEntryDetail(entry) {
   document.getElementById('detailContent').textContent = entry.content;
   document.getElementById('detailTags').innerHTML = entry.tags.map(t => `<span class="tag">${t}</span>`).join('');
 
-  document.getElementById('backToListBtn').onclick = () => {
-    showSection('viewEntriesSection');
-  };
-  document.getElementById('editEntryBtn').onclick = () => {
-    alert('Edit not yet implemented.');
-  };
+  document.getElementById('backToListBtn').onclick = () => showSection('viewEntriesSection');
+  document.getElementById('editEntryBtn').onclick = () => alert('Edit not yet implemented.');
   document.getElementById('deleteEntryBtn').onclick = () => {
     entries = entries.filter(e => e.id !== entry.id);
     localStorage.setItem('entries', JSON.stringify(entries));
@@ -129,7 +125,8 @@ function showEntryDetail(entry) {
 
 function showSection(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
+  const target = document.getElementById(id);
+  if (target) target.classList.add('active');
 }
 
 function setupViewEntries() {
@@ -141,6 +138,7 @@ function setupViewEntries() {
 // === Theme ===
 function setupTheme() {
   const select = document.getElementById('themeSelect');
+  if (!select) return;
   const current = localStorage.getItem('theme') || 'light';
   select.value = current;
   document.body.className = current;
@@ -150,74 +148,87 @@ function setupTheme() {
   });
 }
 
-// === Avatar ===
+// === Avatar/Profile ===
 function setupProfile() {
   const input = document.getElementById('profilePicInput');
   const img = document.getElementById('profilePic');
   const saved = localStorage.getItem('avatarImage');
-  if (saved) img.src = saved;
+  if (saved && img) img.src = saved;
 
-  input.addEventListener('change', function () {
-    const file = this.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = e => {
-        img.src = e.target.result;
-        localStorage.setItem('avatarImage', e.target.result);
-      };
-      reader.readAsDataURL(file);
-    }
-  });
+  if (input) {
+    input.addEventListener('change', function () {
+      const file = this.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          if (img) img.src = e.target.result;
+          localStorage.setItem('avatarImage', e.target.result);
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
 
   const user = JSON.parse(localStorage.getItem('loggedInUser'));
   if (user && user.username) {
-    document.getElementById('usernameDisplay').textContent = user.username;
+    const display = document.getElementById('usernameDisplay');
+    if (display) display.textContent = user.username;
   }
 }
 
 // === Settings ===
 function setupSettings() {
-  document.getElementById('settingsBtn').onclick = () => showSection('settingsSection');
-  document.getElementById('newEntryBtn').onclick = () => showSection('newEntrySection');
-  document.getElementById('statsBtn').onclick = () => showSection('statsSection');
-  document.getElementById('saveSettingsBtn').onclick = () => alert('Settings saved!');
+  const settingsBtn = document.getElementById('settingsBtn');
+  const newEntryBtn = document.getElementById('newEntryBtn');
+  const statsBtn = document.getElementById('statsBtn');
+  const saveBtn = document.getElementById('saveSettingsBtn');
+  const exportBtn = document.getElementById('exportDataBtn');
+  const importBtn = document.getElementById('importDataBtn');
+  const importInput = document.getElementById('importDataInput');
 
-  document.getElementById('exportDataBtn').onclick = () => {
-    const blob = new Blob([JSON.stringify(entries)], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'diary-entries.json';
-    a.click();
-  };
+  if (settingsBtn) settingsBtn.onclick = () => showSection('settingsSection');
+  if (newEntryBtn) newEntryBtn.onclick = () => showSection('newEntrySection');
+  if (statsBtn) statsBtn.onclick = () => showSection('statsSection');
+  if (saveBtn) saveBtn.onclick = () => alert('Settings saved!');
 
-  document.getElementById('importDataBtn').onclick = () => {
-    document.getElementById('importDataInput').click();
-  };
-
-  document.getElementById('importDataInput').addEventListener('change', function () {
-    const file = this.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = e => {
-      try {
-        entries = JSON.parse(e.target.result);
-        localStorage.setItem('entries', JSON.stringify(entries));
-        alert('Data imported!');
-        loadEntries();
-      } catch {
-        alert('Invalid file.');
-      }
+  if (exportBtn) {
+    exportBtn.onclick = () => {
+      const blob = new Blob([JSON.stringify(entries)], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'diary-entries.json';
+      a.click();
     };
-    reader.readAsText(file);
-  });
+  }
+
+  if (importBtn && importInput) {
+    importBtn.onclick = () => importInput.click();
+    importInput.addEventListener('change', function () {
+      const file = this.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = e => {
+        try {
+          entries = JSON.parse(e.target.result);
+          localStorage.setItem('entries', JSON.stringify(entries));
+          alert('Data imported!');
+          loadEntries();
+        } catch {
+          alert('Invalid file.');
+        }
+      };
+      reader.readAsText(file);
+    });
+  }
 }
 
-// === Stickers / Emojis ===
+// === Emoji / Stickers ===
 function setupStickers() {
   const stickerBtn = document.getElementById('toggleEmojiPicker');
   const list = document.getElementById('emojiList');
-  if (!stickerBtn || !list) return;
+  const textarea = document.getElementById('entryContent');
+  if (!stickerBtn || !list || !textarea) return;
 
   const emojis = ['😀', '😂', '😍', '🥳', '😢', '😎', '🤔', '😠', '👍', '🎉'];
   list.innerHTML = emojis.map(e => `<button class='emoji-btn'>${e}</button>`).join('');
@@ -229,29 +240,33 @@ function setupStickers() {
 
   list.querySelectorAll('.emoji-btn').forEach(btn => {
     btn.addEventListener('click', () => {
-      document.getElementById('entryContent').value += btn.textContent;
+      textarea.value += btn.textContent;
     });
   });
 }
 
-// === PWA ===
+// === PWA Installation + Sharing ===
 function setupPWA() {
   let deferredPrompt;
   const installBtn = document.getElementById('installBtn');
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     deferredPrompt = e;
-    installBtn.style.display = 'inline-block';
+    if (installBtn) installBtn.style.display = 'inline-block';
   });
-  installBtn.addEventListener('click', () => {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(choice => {
-      if (choice.outcome === 'accepted') installBtn.style.display = 'none';
+  if (installBtn) {
+    installBtn.addEventListener('click', () => {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(choice => {
+        if (choice.outcome === 'accepted') {
+          installBtn.style.display = 'none';
+        }
+      });
     });
-  });
+  }
 
   const shareBtn = document.getElementById('shareBtn');
-  if (navigator.share) {
+  if (navigator.share && shareBtn) {
     shareBtn.style.display = 'inline-block';
     shareBtn.addEventListener('click', async () => {
       await navigator.share({
