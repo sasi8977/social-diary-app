@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <title>Sign Up - Social Diary</title>
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css"> <!-- reuse your existing style -->
+  <link rel="stylesheet" href="style.css">
   <style>
     body {
       display: flex;
@@ -12,7 +12,7 @@
       align-items: center;
       height: 100vh;
       background: #f1f1f1;
-      font-family: sans-serif;
+      font-family: 'Poppins', sans-serif;
     }
     .signup-box {
       background: white;
@@ -37,6 +37,10 @@
       border-radius: 0.5rem;
       width: 100%;
       font-size: 1rem;
+      cursor: pointer;
+    }
+    button:hover {
+      background: #6930c3;
     }
     a {
       display: block;
@@ -57,7 +61,7 @@
 
   <script>
     function register() {
-      const user = document.getElementById("newUsername").value;
+      const user = document.getElementById("newUsername").value.trim();
       const pass = document.getElementById("newPassword").value;
 
       if (!user || !pass) {
@@ -73,9 +77,12 @@
 
       users[user] = pass;
       localStorage.setItem("users", JSON.stringify(users));
-      localStorage.setItem("loggedInUser", user);
+
+      // ✅ Store username in an object for use in index.html
+      localStorage.setItem("loggedInUser", JSON.stringify({ username: user }));
+
       alert("Account created!");
-      window.location.href = "index.html"; // redirect to main app
+      window.location.href = "index.html";
     }
   </script>
 </body>
