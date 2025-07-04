@@ -154,13 +154,31 @@ emojiList?.addEventListener('click', e => {
     entryContent.value += e.target.textContent;
   }
 });
+// 🌟 Sticker Picker
+const stickerList = document.getElementById("stickerList");
+const toggleStickerPicker = document.getElementById("toggleStickerPicker");
 
-// 🧸 Sticker Picker
-const stickers = document.querySelectorAll('.sticker');
-stickers.forEach(sticker => {
-  sticker.addEventListener('click', () => {
-    const stickerTag = `[Sticker:${sticker.src}]`;
-    entryContent.value += `\n${stickerTag}\n`;
+const stickers = [
+  "stickers/sticker1.png",
+  "stickers/sticker2.png",
+  "stickers/sticker3.png",
+  "stickers/sticker4.png",
+  "stickers/sticker5.png"
+];
+
+stickers.forEach(url => {
+  const img = document.createElement("img");
+  img.src = url;
+  img.alt = "Sticker";
+  img.addEventListener("click", () => {
+    const entryContent = document.getElementById("entryContent");
+    entryContent.value += `\n[Sticker: ${url}]`;
   });
+  stickerList.appendChild(img);
 });
+
+toggleStickerPicker.addEventListener("click", () => {
+  stickerList.style.display = stickerList.style.display === "none" ? "flex" : "none";
+});
+
 
