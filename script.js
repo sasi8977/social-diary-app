@@ -1,3 +1,4 @@
+// 📘 Social Diary JavaScript File
 let selectedMood = '';
 let entries = JSON.parse(localStorage.getItem("entries")) || [];
 
@@ -21,26 +22,6 @@ window.addEventListener('DOMContentLoaded', () => {
       pinError.textContent = 'Incorrect PIN. Try again.';
     }
   });
-
-  // === Emoji Picker ===
-  const emojiPickerBtn = document.getElementById("toggleEmojiPicker");
-  const emojiList = document.getElementById("emojiList");
-  const entryContent = document.getElementById("entryContent");
-
-  const emojis = ["😊", "😢", "😂", "😍", "😠", "😎", "👍", "🎉", "💖", "🙏", "🌈", "🔥"];
-
-  emojiPickerBtn?.addEventListener("click", () => {
-    emojiList.style.display = emojiList.style.display === "none" ? "flex" : "none";
-  });
-
-  if (emojiList) {
-    emojiList.innerHTML = emojis.map(e => `<span>${e}</span>`).join("");
-    emojiList.addEventListener("click", (e) => {
-      if (e.target.tagName === "SPAN") {
-        entryContent.value += e.target.textContent;
-      }
-    });
-  }
 });
 
 // 📅 Date Display
@@ -61,21 +42,20 @@ const diaryForm = document.getElementById('diaryForm');
 if (diaryForm) {
   diaryForm.addEventListener('submit', e => {
     e.preventDefault();
-
     const entry = {
       date: document.getElementById('entryDate').value,
       title: document.getElementById('entryTitle').value,
       content: document.getElementById('entryContent').value,
       mood: selectedMood,
       tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(tag => tag.textContent),
-      gifUrl: document.getElementById('gifUrl')?.value || ""
+      gif: document.getElementById('gifUrl')?.value || ""
     };
-
     entries.push(entry);
     localStorage.setItem('entries', JSON.stringify(entries));
     alert('Diary entry saved!');
     diaryForm.reset();
     document.getElementById('tagsDisplay').innerHTML = '';
+    document.getElementById('gifUrl').value = '';
     selectedMood = '';
     document.getElementById('selectedMood').textContent = '';
   });
@@ -157,39 +137,30 @@ const savedAvatar = localStorage.getItem('avatarImage');
 if (savedAvatar) {
   profilePic.src = savedAvatar;
 }
-// 🎉 Emoji Picker Logic
-const emojiList = ['😀', '😅', '😍', '😢', '😠', '🤔', '🎉', '❤️', '👍', '👎'];
-const emojiListDiv = document.getElementById('emojiList');
+
+// 😀 Emoji Picker
+const emojiList = document.getElementById('emojiList');
 const toggleEmojiPicker = document.getElementById('toggleEmojiPicker');
 const entryContent = document.getElementById('entryContent');
+const emojis = ['😀','😢','❤️','🎉','😡','😍','🌟','😭','🤩','✌️'];
 
-emojiList.forEach(emoji => {
-  const btn = document.createElement('button');
-  btn.textContent = emoji;
-  btn.className = 'emoji-btn';
-  btn.addEventListener('click', () => {
-    entryContent.value += emoji;
-  });
-  emojiListDiv.appendChild(btn);
+toggleEmojiPicker?.addEventListener('click', () => {
+  emojiList.style.display = emojiList.style.display === 'none' ? 'flex' : 'none';
+  emojiList.innerHTML = emojis.map(emoji => `<span class="emoji">${emoji}</span>`).join('');
 });
 
-toggleEmojiPicker.addEventListener('click', () => {
-  emojiListDiv.style.display = emojiListDiv.style.display === 'none' ? 'flex' : 'none';
+emojiList?.addEventListener('click', e => {
+  if (e.target.classList.contains('emoji')) {
+    entryContent.value += e.target.textContent;
+  }
 });
 
-// 🖼️ Show GIF in entry
-const gifUrlInput = document.getElementById('gifUrl');
-const saveEntryBtn = document.getElementById('saveEntryBtn');
-
-if (saveEntryBtn) {
-  saveEntryBtn.addEventListener('click', () => {
-    const gifUrl = gifUrlInput.value.trim();
-    if (gifUrl) {
-      const img = document.createElement('img');
-      img.src = gifUrl;
-      img.alt = "GIF";
-      img.style.maxWidth = "100%";
-      entryContent.value += `\n[GIF]: ${gifUrl}`;
-    }
+// 🧸 Sticker Picker
+const stickers = document.querySelectorAll('.sticker');
+stickers.forEach(sticker => {
+  sticker.addEventListener('click', () => {
+    const stickerTag = `[Sticker:${sticker.src}]`;
+    entryContent.value += `\n${stickerTag}\n`;
   });
-}
+});
+
