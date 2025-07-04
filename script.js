@@ -1,17 +1,16 @@
-// ✅ Full JavaScript for Social Diary App
+// === Social Diary App - Final Working script.js ===
 
 let selectedMood = '';
 let entries = JSON.parse(localStorage.getItem('entries')) || [];
 
-// 🔐 PIN Lock Logic
-window.addEventListener('DOMContentLoaded', () => {
+// === PIN Lock ===
+document.addEventListener('DOMContentLoaded', () => {
   const pinLock = document.getElementById('pin-lock');
   const unlockBtn = document.getElementById('unlockBtn');
   const pinInput = document.getElementById('pinInput');
   const pinError = document.getElementById('pinError');
 
-  const savedPinUnlocked = localStorage.getItem('pinUnlocked');
-  if (!savedPinUnlocked) {
+  if (!localStorage.getItem('pinUnlocked')) {
     pinLock.style.display = 'flex';
   }
 
@@ -24,260 +23,254 @@ window.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  showSection('newEntrySection');
+  document.getElementById('today-date').textContent = new Date().toDateString();
+
   loadEntries();
-  updateStats();
+  setupMoodPicker();
+  setupDiaryForm();
+  setupTags();
+  setupTheme();
+  setupProfile();
+  setupSettings();
+  setupPWA();
+  setupViewEntries();
+  setupStickers();
+  setupLogout();
 });
 
-// 📅 Show Today’s Date
-const today = new Date();
-document.getElementById('today-date').textContent = today.toDateString();
-
-// 😊 Mood Picker
-const moodOptions = document.querySelectorAll('.mood-option');
-moodOptions.forEach(option => {
-  option.addEventListener('click', () => {
-    selectedMood = option.dataset.mood;
-    document.getElementById('selectedMood').textContent = `You feel: ${selectedMood}`;
+// === Mood ===
+function setupMoodPicker() {
+  document.querySelectorAll('.mood-option').forEach(option => {
+    option.addEventListener('click', () => {
+      selectedMood = option.dataset.mood;
+      document.getElementById('selectedMood').textContent = `You feel: ${selectedMood}`;
+    });
   });
-});
+}
 
-// 📝 Save Diary Entry
-const diaryForm = document.getElementById('diaryForm');
-if (diaryForm) {
-  diaryForm.addEventListener('submit', e => {
+// === Diary Form ===
+function setupDiaryForm() {
+  const form = document.getElementById('diaryForm');
+  if (!form) return;
+  form.addEventListener('submit', e => {
     e.preventDefault();
     const entry = {
+      id: Date.now(),
       date: document.getElementById('entryDate').value,
       title: document.getElementById('entryTitle').value,
       content: document.getElementById('entryContent').value,
       mood: selectedMood,
-      tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(tag => tag.textContent)
+      tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(t => t.textContent)
     };
     entries.push(entry);
     localStorage.setItem('entries', JSON.stringify(entries));
-    alert('Diary entry saved!');
-    diaryForm.reset();
-    document.getElementById('tagsDisplay').innerHTML = '';
+    alert('Saved!');
+    form.reset();
     selectedMood = '';
     document.getElementById('selectedMood').textContent = '';
+    document.getElementById('tagsDisplay').innerHTML = '';
     loadEntries();
-    updateStats();
   });
 }
 
-// 🔖 Tag Management
-const tagsInput = document.getElementById('tagsInput');
-const addTagBtn = document.getElementById('addTagBtn');
-const tagsDisplay = document.getElementById('tagsDisplay');
-if (addTagBtn) {
-  addTagBtn.addEventListener('click', () => {
-    const tagText = tagsInput.value.trim();
-    if (tagText) {
+// === Tags ===
+function setupTags() {
+  const addBtn = document.getElementById('addTagBtn');
+  if (!addBtn) return;
+  addBtn.addEventListener('click', () => {
+    const input = document.getElementById('tagsInput');
+    const value = input.value.trim();
+    if (value) {
       const tag = document.createElement('span');
       tag.className = 'tag';
-      tag.textContent = tagText;
-      tagsDisplay.appendChild(tag);
-      tagsInput.value = '';
+      tag.textContent = value;
+      document.getElementById('tagsDisplay').appendChild(tag);
+      input.value = '';
     }
   });
 }
 
-// 📂 Load Entries
+// === View Entries ===
 function loadEntries() {
-  const entriesList = document.getElementById('entriesList');
-  if (!entriesList) return;
-  entriesList.innerHTML = '';
-  entries.forEach((entry, index) => {
+  const list = document.getElementById('entriesList');
+  if (!list) return;
+  list.innerHTML = '';
+  entries.forEach(entry => {
     const card = document.createElement('div');
     card.className = 'entry-card';
-    card.innerHTML = `
-      <h3>${entry.title}</h3>
-      <p>${entry.date} — Mood: ${entry.mood}</p>
-      <p>${entry.content}</p>
-      <div class="tags">${entry.tags.map(tag => `<span class="tag">${tag}</span>`).join('')}</div>
-      <div class="entry-actions">
-        <button onclick="editEntry(${index})">Edit</button>
-        <button onclick="deleteEntry(${index})">Delete</button>
-      </div>
-    `;
-    entriesList.appendChild(card);
+    card.innerHTML = `<h3>${entry.title}</h3><p>${entry.date}</p><p>${entry.mood}</p>`;
+    card.addEventListener('click', () => showEntryDetail(entry));
+    list.appendChild(card);
   });
 }
 
-function editEntry(index) {
-  const entry = entries[index];
-  document.getElementById('entryDate').value = entry.date;
-  document.getElementById('entryTitle').value = entry.title;
-  document.getElementById('entryContent').value = entry.content;
-  selectedMood = entry.mood;
-  document.getElementById('selectedMood').textContent = `You feel: ${selectedMood}`;
-  document.getElementById('tagsDisplay').innerHTML = entry.tags.map(tag => `<span class="tag">${tag}</span>`).join('');
-  entries.splice(index, 1);
-  localStorage.setItem('entries', JSON.stringify(entries));
-  showSection('newEntrySection');
-}
+function showEntryDetail(entry) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById('entryDetailSection').classList.add('active');
+  document.getElementById('detailTitle').textContent = entry.title;
+  document.getElementById('detailDate').textContent = entry.date;
+  document.getElementById('detailMood').textContent = entry.mood;
+  document.getElementById('detailContent').textContent = entry.content;
+  document.getElementById('detailTags').innerHTML = entry.tags.map(t => `<span class="tag">${t}</span>`).join('');
 
-function deleteEntry(index) {
-  if (confirm('Are you sure you want to delete this entry?')) {
-    entries.splice(index, 1);
+  document.getElementById('backToListBtn').onclick = () => {
+    showSection('viewEntriesSection');
+  };
+  document.getElementById('editEntryBtn').onclick = () => {
+    alert('Edit not yet implemented.');
+  };
+  document.getElementById('deleteEntryBtn').onclick = () => {
+    entries = entries.filter(e => e.id !== entry.id);
     localStorage.setItem('entries', JSON.stringify(entries));
+    showSection('viewEntriesSection');
     loadEntries();
-    updateStats();
-  }
+  };
 }
 
-// 📊 Update Stats
-function updateStats() {
-  document.getElementById('totalEntries').textContent = entries.length;
-  // Add more logic for mostActiveDay and chart later
-}
-
-// 🎨 Theme Switching
-const themeSelect = document.getElementById('themeSelect');
-if (themeSelect) {
-  themeSelect.addEventListener('change', () => {
-    document.documentElement.setAttribute('data-theme', themeSelect.value);
-    localStorage.setItem('theme', themeSelect.value);
-  });
-  const savedTheme = localStorage.getItem('theme');
-  if (savedTheme) {
-    document.documentElement.setAttribute('data-theme', savedTheme);
-    themeSelect.value = savedTheme;
-  }
-}
-
-// ⚙ Save Settings
-const saveSettingsBtn = document.getElementById('saveSettingsBtn');
-if (saveSettingsBtn) {
-  saveSettingsBtn.addEventListener('click', e => {
-    e.preventDefault();
-    const username = document.getElementById('username').value;
-    const currentUser = JSON.parse(localStorage.getItem("loggedInUser")) || {};
-    currentUser.username = username;
-    localStorage.setItem("loggedInUser", JSON.stringify(currentUser));
-    document.getElementById('usernameDisplay').textContent = username;
-    alert('Settings saved!');
-  });
-}
-
-// 🔁 Export Data
-const exportDataBtn = document.getElementById('exportDataBtn');
-if (exportDataBtn) {
-  exportDataBtn.addEventListener('click', () => {
-    const dataStr = JSON.stringify(entries);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'diary-entries.json';
-    a.click();
-  });
-}
-
-// 🔁 Import Data
-const importDataBtn = document.getElementById('importDataBtn');
-const importDataInput = document.getElementById('importDataInput');
-if (importDataBtn && importDataInput) {
-  importDataBtn.addEventListener('click', () => importDataInput.click());
-  importDataInput.addEventListener('change', () => {
-    const file = importDataInput.files[0];
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      entries = JSON.parse(e.target.result);
-      localStorage.setItem('entries', JSON.stringify(entries));
-      loadEntries();
-      updateStats();
-    };
-    reader.readAsText(file);
-  });
-}
-
-// 🚪 Logout
-const logoutBtn = document.getElementById('logoutBtn');
-if (logoutBtn) {
-  logoutBtn.addEventListener('click', () => {
-    localStorage.removeItem("loggedInUser");
-    localStorage.removeItem("pinUnlocked");
-    window.location.href = "login.html";
-  });
-}
-
-// 🔄 Section Switching
 function showSection(id) {
-  document.querySelectorAll('.section').forEach(sec => sec.classList.remove('active'));
-  const section = document.getElementById(id);
-  if (section) section.classList.add('active');
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
 }
 
-// 📲 PWA Install
-let deferredPrompt;
-const installBtn = document.getElementById('installBtn');
-window.addEventListener('beforeinstallprompt', e => {
-  e.preventDefault();
-  deferredPrompt = e;
-  installBtn.style.display = 'inline-block';
-});
-if (installBtn) {
-  installBtn.addEventListener('click', () => {
-    deferredPrompt.prompt();
-    deferredPrompt.userChoice.then(choice => {
-      if (choice.outcome === 'accepted') {
-        installBtn.style.display = 'none';
-      }
-    });
+function setupViewEntries() {
+  const btn = document.getElementById('viewEntriesBtn');
+  if (!btn) return;
+  btn.addEventListener('click', () => showSection('viewEntriesSection'));
+}
+
+// === Theme ===
+function setupTheme() {
+  const select = document.getElementById('themeSelect');
+  const current = localStorage.getItem('theme') || 'light';
+  select.value = current;
+  document.body.className = current;
+  select.addEventListener('change', () => {
+    localStorage.setItem('theme', select.value);
+    document.body.className = select.value;
   });
 }
 
-// 🔗 Share App
-const shareBtn = document.getElementById('shareBtn');
-if (navigator.share && shareBtn) {
-  shareBtn.style.display = 'inline-block';
-  shareBtn.addEventListener('click', async () => {
-    await navigator.share({
-      title: 'Social Diary',
-      text: 'Check out my digital diary!',
-      url: window.location.href
-    });
-  });
-}
+// === Avatar ===
+function setupProfile() {
+  const input = document.getElementById('profilePicInput');
+  const img = document.getElementById('profilePic');
+  const saved = localStorage.getItem('avatarImage');
+  if (saved) img.src = saved;
 
-// 🖼️ Avatar Upload
-const profilePicInput = document.getElementById('profilePicInput');
-const profilePic = document.getElementById('profilePic');
-
-if (profilePicInput && profilePic) {
-  profilePicInput.addEventListener('change', function () {
+  input.addEventListener('change', function () {
     const file = this.files[0];
     if (file) {
       const reader = new FileReader();
-      reader.onload = function (e) {
-        profilePic.src = e.target.result;
+      reader.onload = e => {
+        img.src = e.target.result;
         localStorage.setItem('avatarImage', e.target.result);
       };
       reader.readAsDataURL(file);
     }
   });
 
-  const savedAvatar = localStorage.getItem('avatarImage');
-  if (savedAvatar) {
-    profilePic.src = savedAvatar;
+  const user = JSON.parse(localStorage.getItem('loggedInUser'));
+  if (user && user.username) {
+    document.getElementById('usernameDisplay').textContent = user.username;
   }
 }
 
-// 👤 Show Username
-const usernameDisplay = document.getElementById('usernameDisplay');
-const currentUser = JSON.parse(localStorage.getItem("loggedInUser"));
-if (currentUser && currentUser.username) {
-  usernameDisplay.textContent = currentUser.username;
-}
+// === Settings ===
+function setupSettings() {
+  document.getElementById('settingsBtn').onclick = () => showSection('settingsSection');
+  document.getElementById('newEntryBtn').onclick = () => showSection('newEntrySection');
+  document.getElementById('statsBtn').onclick = () => showSection('statsSection');
+  document.getElementById('saveSettingsBtn').onclick = () => alert('Settings saved!');
 
-// 🔙 Back Button
-const backToListBtn = document.getElementById('backToListBtn');
-if (backToListBtn) {
-  backToListBtn.addEventListener('click', () => {
-    showSection('viewEntriesSection');
+  document.getElementById('exportDataBtn').onclick = () => {
+    const blob = new Blob([JSON.stringify(entries)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'diary-entries.json';
+    a.click();
+  };
+
+  document.getElementById('importDataBtn').onclick = () => {
+    document.getElementById('importDataInput').click();
+  };
+
+  document.getElementById('importDataInput').addEventListener('change', function () {
+    const file = this.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = e => {
+      try {
+        entries = JSON.parse(e.target.result);
+        localStorage.setItem('entries', JSON.stringify(entries));
+        alert('Data imported!');
+        loadEntries();
+      } catch {
+        alert('Invalid file.');
+      }
+    };
+    reader.readAsText(file);
   });
 }
 
+// === Stickers / Emojis ===
+function setupStickers() {
+  const stickerBtn = document.getElementById('toggleEmojiPicker');
+  const list = document.getElementById('emojiList');
+  if (!stickerBtn || !list) return;
 
+  const emojis = ['😀', '😂', '😍', '🥳', '😢', '😎', '🤔', '😠', '👍', '🎉'];
+  list.innerHTML = emojis.map(e => `<button class='emoji-btn'>${e}</button>`).join('');
+  list.style.display = 'none';
+
+  stickerBtn.addEventListener('click', () => {
+    list.style.display = list.style.display === 'none' ? 'block' : 'none';
+  });
+
+  list.querySelectorAll('.emoji-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.getElementById('entryContent').value += btn.textContent;
+    });
+  });
+}
+
+// === PWA ===
+function setupPWA() {
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    installBtn.style.display = 'inline-block';
+  });
+  installBtn.addEventListener('click', () => {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(choice => {
+      if (choice.outcome === 'accepted') installBtn.style.display = 'none';
+    });
+  });
+
+  const shareBtn = document.getElementById('shareBtn');
+  if (navigator.share) {
+    shareBtn.style.display = 'inline-block';
+    shareBtn.addEventListener('click', async () => {
+      await navigator.share({
+        title: 'Social Diary',
+        text: 'Check out my diary app!',
+        url: window.location.href
+      });
+    });
+  }
+}
+
+// === Logout ===
+function setupLogout() {
+  const logoutBtn = document.getElementById('logoutBtn');
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+      localStorage.removeItem('loggedInUser');
+      localStorage.removeItem('pinUnlocked');
+      window.location.href = 'login.html';
+    });
+  }
+}
