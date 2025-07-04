@@ -35,7 +35,16 @@ body {
   font-weight: bold;
 }
 
-/* Avatar + Greeting */
+.header-left {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.greeting-text h2 {
+  margin: 0;
+}
+
 .avatar-circle {
   width: 48px;
   height: 48px;
@@ -46,51 +55,37 @@ body {
   align-items: center;
   justify-content: center;
   font-weight: bold;
-  margin-right: 10px;
 }
 
-/* Avatar Image */
-.avatar-img {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin: 0 auto;
-  display: block;
-  border: 2px solid var(--primary-color);
-  cursor: pointer;
-}
-
-/* App Layout */
+/* Layout */
 .app {
   display: flex;
-  flex-direction: column;
+  flex-wrap: wrap;
   padding: 1rem;
 }
 
 .sidebar {
-  margin-bottom: 2rem;
+  width: 250px;
+  padding: 1rem;
+  background: #fff;
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  margin-right: 1rem;
 }
 
-.mood-tracker {
-  margin-top: 2rem;
+.content-area {
+  flex: 1;
+  min-width: 300px;
 }
 
-.mood-options {
-  font-size: 1.5rem;
+.section {
+  display: none;
 }
 
-.mood-option {
-  margin: 0 0.5rem;
-  cursor: pointer;
-  transition: transform 0.2s;
+.section.active {
+  display: block;
 }
 
-.mood-option:hover {
-  transform: scale(1.3);
-}
-
-/* Entry Form */
 form {
   background: var(--card-bg);
   padding: 1.5rem;
@@ -109,6 +104,7 @@ input, textarea, select, button {
   border: 1px solid #ccc;
   border-radius: var(--border-radius);
   font-family: inherit;
+  font-size: 1rem;
 }
 
 button {
@@ -124,14 +120,53 @@ button:hover {
   background: var(--accent-color);
 }
 
-/* Entry Textarea - Notebook Feel */
 textarea#entryContent {
   background: url('https://www.transparenttextures.com/patterns/notebook.png') repeat;
   font-family: 'Georgia', serif;
   line-height: 1.6;
-  padding: 1rem;
   border: 2px solid #ccc;
   border-radius: 10px;
+}
+
+/* Mood Picker */
+.mood-option {
+  margin: 0 0.5rem;
+  cursor: pointer;
+  font-size: 1.5rem;
+  transition: transform 0.2s;
+}
+
+.mood-option:hover {
+  transform: scale(1.3);
+}
+
+/* Avatar */
+.avatar-img {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin: 0 auto;
+  display: block;
+  border: 2px solid var(--primary-color);
+  cursor: pointer;
+}
+
+/* Tags */
+.tags-container {
+  display: flex;
+  gap: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.tag {
+  background: var(--secondary-color);
+  color: #fff;
+  padding: 0.3rem 0.7rem;
+  border-radius: 999px;
+  display: inline-block;
+  margin-right: 5px;
+  font-size: 0.8rem;
 }
 
 /* Entry Cards */
@@ -146,31 +181,89 @@ textarea#entryContent {
   padding: 1rem;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
+  cursor: pointer;
 }
 
-.entry-card h3 {
-  margin-top: 0;
+/* Entry Detail */
+.entry-meta {
+  margin: 1rem 0;
+  font-size: 0.9rem;
+  color: #666;
 }
 
-.tags .tag {
-  background: var(--secondary-color);
-  color: #fff;
-  padding: 0.3rem 0.7rem;
-  border-radius: 999px;
-  display: inline-block;
-  margin-right: 5px;
-  font-size: 0.8rem;
+.entry-content {
+  white-space: pre-wrap;
+  line-height: 1.6;
 }
 
-/* Statistics & Word Cloud */
-.stats, .word-cloud {
+.entry-tags {
+  margin-top: 1rem;
+}
+
+.entry-actions {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+/* Stats */
+.stat-card {
   background: var(--card-bg);
   padding: 1rem;
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
+  margin-bottom: 1rem;
 }
 
-/* PIN Lock Screen */
+/* Word Cloud */
+.word-cloud {
+  padding: 1rem;
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+}
+
+/* Buttons */
+.action-btn {
+  padding: 12px 20px;
+  margin: 10px;
+  font-size: 1rem;
+  border: none;
+  border-radius: 10px;
+  background-color: var(--primary-color);
+  color: white;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.action-btn:hover {
+  background-color: var(--secondary-color);
+}
+
+.back-button {
+  background: transparent;
+  border: none;
+  font-size: 1rem;
+  color: var(--primary-color);
+  margin-bottom: 1rem;
+  cursor: pointer;
+}
+
+/* Notification */
+.notification {
+  position: fixed;
+  bottom: 10px;
+  right: 10px;
+  background: var(--primary-color);
+  color: white;
+  padding: 10px 15px;
+  border-radius: var(--border-radius);
+  display: none;
+  box-shadow: var(--shadow);
+}
+
+/* PIN Lock */
 .pin-lock-screen {
   position: fixed;
   top: 0;
@@ -210,7 +303,45 @@ textarea#entryContent {
   margin-top: 0.5rem;
 }
 
-/* Diary Container - Real Diary Look */
+/* Emoji Picker */
+#emojiList {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  background: #f1f1f1;
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+  margin-top: 0.5rem;
+}
+
+.emoji-btn {
+  font-size: 1.5rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.emoji-btn:hover {
+  transform: scale(1.3);
+}
+
+/* Stickers */
+.sticker {
+  width: 50px;
+  margin: 5px;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.sticker:hover {
+  transform: scale(1.3);
+}
+
+/* Diary Binding */
 .diary-container {
   position: relative;
   background: #fffef9;
@@ -244,24 +375,6 @@ textarea#entryContent {
   z-index: 20;
 }
 
-/* Buttons */
-.action-btn {
-  padding: 12px 20px;
-  margin: 10px;
-  font-size: 1rem;
-  border: none;
-  border-radius: 10px;
-  background-color: var(--primary-color);
-  color: white;
-  box-shadow: var(--shadow);
-  cursor: pointer;
-  transition: background 0.3s ease;
-}
-
-.action-btn:hover {
-  background-color: var(--secondary-color);
-}
-
 /* Responsive */
 @media (max-width: 768px) {
   .app {
@@ -272,6 +385,7 @@ textarea#entryContent {
   .sidebar {
     width: 100%;
     order: 2;
+    margin-bottom: 1rem;
   }
 
   .content-area {
@@ -286,82 +400,4 @@ textarea#entryContent {
     font-size: 1rem;
     padding: 0.75rem;
   }
-}
-
-.top-action {
-  text-align: center;
-  margin-top: 10px;
-}
-.emoji-picker {
-  margin-top: 1rem;
-}
-
-#emojiList {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  max-height: 150px;
-  overflow-y: auto;
-  background: #f1f1f1;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ccc;
-}
-
-#emojiList span {
-  font-size: 1.5rem;
-  cursor: pointer;
-}
-
-.entry-gif {
-  max-width: 100%;
-  margin-top: 1rem;
-  border-radius: 10px;
-}
-#emojiList {
-  margin-top: 0.5rem;
-  font-size: 1.5rem;
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.emoji {
-  cursor: pointer;
-  padding: 4px;
-  border-radius: 6px;
-  transition: transform 0.2s;
-}
-
-.emoji:hover {
-  transform: scale(1.3);
-  background: #f0f0f0;
-}
-
-.sticker {
-  width: 50px;
-  margin: 5px;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.sticker:hover {
-  transform: scale(1.3);
-}
-#stickerPicker,
-#emojiPicker {
-  margin: 1rem 0;
-}
-
-#stickerList img {
-  width: 48px;
-  height: 48px;
-  margin: 4px;
-  cursor: pointer;
-}
-
-#emojiList span {
-  font-size: 1.5rem;
-  margin: 4px;
-  cursor: pointer;
 }
