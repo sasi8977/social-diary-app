@@ -171,10 +171,10 @@ function setupProfile() {
   }
 
   const user = JSON.parse(localStorage.getItem('loggedInUser'));
-  if (user && user.username) {
-    const display = document.getElementById('usernameDisplay');
-    if (display) display.textContent =  `Hi, ${user.username} 👋`;;
-  }
+if (user) {
+  const name = user.username || user.displayName || user.email?.split('@')[0] || 'User';
+  document.getElementById('usernameDisplay').textContent = `Hi, ${name} 👋`;
+}
 }
 
 // === Settings ===
