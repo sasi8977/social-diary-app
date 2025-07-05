@@ -227,18 +227,19 @@ function setupSettings() {
 
 // === Emoji / Stickers ===
 function setupStickers() {
-  const picker = new EmojiButton();
-  const button = document.getElementById('toggleEmojiPicker');
-  const textarea = document.getElementById('entryContent');
+  const emojiBtn = document.getElementById('toggleEmojiPicker');
+  const inputField = document.getElementById('entryContent');
 
-  if (!button || !textarea) return;
+  if (!emojiBtn || !inputField) return;
+
+  const picker = new EmojiButton({ position: 'top-start' });
 
   picker.on('emoji', emoji => {
-    textarea.value += emoji;
+    inputField.value += emoji;
   });
 
-  button.addEventListener('click', () => {
-    picker.togglePicker(button);
+  emojiBtn.addEventListener('click', () => {
+    picker.togglePicker(emojiBtn);
   });
 }
 
