@@ -86,7 +86,7 @@
 
   <div class="login-container">
     <h2>Login to Social Diary</h2>
-    
+
     <!-- Username/Password Login -->
     <form id="loginForm">
       <div class="form-group">
@@ -128,6 +128,8 @@
     </div>
   </div>
 
+  <div id="recaptcha-container"></div>
+
   <!-- Scripts -->
   <script src="script.js" defer></script>
   <script>
@@ -156,7 +158,7 @@
     firebase.initializeApp(firebaseConfig);
   </script>
 
-  <!-- LocalStorage Username/Password Auth -->
+  <!-- Username/Password Login -->
   <script>
     document.getElementById("loginForm").addEventListener("submit", function(e) {
       e.preventDefault();
@@ -166,10 +168,9 @@
 
       if (users[username] && users[username] === password) {
         localStorage.setItem("loggedInUser", JSON.stringify({
-          username: user.displayName ||
-            "User",
-          email: user.email,
-          photoURL: user.photoURL
+          username: username,
+          email: username + "@local",
+          photoURL: ""
         }));
         alert("Login successful!");
         window.location.href = "index.html";
@@ -205,6 +206,10 @@
   <!-- Phone Number OTP Script -->
   <script>
     let confirmationResult;
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+      size: 'invisible',
+      callback: () => {}
+    });
 
     document.getElementById("sendOtpBtn").addEventListener("click", () => {
       const phoneNumber = document.getElementById("phoneNumber").value.trim();
@@ -213,11 +218,7 @@
         return;
       }
 
-      const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        size: 'invisible'
-      });
-
-      firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
+      firebase.auth().signInWithPhoneNumber(phoneNumber, window.recaptchaVerifier)
         .then((result) => {
           confirmationResult = result;
           alert("OTP sent!");
@@ -241,7 +242,8 @@
           const user = result.user;
           localStorage.setItem("loggedInUser", JSON.stringify({
             username: user.phoneNumber,
-            phone: user.phoneNumber
+            email: user.phoneNumber,
+            photoURL: ""
           }));
           alert("Phone login successful!");
           window.location.href = "index.html";
@@ -252,9 +254,6 @@
         });
     });
   </script>
-
-  <!-- reCAPTCHA container -->
-  <div id="recaptcha-container"></div>
 
 </body>
 </html>
