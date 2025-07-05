@@ -52,11 +52,14 @@ function setupMoodPicker() {
 function setupDiaryForm() {
   const form = document.getElementById('diaryForm');
   if (!form) return;
+  const dateField = document.getElementById('entryDate');
+  dateField.value = new Date().toISOString().substr(0, 10); // auto-fill today's date
+
   form.addEventListener('submit', e => {
     e.preventDefault();
     const entry = {
       id: Date.now(),
-      date: document.getElementById('entryDate').value,
+      date: dateField.value,
       title: document.getElementById('entryTitle').value,
       content: document.getElementById('entryContent').value,
       mood: selectedMood,
@@ -152,9 +155,10 @@ function setupTheme() {
 function setupProfile() {
   const input = document.getElementById('profilePicInput');
   const img = document.getElementById('profilePic');
+  const headerAvatar = document.getElementById('profilePicHeader');
   const saved = localStorage.getItem('avatarImage');
-  const headerAvatar=document.getElementById('profilePicHeader');
   if (saved && img) img.src = saved;
+  if (saved && headerAvatar) headerAvatar.src = saved;
 
   if (input) {
     input.addEventListener('change', function () {
@@ -163,6 +167,7 @@ function setupProfile() {
         const reader = new FileReader();
         reader.onload = e => {
           if (img) img.src = e.target.result;
+          if (headerAvatar) headerAvatar.src = e.target.result;
           localStorage.setItem('avatarImage', e.target.result);
         };
         reader.readAsDataURL(file);
@@ -171,10 +176,17 @@ function setupProfile() {
   }
 
   const user = JSON.parse(localStorage.getItem('loggedInUser'));
-  if (user && user.username) {
-    const display = document.getElementById('usernameDisplay');
-    if (display) display.textContent =  `Hi, ${user.username} 👋`;;
+  let displayName = 'User';
+  if (user) {
+    if (user.username && user.username.includes('@')) {
+      displayName = user.username.split('@')[0]; // from email
+    } else if (user.username) {
+      displayName = user.username;
+    }
   }
+
+  const display = document.getElementById('usernameDisplay');
+  if (display) display.textContent = `Hi, ${displayName} 👋`;
 }
 
 // === Settings ===
