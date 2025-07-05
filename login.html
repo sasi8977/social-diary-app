@@ -165,7 +165,12 @@
       const users = JSON.parse(localStorage.getItem("users") || "{}");
 
       if (users[username] && users[username] === password) {
-        localStorage.setItem("loggedInUser", JSON.stringify({ username }));
+        localStorage.setItem("loggedInUser", JSON.stringify({
+          username: user.displayName ||
+            "User",
+          email: user.email,
+          photoURL: user.photoURL
+        }));
         alert("Login successful!");
         window.location.href = "index.html";
       } else {
