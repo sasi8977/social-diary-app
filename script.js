@@ -1,4 +1,4 @@
-// === Social Diary App - Final Working script.js ===
+// === Social Diary App - Final script.js ===
 
 let selectedMood = '';
 let entries = JSON.parse(localStorage.getItem('entries')) || [];
@@ -149,12 +149,11 @@ function setupTheme() {
   });
 }
 
-// === Avatar/Profile + Greeting ===
+// === Avatar/Profile ===
 function setupProfile() {
   const input = document.getElementById('profilePicInput');
   const img = document.getElementById('profilePic');
   const saved = localStorage.getItem('avatarImage');
-
   if (saved && img) img.src = saved;
 
   if (input) {
@@ -173,9 +172,8 @@ function setupProfile() {
 
   const user = JSON.parse(localStorage.getItem('loggedInUser'));
   if (user) {
-    const name = user.displayName || user.username || user.email?.split('@')[0] || 'User';
-    const greeting = document.getElementById('usernameDisplay');
-    if (greeting) greeting.textContent = `Hi, ${name} 👋`;
+    const name = user.username || user.displayName || user.email?.split('@')[0] || 'User';
+    document.getElementById('usernameDisplay').textContent = `Hi, ${name} 👋`;
   }
 }
 
@@ -289,3 +287,4 @@ function setupLogout() {
     });
   }
 }
+
