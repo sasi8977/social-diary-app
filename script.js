@@ -1,9 +1,6 @@
-// === Social Diary App - Final script.js ===
-
 let selectedMood = '';
 let entries = JSON.parse(localStorage.getItem('entries')) || [];
 
-// === PIN Lock ===
 document.addEventListener('DOMContentLoaded', () => {
   const pinLock = document.getElementById('pin-lock');
   const unlockBtn = document.getElementById('unlockBtn');
@@ -24,6 +21,7 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('today-date').textContent = new Date().toDateString();
+  document.getElementById('entryDate').valueAsDate = new Date();
 
   loadEntries();
   setupMoodPicker();
@@ -32,13 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTheme();
   setupProfile();
   setupSettings();
-  setupPWA();
   setupViewEntries();
   setupStickers();
   setupLogout();
 });
 
-// === Mood ===
 function setupMoodPicker() {
   document.querySelectorAll('.mood-option').forEach(option => {
     option.addEventListener('click', () => {
@@ -48,11 +44,10 @@ function setupMoodPicker() {
   });
 }
 
-// === Diary Form ===
 function setupDiaryForm() {
   const form = document.getElementById('diaryForm');
   if (!form) return;
-  document.getElementById('entryDate').valueAsDate = new Date();
+
   form.addEventListener('submit', e => {
     e.preventDefault();
     const entry = {
@@ -74,7 +69,6 @@ function setupDiaryForm() {
   });
 }
 
-// === Tags ===
 function setupTags() {
   const addBtn = document.getElementById('addTagBtn');
   if (!addBtn) return;
@@ -91,7 +85,6 @@ function setupTags() {
   });
 }
 
-// === View Entries ===
 function loadEntries() {
   const list = document.getElementById('entriesList');
   if (!list) return;
@@ -136,7 +129,6 @@ function setupViewEntries() {
   btn.addEventListener('click', () => showSection('viewEntriesSection'));
 }
 
-// === Theme ===
 function setupTheme() {
   const select = document.getElementById('themeSelect');
   if (!select) return;
@@ -149,7 +141,6 @@ function setupTheme() {
   });
 }
 
-// === Avatar/Profile ===
 function setupProfile() {
   const input = document.getElementById('profilePicInput');
   const img = document.getElementById('profilePic');
@@ -177,7 +168,6 @@ function setupProfile() {
   }
 }
 
-// === Settings ===
 function setupSettings() {
   const settingsBtn = document.getElementById('settingsBtn');
   const newEntryBtn = document.getElementById('newEntryBtn');
@@ -224,67 +214,26 @@ function setupSettings() {
   }
 }
 
-// === Emoji / Stickers ===
 function setupStickers() {
   const emojiBtn = document.getElementById('toggleEmojiPicker');
   const inputField = document.getElementById('entryContent');
-
   if (!emojiBtn || !inputField) return;
 
   const picker = new EmojiButton({ position: 'top-start' });
-
   picker.on('emoji', emoji => {
     inputField.value += emoji;
   });
-
-  emojiBtn.addEventListener('click', () => {
-    picker.togglePicker(emojiBtn);
-  });
+  emojiBtn.addEventListener('click', () => picker.togglePicker(emojiBtn));
 }
 
-// === PWA Installation + Sharing ===
-function setupPWA() {
-  let deferredPrompt;
-  const installBtn = document.getElementById('installBtn');
-  window.addEventListener('beforeinstallprompt', e => {
-    e.preventDefault();
-    deferredPrompt = e;
-    if (installBtn) installBtn.style.display = 'inline-block';
-  });
-  if (installBtn) {
-    installBtn.addEventListener('click', () => {
-      deferredPrompt.prompt();
-      deferredPrompt.userChoice.then(choice => {
-        if (choice.outcome === 'accepted') {
-          installBtn.style.display = 'none';
-        }
-      });
-    });
-  }
-
-  const shareBtn = document.getElementById('shareBtn');
-  if (navigator.share && shareBtn) {
-    shareBtn.style.display = 'inline-block';
-    shareBtn.addEventListener('click', async () => {
-      await navigator.share({
-        title: 'Social Diary',
-        text: 'Check out my diary app!',
-        url: window.location.href
-      });
-    });
-  }
-}
-
-// === Logout ===
 function setupLogout() {
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('loggedInUser');
       localStorage.removeItem('pinUnlocked');
-      firebase.auth().signOut().catch(() => {});
+      firebase.auth().signOut();
       window.location.href = 'login.html';
     });
   }
 }
-
