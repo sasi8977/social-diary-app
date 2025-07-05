@@ -155,12 +155,10 @@ function setupTheme() {
 function setupProfile() {
   const input = document.getElementById('profilePicInput');
   const img = document.getElementById('profilePic');
+   const saved = localStorage.getItem('avatarImage');
   const headerAvatar = document.getElementById('profilePicHeader');
-  const saved = localStorage.getItem('avatarImage');
   if (saved && img) img.src = saved;
-  if (saved && headerAvatar) headerAvatar.src = saved;
-
-  if (input) {
+ if (input) {
     input.addEventListener('change', function () {
       const file = this.files[0];
       if (file) {
@@ -176,17 +174,12 @@ function setupProfile() {
   }
 
   const user = JSON.parse(localStorage.getItem('loggedInUser'));
-  let displayName = 'User';
-  if (user) {
-    if (user.username && user.username.includes('@')) {
-      displayName = user.username.split('@')[0]; // from email
-    } else if (user.username) {
-      displayName = user.username;
+    if (user && user.username){
+      const display =document.getElementById('usernameDisplay');
+      const sidebarDisplay =document.getElementById('sidebarUsername');
+      if (display) display.textContent = `Hi, ${user.username} 👋`;
+      if (sidebarDisplay)sidebarDisplay.textContent =user.username;
     }
-  }
-
-  const display = document.getElementById('usernameDisplay');
-  if (display) display.textContent = `Hi, ${displayName} 👋`;
 }
 
 // === Settings ===
