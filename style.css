@@ -44,19 +44,6 @@ body {
 .greeting-text h2 {
   margin: 0;
 }
-
-.avatar-circle {
-  width: 48px;
-  height: 48px;
-  border-radius: 50%;
-  background: #fff;
-  color: var(--primary-color);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-}
-
 /* Layout */
 .app {
   display: flex;
