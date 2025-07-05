@@ -52,7 +52,7 @@ function setupMoodPicker() {
 function setupDiaryForm() {
   const form = document.getElementById('diaryForm');
   if (!form) return;
-  document.getElementById('entryDate').valueAsDate= new Date();
+  document.getElementById('entryDate').valueAsDate = new Date();
   form.addEventListener('submit', e => {
     e.preventDefault();
     const entry = {
@@ -149,12 +149,12 @@ function setupTheme() {
   });
 }
 
-// === Avatar/Profile ===
+// === Avatar/Profile + Greeting ===
 function setupProfile() {
   const input = document.getElementById('profilePicInput');
   const img = document.getElementById('profilePic');
   const saved = localStorage.getItem('avatarImage');
-  const headerAvatar=document.getElementById('profilePicHeader');
+
   if (saved && img) img.src = saved;
 
   if (input) {
@@ -172,10 +172,11 @@ function setupProfile() {
   }
 
   const user = JSON.parse(localStorage.getItem('loggedInUser'));
-if (user) {
-  const name = user.username || user.displayName || user.email?.split('@')[0] || 'User';
-  document.getElementById('usernameDisplay').textContent = `Hi, ${name} 👋`;
-}
+  if (user) {
+    const name = user.displayName || user.username || user.email?.split('@')[0] || 'User';
+    const greeting = document.getElementById('usernameDisplay');
+    if (greeting) greeting.textContent = `Hi, ${name} 👋`;
+  }
 }
 
 // === Settings ===
@@ -283,7 +284,7 @@ function setupLogout() {
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('loggedInUser');
       localStorage.removeItem('pinUnlocked');
-      firebase.auth().signOut();
+      firebase.auth().signOut().catch(() => {});
       window.location.href = 'login.html';
     });
   }
