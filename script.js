@@ -52,6 +52,7 @@ function setupMoodPicker() {
 function setupDiaryForm() {
   const form = document.getElementById('diaryForm');
   if (!form) return;
+  document.getElementById('entryDate').valueAsDate= new Date();
   form.addEventListener('submit', e => {
     e.preventDefault();
     const entry = {
