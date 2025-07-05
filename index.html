@@ -4,141 +4,122 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Social Diary</title>
-  <link rel="stylesheet" href="style.css" />
+
+  <!-- PWA Meta -->
   <link rel="manifest" href="manifest.json" />
   <link rel="icon" href="icons/icon-192.png" />
-</head>
-<body>
+  <link rel="apple-touch-icon" href="icons/icon-512.png" />
+  <meta name="theme-color" content="#5e60ce" />
 
-  <!-- === PIN Lock Screen === -->
-  <div id="pin-lock" class="pin-overlay">
-    <div class="pin-box">
-      <h2>Enter PIN</h2>
-      <input type="password" id="pinInput" maxlength="4" placeholder="4-digit PIN" />
-      <button id="unlockBtn">Unlock</button>
-      <p id="pinError" class="error"></p>
-    </div>
-  </div>
-
-  <!-- === Header === -->
-  <header>
-    <div class="profile-info">
-      <img id="profilePicHeader" src="icons/icon-192.png" alt="Avatar" />
-      <span id="usernameDisplay">Hi 👋</span>
-    </div>
-    <button id="logoutBtn">Logout</button>
-  </header>
-
-  <!-- === Sections === -->
-  <main>
-
-    <!-- New Entry -->
-    <section id="newEntrySection" class="section active">
-      <h2>New Diary Entry</h2>
-      <form id="diaryForm">
-        <label for="entryDate">Date:</label>
-        <input type="date" id="entryDate" required />
-
-        <label for="entryTitle">Title:</label>
-        <input type="text" id="entryTitle" placeholder="Highlight of your day" required />
-
-        <label for="entryContent">Your Entry:</label>
-        <textarea id="entryContent" placeholder="Write about your day..." required></textarea>
-
-        <label>Mood:</label>
-        <div class="mood-picker">
-          <button type="button" class="mood-option" data-mood="😊">😊</button>
-          <button type="button" class="mood-option" data-mood="😢">😢</button>
-          <button type="button" class="mood-option" data-mood="😠">😠</button>
-          <button type="button" class="mood-option" data-mood="😍">😍</button>
-        </div>
-        <p id="selectedMood"></p>
-
-        <label for="tagsInput">Tags:</label>
-        <input type="text" id="tagsInput" placeholder="e.g., fun, college" />
-        <button type="button" id="addTagBtn">Add Tag</button>
-        <div id="tagsDisplay"></div>
-
-        <label>Add Emojis:</label>
-        <button type="button" id="toggleEmojiPicker">😀</button>
-
-        <button type="submit">Save Entry</button>
-      </form>
-    </section>
-
-    <!-- View Entries -->
-    <section id="viewEntriesSection" class="section">
-      <h2>Your Entries</h2>
-      <div id="entriesList"></div>
-    </section>
-
-    <!-- Entry Detail -->
-    <section id="entryDetailSection" class="section">
-      <h2 id="detailTitle"></h2>
-      <p id="detailDate"></p>
-      <p id="detailMood"></p>
-      <div id="detailTags"></div>
-      <p id="detailContent"></p>
-      <button id="backToListBtn">← Back</button>
-      <button id="editEntryBtn">Edit</button>
-      <button id="deleteEntryBtn">Delete</button>
-    </section>
-
-    <!-- Settings -->
-    <section id="settingsSection" class="section">
-      <h2>Settings</h2>
-      <button id="themeSelect" value="light">Switch Theme</button>
-
-      <label for="profilePicInput">Change Avatar:</label>
-      <input type="file" id="profilePicInput" accept="image/*" />
-      <img id="profilePic" src="icons/icon-192.png" alt="Profile Picture" />
-
-      <button id="exportDataBtn">Export Data</button>
-      <button id="importDataBtn">Import Data</button>
-      <input type="file" id="importDataInput" accept=".json" style="display: none;" />
-
-      <button id="saveSettingsBtn">Save Settings</button>
-    </section>
-
-    <!-- Statistics -->
-    <section id="statsSection" class="section">
-      <h2>Statistics</h2>
-      <p>Coming soon!</p>
-    </section>
-
-  </main>
-
-  <!-- === Footer Navigation === -->
-  <footer>
-    <button id="newEntryBtn">New Entry</button>
-    <button id="viewEntriesBtn">View Entries</button>
-    <button id="statsBtn">Statistics</button>
-    <button id="settingsBtn">Settings</button>
-    <button id="installBtn" style="display: none;">Install App</button>
-    <button id="shareBtn" style="display: none;">Share App</button>
-  </footer>
-
-  <!-- === Scripts === -->
-
-  <!-- Firebase (v8 for compatibility) -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
-
-  <!-- Emoji Button CDN -->
+  <!-- Emoji Picker -->
   <script src="https://cdn.jsdelivr.net/npm/@joeattardi/emoji-button@4.6.2/dist/index.min.js"></script>
 
-  <!-- App Script -->
-  <script src="script.js" defer></script>
+  <!-- Styles -->
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+</head>
 
-  <!-- Service Worker -->
+<body>
+  <!-- PIN Lock -->
+  <div id="pin-lock" class="pin-lock-screen">
+    <h2>Enter PIN to Unlock</h2>
+    <input type="password" id="pinInput" maxlength="4" placeholder="4-digit PIN" />
+    <button id="unlockBtn">Unlock</button>
+    <p id="pinError" class="error-msg"></p>
+  </div>
+
+  <!-- Greeting Header -->
+  <div class="greeting-text">
+    <h2 id="usernameDisplay">Hi 👋</h2>
+    <p id="today-date"></p>
+  </div>
+
+  <!-- App Wrapper -->
+  <div class="app">
+    <aside class="sidebar">
+      <div class="user-profile">
+        <label for="profilePicInput">
+          <img id="profilePic" src="images/default-avatar.png" class="avatar-img" />
+        </label>
+        <input type="file" id="profilePicInput" accept="image/*" style="display: none;" />
+      </div>
+
+      <nav>
+        <ul>
+          <li><a href="#" id="newEntryBtn"><i class="fas fa-plus"></i> New Entry</a></li>
+          <li><a href="#" id="viewEntriesBtn"><i class="fas fa-list"></i> View Entries</a></li>
+          <li><a href="#" id="statsBtn"><i class="fas fa-chart-bar"></i> Statistics</a></li>
+          <li><a href="#" id="settingsBtn"><i class="fas fa-cog"></i> Settings</a></li>
+          <li><a href="#" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+        </ul>
+      </nav>
+
+      <!-- Mood Tracker -->
+      <div class="mood-tracker">
+        <h3>Today's Mood</h3>
+        <div class="mood-options">
+          <span class="mood-option" data-mood="happy">😊</span>
+          <span class="mood-option" data-mood="neutral">😐</span>
+          <span class="mood-option" data-mood="sad">😢</span>
+          <span class="mood-option" data-mood="angry">😠</span>
+          <span class="mood-option" data-mood="excited">🤩</span>
+        </div>
+        <div id="selectedMood"></div>
+      </div>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="content-area diary-container">
+      <section id="newEntrySection" class="section active">
+        <h2>New Diary Entry</h2>
+        <form id="diaryForm">
+          <div class="form-group">
+            <label for="entryDate">Date:</label>
+            <input type="date" id="entryDate" required />
+          </div>
+          <div class="form-group">
+            <label for="entryTitle">Title:</label>
+            <input type="text" id="entryTitle" required />
+          </div>
+          <div class="form-group">
+            <label for="entryContent">Your Entry:</label>
+            <textarea id="entryContent" rows="8" required></textarea>
+          </div>
+          <div class="form-group">
+            <label>Add Emojis:</label>
+            <button type="button" id="toggleEmojiPicker">😀 Emoji</button>
+          </div>
+          <button type="submit" id="saveEntryBtn">Save Entry</button>
+        </form>
+      </section>
+
+      <section id="viewEntriesSection" class="section">
+        <h2>Your Entries</h2>
+        <div id="entriesList" class="entries-list"></div>
+      </section>
+
+      <section id="statsSection" class="section">
+        <h2>Statistics</h2>
+        <div class="stat-card">
+          <h3>Total Entries</h3>
+          <p id="totalEntries">0</p>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Notification -->
+  <div class="notification" id="notification"></div>
+
+  <!-- Scripts -->
+  <script src="script.js" defer></script>
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js', { scope: './' })
-        .then(reg => console.log('✅ Service Worker registered:', reg.scope))
-        .catch(err => console.error('❌ Service Worker registration failed:', err));
+      navigator.serviceWorker.register('sw.js')
+        .then(reg => console.log('Service Worker registered'))
+        .catch(err => console.error('Service Worker failed:', err));
     }
   </script>
-
 </body>
 </html>
 
