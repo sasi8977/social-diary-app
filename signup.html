@@ -1,106 +1,132 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>Sign Up - Social Diary</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Sign Up – Social Diary</title>
+  <link rel="stylesheet" href="style.css" />
+  <link rel="icon" href="icons/icon-192.png" />
   <style>
     body {
+      background: linear-gradient(to right, #5e60ce, #6930c3);
+      font-family: 'Segoe UI', sans-serif;
       display: flex;
-      justify-content: center;
       align-items: center;
+      justify-content: center;
       height: 100vh;
-      background: #f1f1f1;
-      font-family: 'Poppins', sans-serif;
+      margin: 0;
     }
-    .signup-box {
+
+    .signup-container {
       background: white;
       padding: 2rem;
       border-radius: 1rem;
-      box-shadow: 0 0 10px rgba(0,0,0,0.1);
-      width: 90%;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+      width: 100%;
       max-width: 400px;
     }
+
+    .signup-container h2 {
+      margin-bottom: 1rem;
+      color: #5e60ce;
+      text-align: center;
+    }
+
+    .form-group {
+      margin-bottom: 1rem;
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 0.25rem;
+    }
+
     input {
       width: 100%;
-      padding: 10px;
-      margin: 10px 0;
+      padding: 0.75rem;
       border-radius: 0.5rem;
       border: 1px solid #ccc;
+      font-size: 1rem;
     }
+
     button {
-      padding: 10px;
-      background: #5e60ce;
-      color: white;
+      width: 100%;
+      padding: 0.75rem;
+      background-color: #5e60ce;
       border: none;
       border-radius: 0.5rem;
-      width: 100%;
+      color: white;
       font-size: 1rem;
       cursor: pointer;
+      transition: background 0.3s ease;
     }
+
     button:hover {
-      background: #6930c3;
+      background-color: #4b4dc0;
     }
-    a {
-      display: block;
-      margin-top: 1rem;
+
+    .bottom-text {
       text-align: center;
-      color: #5e60ce;
+      margin-top: 1rem;
+    }
+
+    .bottom-text a {
+      color: #6930c3;
+      text-decoration: none;
+      font-weight: bold;
+    }
+
+    .bottom-text a:hover {
+      text-decoration: underline;
     }
   </style>
 </head>
 <body>
-  <div class="signup-box">
-    <h2>Create Account</h2>
-    <input type="text" id="newUsername" placeholder="Username" required>
-    <input type="password" id="newPassword" placeholder="Password" required>
-    <button onclick="register()">Sign Up</button>
-    <a href="login.html">Already have an account? Login</a>
+
+  <div class="signup-container">
+    <h2>Create Your Account</h2>
+    <form id="signupForm">
+      <div class="form-group">
+        <label for="newUsername">Username:</label>
+        <input type="text" id="newUsername" required />
+      </div>
+      <div class="form-group">
+        <label for="newPassword">Password:</label>
+        <input type="password" id="newPassword" required />
+      </div>
+      <button type="submit">Sign Up</button>
+    </form>
+
+    <div class="bottom-text">
+      Already have an account? <a href="login.html">Login</a>
+    </div>
   </div>
 
   <script>
-    function register() {
-      const user = document.getElementById("newUsername").value.trim();
-      const pass = document.getElementById("newPassword").value;
+    document.getElementById("signupForm").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const username = document.getElementById("newUsername").value.trim();
+      const password = document.getElementById("newPassword").value.trim();
 
-      if (!user || !pass) {
-        alert("Please enter both username and password.");
+      if (!username || !password) {
+        alert("Please fill in both fields.");
         return;
       }
 
       const users = JSON.parse(localStorage.getItem("users") || "{}");
-      if (users[user]) {
-        alert("User already exists. Please login.");
+
+      if (users[username]) {
+        alert("Username already exists. Please choose another.");
         return;
       }
 
-      users[user] = pass;
+      users[username] = password;
       localStorage.setItem("users", JSON.stringify(users));
 
-      // ✅ Store username in an object for use in index.html
-      localStorage.setItem("loggedInUser", JSON.stringify({ username: user }));
-
-      alert("Account created!");
-      window.location.href = "index.html";
-    }
+      alert("Signup successful! Please login.");
+      window.location.href = "login.html";
+    });
   </script>
-  <!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
-
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDsnJWkninWVCts0sy4qnRCzW8swC6fBQQ",
-    authDomain: "social-diary-b6754.firebaseapp.com",
-    projectId: "social-diary-b6754",
-    storageBucket: "social-diary-b6754.appspot.com",
-    messagingSenderId: "324502889073",
-    appId: "1:324502889073:web:05b3f162f18dc7f14bbc84",
-    measurementId: "G-6NSE7QK8LB"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-</script>
 </body>
 </html>
