@@ -227,23 +227,18 @@ function setupSettings() {
 
 // === Emoji / Stickers ===
 function setupStickers() {
-  const stickerBtn = document.getElementById('toggleEmojiPicker');
-  const list = document.getElementById('emojiList');
+  const picker = new EmojiButton();
+  const button = document.getElementById('toggleEmojiPicker');
   const textarea = document.getElementById('entryContent');
-  if (!stickerBtn || !list || !textarea) return;
 
-  const emojis = ['😀', '😂', '😍', '🥳', '😢', '😎', '🤔', '😠', '👍', '🎉'];
-  list.innerHTML = emojis.map(e => `<button class='emoji-btn'>${e}</button>`).join('');
-  list.style.display = 'none';
+  if (!button || !textarea) return;
 
-  stickerBtn.addEventListener('click', () => {
-    list.style.display = list.style.display === 'none' ? 'block' : 'none';
+  picker.on('emoji', emoji => {
+    textarea.value += emoji;
   });
 
-  list.querySelectorAll('.emoji-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      textarea.value += btn.textContent;
-    });
+  button.addEventListener('click', () => {
+    picker.togglePicker(button);
   });
 }
 
