@@ -283,6 +283,7 @@ function setupLogout() {
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('loggedInUser');
       localStorage.removeItem('pinUnlocked');
+      firebase.auth().signOut();
       window.location.href = 'login.html';
     });
   }
