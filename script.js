@@ -153,6 +153,7 @@ function setupProfile() {
   const input = document.getElementById('profilePicInput');
   const img = document.getElementById('profilePic');
   const saved = localStorage.getItem('avatarImage');
+  const headerAvatar=document.getElementById('profilePicHeader');
   if (saved && img) img.src = saved;
 
   if (input) {
@@ -172,7 +173,7 @@ function setupProfile() {
   const user = JSON.parse(localStorage.getItem('loggedInUser'));
   if (user && user.username) {
     const display = document.getElementById('usernameDisplay');
-    if (display) display.textContent = user.username;
+    if (display) display.textContent =  `Hi, ${user.username} 👋`;;
   }
 }
 
