@@ -257,6 +257,17 @@
   };
 
   firebase.initializeApp(firebaseConfig);
+  <script>
+  // Show correct name from Google or phone number login
+  const user = JSON.parse(localStorage.getItem("loggedInUser"));
+  if (user) {
+    const display = document.getElementById("usernameDisplay");
+    if (display) {
+      const nameToShow = user.username || user.email || user.phone || "Friend";
+      display.textContent = `Hi, ${nameToShow} 👋`;
+    }
+  }
+</script>
 </script>
 <!-- 🔺 Firebase config ends -->
 
