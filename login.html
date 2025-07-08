@@ -42,22 +42,26 @@
 <!-- Firebase SDK -->
 <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-app.js"></script>
 <script src="https://www.gstatic.com/firebasejs/10.4.0/firebase-auth.js"></script>
-  firebase.initializeApp({
-    const firebaseConfig = {
-  apiKey: "AIzaSyD0iJWnkuinWVCtsO5vjqohrCA4ws6fb8Q",
-  authDomain: "social-diary-b6754.firebaseapp.com",
-  projectId: "social-diary-b6754",
-  storageBucket: "social-diary-b6754.firebasestorage.app",
-  messagingSenderId: "324502839373",
-  appId: "1:324502839373:web:05b3f62f18dd78f14bbc04",
-  measurementId: "G-6NSE70KRLB"
-};
 
+<!-- Firebase initialization -->
+<script>
+  const firebaseConfig = {
+    apiKey: "AIzaSyD0iJWnkuinWVCtsO5vjqohrCA4ws6fb8Q",
+    authDomain: "social-diary-b6754.firebaseapp.com",
+    projectId: "social-diary-b6754",
+    storageBucket: "social-diary-b6754.firebasestorage.app",
+    messagingSenderId: "324502839373",
+    appId: "1:324502839373:web:05b3f62f18dd78f14bbc04",
+    measurementId: "G-6NSE70KRLB"
+  };
+
+  firebase.initializeApp(firebaseConfig);
 </script>
 
 <!-- Auth Logic -->
 <script>
   // Username/password login
+  const loginForm = document.getElementById('loginForm');
   loginForm.addEventListener("submit", e => {
     e.preventDefault();
     const u = username.value.trim(), p = password.value.trim();
@@ -69,6 +73,7 @@
   });
 
   // Google login
+  const googleLoginBtn = document.getElementById('googleLoginBtn');
   googleLoginBtn.addEventListener("click", () => {
     const provider = new firebase.auth.GoogleAuthProvider();
     firebase.auth().signInWithPopup(provider)
@@ -83,6 +88,8 @@
   });
 
   // Phone login + OTP
+  const sendOtpBtn = document.getElementById('sendOtpBtn');
+  const otpSection = document.getElementById('otpSection');
   let confirmationResult;
   sendOtpBtn.addEventListener("click", () => {
     const phone = phoneNumber.value.trim();
@@ -97,6 +104,8 @@
       .catch(e => alert("OTP failed: " + e.message));
   });
 
+  // OTP verification
+  const verifyOtpBtn = document.getElementById('verifyOtpBtn');
   verifyOtpBtn.addEventListener("click", () => {
     confirmationResult.confirm(otpCode.value.trim())
       .then(r => {
