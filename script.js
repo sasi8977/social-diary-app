@@ -149,6 +149,16 @@ function showEntryDetail(entry) {
   document.getElementById('detailDate').textContent = entry.date;
   document.getElementById('detailMood').textContent = entry.mood;
   document.getElementById('detailContent').textContent = entry.content;
+  const imageEl = document.getElementById('detailImage');
+if (imageEl) {
+  if (entry.image) {
+    imageEl.src = entry.image;
+    imageEl.style.display = 'block';
+  } else {
+    imageEl.style.display = 'none';
+  }
+}
+
   document.getElementById('detailTags').innerHTML = entry.tags.map(t => `<span class="tag">${t}</span>`).join('');
 
   document.getElementById('backToListBtn').onclick = () => showSection('viewEntriesSection');
