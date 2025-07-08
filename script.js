@@ -1,8 +1,9 @@
-// === Social Diary App - Working script.js (with emoji/logout issues only) ===
+// === Social Diary App - Updated script.js ===
 
 let selectedMood = '';
 let entries = JSON.parse(localStorage.getItem('entries')) || [];
 
+// === PIN Lock ===
 document.addEventListener('DOMContentLoaded', () => {
   const pinLock = document.getElementById('pin-lock');
   const unlockBtn = document.getElementById('unlockBtn');
@@ -23,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   document.getElementById('today-date').textContent = new Date().toDateString();
-  document.getElementById('entryDate').valueAsDate = new Date();
 
   loadEntries();
   setupMoodPicker();
@@ -32,11 +32,13 @@ document.addEventListener('DOMContentLoaded', () => {
   setupTheme();
   setupProfile();
   setupSettings();
+  setupPWA();
   setupViewEntries();
   setupStickers();
   setupLogout();
 });
 
+// === Mood ===
 function setupMoodPicker() {
   document.querySelectorAll('.mood-option').forEach(option => {
     option.addEventListener('click', () => {
@@ -46,31 +48,81 @@ function setupMoodPicker() {
   });
 }
 
+// === Diary Form ===
 function setupDiaryForm() {
   const form = document.getElementById('diaryForm');
   if (!form) return;
+  const dateField = document.getElementById('entryDate');
+  dateField.value = new Date().toISOString().substr(0, 10);
+
+  const imageInput = document.getElementById('entryImage');
+  const imagePreview = document.getElementById('imagePreview');
+  const removeBtn = document.getElementById('removeImageBtn');
+
+  if (imageInput && imagePreview && removeBtn) {
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          imagePreview.src = e.target.result;
+          imagePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    removeBtn.addEventListener('click', () => {
+      imageInput.value = '';
+      imagePreview.src = '';
+      imagePreview.style.display = 'none';
+    });
+  }
 
   form.addEventListener('submit', e => {
     e.preventDefault();
-    const entry = {
-      id: Date.now(),
-      date: document.getElementById('entryDate').value,
-      title: document.getElementById('entryTitle').value,
-      content: document.getElementById('entryContent').value,
-      mood: selectedMood,
-      tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(t => t.textContent)
-    };
-    entries.push(entry);
-    localStorage.setItem('entries', JSON.stringify(entries));
-    alert('Saved!');
-    form.reset();
-    selectedMood = '';
-    document.getElementById('selectedMood').textContent = '';
-    document.getElementById('tagsDisplay').innerHTML = '';
-    loadEntries();
+
+    let imageData = '';
+    const imageFile = imageInput && imageInput.files[0];
+
+    if (imageFile) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        imageData = e.target.result;
+        saveEntry(imageData);
+      };
+      reader.readAsDataURL(imageFile);
+    } else {
+      saveEntry('');
+    }
   });
 }
 
+function saveEntry(imageData) {
+  const entry = {
+    id: Date.now(),
+    date: document.getElementById('entryDate').value,
+    title: document.getElementById('entryTitle').value,
+    content: document.getElementById('entryContent').value,
+    mood: selectedMood,
+    tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(t => t.textContent),
+    image: imageData
+  };
+  entries.push(entry);
+  localStorage.setItem('entries', JSON.stringify(entries));
+  alert('Saved!');
+  document.getElementById('diaryForm').reset();
+  selectedMood = '';
+  document.getElementById('selectedMood').textContent = '';
+  document.getElementById('tagsDisplay').innerHTML = '';
+  if (document.getElementById('imagePreview')) {
+    document.getElementById('imagePreview').style.display = 'none';
+    document.getElementById('imagePreview').src = '';
+  }
+  loadEntries();
+}
+
+// === Tags ===
 function setupTags() {
   const addBtn = document.getElementById('addTagBtn');
   if (!addBtn) return;
@@ -87,6 +139,7 @@ function setupTags() {
   });
 }
 
+// === View Entries ===
 function loadEntries() {
   const list = document.getElementById('entriesList');
   if (!list) return;
@@ -94,7 +147,7 @@ function loadEntries() {
   entries.forEach(entry => {
     const card = document.createElement('div');
     card.className = 'entry-card';
-    card.innerHTML = `<h3>${entry.title}</h3><p>${entry.date}</p><p>${entry.mood}</p>`;
+    card.innerHTML = `<h3>${entry.title}</h3><p>${entry.date}</p><p>${entry.mood}</p>${entry.image ? `<img src="${entry.image}" class="entry-thumb" alt="entry photo"/>` : ''}`;
     card.addEventListener('click', () => showEntryDetail(entry));
     list.appendChild(card);
   });
@@ -108,6 +161,13 @@ function showEntryDetail(entry) {
   document.getElementById('detailMood').textContent = entry.mood;
   document.getElementById('detailContent').textContent = entry.content;
   document.getElementById('detailTags').innerHTML = entry.tags.map(t => `<span class="tag">${t}</span>`).join('');
+  const detailImage = document.getElementById('detailImage');
+  if (entry.image && detailImage) {
+    detailImage.src = entry.image;
+    detailImage.style.display = 'block';
+  } else if (detailImage) {
+    detailImage.style.display = 'none';
+  }
 
   document.getElementById('backToListBtn').onclick = () => showSection('viewEntriesSection');
   document.getElementById('editEntryBtn').onclick = () => alert('Edit not yet implemented.');
@@ -131,6 +191,7 @@ function setupViewEntries() {
   btn.addEventListener('click', () => showSection('viewEntriesSection'));
 }
 
+// === Theme ===
 function setupTheme() {
   const select = document.getElementById('themeSelect');
   if (!select) return;
@@ -143,12 +204,13 @@ function setupTheme() {
   });
 }
 
+// === Avatar/Profile ===
 function setupProfile() {
   const input = document.getElementById('profilePicInput');
   const img = document.getElementById('profilePic');
   const saved = localStorage.getItem('avatarImage');
+  const headerAvatar = document.getElementById('profilePicHeader');
   if (saved && img) img.src = saved;
-
   if (input) {
     input.addEventListener('change', function () {
       const file = this.files[0];
@@ -156,6 +218,7 @@ function setupProfile() {
         const reader = new FileReader();
         reader.onload = e => {
           if (img) img.src = e.target.result;
+          if (headerAvatar) headerAvatar.src = e.target.result;
           localStorage.setItem('avatarImage', e.target.result);
         };
         reader.readAsDataURL(file);
@@ -164,12 +227,15 @@ function setupProfile() {
   }
 
   const user = JSON.parse(localStorage.getItem('loggedInUser'));
-  if (user) {
-    const name = user.username || user.displayName || user.email?.split('@')[0] || 'User';
-    document.getElementById('usernameDisplay').textContent = `Hi, ${name} 👋`;
+  if (user && user.username){
+    const display = document.getElementById('usernameDisplay');
+    const sidebarDisplay = document.getElementById('sidebarUsername');
+    if (display) display.textContent = `Hi, ${user.username} 👋`;
+    if (sidebarDisplay) sidebarDisplay.textContent = user.username;
   }
 }
 
+// === Settings ===
 function setupSettings() {
   const settingsBtn = document.getElementById('settingsBtn');
   const newEntryBtn = document.getElementById('newEntryBtn');
@@ -216,28 +282,72 @@ function setupSettings() {
   }
 }
 
+// === Emoji / Stickers ===
 function setupStickers() {
-  const emojiBtn = document.getElementById('toggleEmojiPicker');
-  const inputField = document.getElementById('entryContent');
-  if (!emojiBtn || !inputField) return;
+  const stickerBtn = document.getElementById('toggleEmojiPicker');
+  const list = document.getElementById('emojiList');
+  const textarea = document.getElementById('entryContent');
+  if (!stickerBtn || !list || !textarea) return;
 
-  const picker = new EmojiButton({ position: 'top-start' });
-  picker.on('emoji', emoji => {
-    inputField.value += emoji;
+  const emojis = ['😀', '😂', '😍', '🥳', '😢', '😎', '🤔', '😠', '👍', '🎉'];
+  list.innerHTML = emojis.map(e => `<button class='emoji-btn'>${e}</button>`).join('');
+  list.style.display = 'none';
+
+  stickerBtn.addEventListener('click', () => {
+    list.style.display = list.style.display === 'none' ? 'block' : 'none';
   });
-  emojiBtn.addEventListener('click', () => picker.togglePicker(emojiBtn));
+
+  list.querySelectorAll('.emoji-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      textarea.value += btn.textContent;
+    });
+  });
 }
 
+// === PWA Installation + Sharing ===
+function setupPWA() {
+  let deferredPrompt;
+  const installBtn = document.getElementById('installBtn');
+  window.addEventListener('beforeinstallprompt', e => {
+    e.preventDefault();
+    deferredPrompt = e;
+    if (installBtn) installBtn.style.display = 'inline-block';
+  });
+  if (installBtn) {
+    installBtn.addEventListener('click', () => {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(choice => {
+        if (choice.outcome === 'accepted') {
+          installBtn.style.display = 'none';
+        }
+      });
+    });
+  }
+
+  const shareBtn = document.getElementById('shareBtn');
+  if (navigator.share && shareBtn) {
+    shareBtn.style.display = 'inline-block';
+    shareBtn.addEventListener('click', async () => {
+      await navigator.share({
+        title: 'Social Diary',
+        text: 'Check out my diary app!',
+        url: window.location.href
+      });
+    });
+  }
+}
+
+// === Logout ===
 function setupLogout() {
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
       localStorage.removeItem('loggedInUser');
       localStorage.removeItem('pinUnlocked');
-      firebase.auth().signOut();
       window.location.href = 'login.html';
     });
   }
 }
+
 
 
