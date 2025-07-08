@@ -89,11 +89,11 @@
     <form id="signupForm">
       <div class="form-group">
         <label for="newUsername">Username:</label>
-        <input type="text" id="newUsername" required />
+        <input type="text" id="signupName" required />
       </div>
       <div class="form-group">
         <label for="newPassword">Password:</label>
-        <input type="password" id="newPassword" required />
+        <input type="password" id="newPassword" placeholder="Full Name required />
       </div>
       <button type="submit">Sign Up</button>
     </form>
@@ -104,29 +104,24 @@
   </div>
 
   <script>
-    document.getElementById("signupForm").addEventListener("submit", function (e) {
-      e.preventDefault();
-      const username = document.getElementById("newUsername").value.trim();
-      const password = document.getElementById("newPassword").value.trim();
+    document.getElementById("signupForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const email = signupEmail.value.trim();
+  const password = signupPassword.value.trim();
+  const name = signupName.value.trim();
 
-      if (!username || !password) {
-        alert("Please fill in both fields.");
-        return;
-      }
+  const users = JSON.parse(localStorage.getItem("users") || "{}");
+  if (users[email]) return alert("User already exists.");
 
-      const users = JSON.parse(localStorage.getItem("users") || "{}");
+  users[email] = {
+    password: password,
+    name: name
+  };
 
-      if (users[username]) {
-        alert("Username already exists. Please choose another.");
-        return;
-      }
-
-      users[username] = password;
-      localStorage.setItem("users", JSON.stringify(users));
-
-      alert("Signup successful! Please login.");
-      window.location.href = "login.html";
-    });
+  localStorage.setItem("users", JSON.stringify(users));
+  alert("Signup successful!");
+  location.href = "login.html";
+});
   </script>
 </body>
 </html>
