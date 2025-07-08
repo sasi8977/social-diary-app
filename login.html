@@ -66,9 +66,11 @@
     e.preventDefault();
     const u = username.value.trim(), p = password.value.trim();
     const users = JSON.parse(localStorage.getItem("users") || "{}");
-    if (users[u] === p) {
-      localStorage.setItem("loggedInUser", JSON.stringify({username: u}));
-      location.href = "index.html";
+    if (users[u] && users[u].password === p) {
+  localStorage.setItem("loggedInUser", JSON.stringify({
+    username: users[u].name || u // fallback to email if name missing
+  }));
+  location.href = "index.html";
     } else alert("Invalid credentials.");
   });
 
