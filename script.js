@@ -58,6 +58,22 @@ function setupDiaryForm() {
   form.addEventListener('submit', e => {
     e.preventDefault();
     const entry = {
+      const imageInput = document.getElementById('entryImage');
+let imageData = '';
+if (imageInput && imageInput.files[0]) {
+  const reader = new FileReader();
+  reader.onload = function(e) {
+    imageData = e.target.result;
+
+    // Proceed to save entry after image is loaded
+    saveEntry(imageData);
+  };
+  reader.readAsDataURL(imageInput.files[0]);
+} else {
+  // If no image selected, save entry immediately
+  saveEntry('');
+}
+
       id: Date.now(),
       date: dateField.value,
       title: document.getElementById('entryTitle').value,
@@ -74,6 +90,24 @@ function setupDiaryForm() {
     document.getElementById('tagsDisplay').innerHTML = '';
     loadEntries();
   });
+function saveEntry(imageData) {
+  const entry = {
+    id: Date.now(),
+    date: document.getElementById('entryDate').value,
+    title: document.getElementById('entryTitle').value,
+    content: document.getElementById('entryContent').value,
+    mood: selectedMood,
+    tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(t => t.textContent),
+    image: imageData
+  };
+  entries.push(entry);
+  localStorage.setItem('entries', JSON.stringify(entries));
+  alert('Saved!');
+  document.getElementById('diaryForm').reset();
+  selectedMood = '';
+  document.getElementById('selectedMood').textContent = '';
+  document.getElementById('tagsDisplay').innerHTML = '';
+  loadEntries();
 }
 
 // === Tags ===
