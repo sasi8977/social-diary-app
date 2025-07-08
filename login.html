@@ -1,233 +1,110 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
   <title>Login – Social Diary</title>
-  <link rel="stylesheet" href="style.css" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <style>
-    body {
-      background: linear-gradient(to right, #5e60ce, #6930c3);
-      font-family: 'Segoe UI', sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      height: 100vh;
-      margin: 0;
-    }
-    .login-container {
-      background: white;
-      padding: 2rem;
-      border-radius: 1rem;
-      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
-      width: 100%;
-      max-width: 400px;
-    }
-    .login-container h2 {
-      margin-bottom: 1rem;
-      color: #5e60ce;
-      text-align: center;
-    }
-    .form-group {
-      margin-bottom: 1rem;
-    }
-    label {
-      display: block;
-      font-weight: 600;
-      margin-bottom: 0.25rem;
-    }
-    input {
-      width: 100%;
-      padding: 0.75rem;
-      border-radius: 0.5rem;
-      border: 1px solid #ccc;
-      font-size: 1rem;
-    }
-    button {
-      width: 100%;
-      padding: 0.75rem;
-      background-color: #5e60ce;
-      border: none;
-      border-radius: 0.5rem;
-      color: white;
-      font-size: 1rem;
-      cursor: pointer;
-      transition: background 0.3s ease;
-    }
-    button:hover {
-      background-color: #4b4dc0;
-    }
-    .bottom-text {
-      text-align: center;
-      margin-top: 1rem;
-    }
-    .bottom-text a {
-      color: #6930c3;
-      text-decoration: none;
-      font-weight: bold;
-    }
-    .bottom-text a:hover {
-      text-decoration: underline;
-    }
-  </style>
+  <link rel="stylesheet" href="style.css"/>
 </head>
 <body>
 
-  <div class="login-container">
-    <h2>Login to Social Diary</h2>
+<div class="login-container">
+  <h2>Login to Social Diary</h2>
 
-    <!-- Username/Password Login -->
-    <form id="loginForm">
-      <div class="form-group">
-        <label for="username">Username:</label>
-        <input type="text" id="username" required />
-      </div>
-      <div class="form-group">
-        <label for="password">Password:</label>
-        <input type="password" id="password" required />
-      </div>
-      <button type="submit">Login</button>
-    </form>
+  <!-- Username / Password -->
+  <form id="loginForm">
+    <input type="text" id="username" placeholder="Username" required/>
+    <input type="password" id="password" placeholder="Password" required/>
+    <button type="submit">Login</button>
+  </form>
 
-    <hr>
+  <hr>
 
-    <!-- Google Login -->
-    <button id="googleLoginBtn" style="margin-top: 1rem; background: #db4437;">
-      Continue with Google
-    </button>
+  <!-- Google -->
+  <button id="googleLoginBtn" style="background: #db4437">Continue with Google</button>
 
-    <hr>
+  <hr>
 
-    <!-- Phone Number Login -->
-    <div class="form-group">
-      <label for="phoneNumber">Phone Number:</label>
-      <input type="tel" id="phoneNumber" placeholder="+91xxxxxxxxxx" />
-    </div>
-    <div class="form-group">
-      <button type="button" id="sendOtpBtn" style="background: #34a853;">Send OTP</button>
-    </div>
-    <div class="form-group" style="display: none;" id="otpSection">
-      <label for="otpCode">Enter OTP:</label>
-      <input type="text" id="otpCode" />
-      <button type="button" id="verifyOtpBtn">Verify OTP</button>
-    </div>
-
-    <div class="bottom-text">
-      Don't have an account? <a href="signup.html">Sign Up</a>
-    </div>
+  <!-- Phone Number + OTP -->
+  <input type="tel" id="phoneNumber" placeholder="+91XXXXXXXXXX"/>
+  <button id="sendOtpBtn" style="background: #34a853">Send OTP</button>
+  <div id="otpSection" style="display:none;">
+    <input type="text" id="otpCode" placeholder="Enter OTP"/>
+    <button id="verifyOtpBtn">Verify OTP</button>
   </div>
 
-  <!-- reCAPTCHA container (hidden) -->
-  <div id="recaptcha-container"></div>
+  <a href="signup.html">Don't have an account? Sign Up</a>
+</div>
 
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<!-- reCAPTCHA container (invisible) -->
+<div id="recaptcha-container"></div>
 
-  <!-- Firebase Config -->
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyDsnJWkninWVCts0sy4qnRCzW8swC6fBQQ",
-      authDomain: "social-diary-b6754.firebaseapp.com",
-      projectId: "social-diary-b6754",
-      storageBucket: "social-diary-b6754.appspot.com",
-      messagingSenderId: "324502889073",
-      appId: "1:324502889073:web:05b3f162f18dc7f14bbc84",
-      measurementId: "G-6NSE7QK8LB"
-    };
-    firebase.initializeApp(firebaseConfig);
-  </script>
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-auth.js"></script>
+<script>
+  firebase.initializeApp({
+    apiKey: "AIzaSyDsnJWkninWVCts0sy4qnRCzW8swC6fBQQ",
+    authDomain: "social-diary-b6754.firebaseapp.com",
+    projectId: "social-diary-b6754",
+    storageBucket: "social-diary-b6754.appspot.com",
+    messagingSenderId: "324502889073",
+    appId: "1:324502889073:web:05b3f162f18dc7f14bbc84"
+  });
+</script>
 
-  <!-- LocalStorage Login Logic -->
-  <script>
-    document.getElementById("loginForm").addEventListener("submit", function(e) {
-      e.preventDefault();
-      const username = document.getElementById("username").value.trim();
-      const password = document.getElementById("password").value.trim();
-      const users = JSON.parse(localStorage.getItem("users") || "{}");
+<!-- Auth Logic -->
+<script>
+  // Username/password login
+  loginForm.addEventListener("submit", e => {
+    e.preventDefault();
+    const u = username.value.trim(), p = password.value.trim();
+    const users = JSON.parse(localStorage.getItem("users") || "{}");
+    if (users[u] === p) {
+      localStorage.setItem("loggedInUser", JSON.stringify({username: u}));
+      location.href = "index.html";
+    } else alert("Invalid credentials.");
+  });
 
-      if (users[username] && users[username] === password) {
-        localStorage.setItem("loggedInUser", JSON.stringify({ username }));
-        alert("Login successful!");
-        window.location.href = "index.html";
-      } else {
-        alert("Invalid username or password.");
-      }
-    });
-  </script>
+  // Google login
+  googleLoginBtn.addEventListener("click", () => {
+    const provider = new firebase.auth.GoogleAuthProvider();
+    firebase.auth().signInWithPopup(provider)
+      .then(r => {
+        const u = r.user;
+        localStorage.setItem("loggedInUser", JSON.stringify({
+          username: u.displayName, email: u.email, photoURL: u.photoURL
+        }));
+        location.href = "index.html";
+      })
+      .catch(e => alert("Google login failed: " + e.message));
+  });
 
-  <!-- Google Login Script -->
-  <script>
-    document.getElementById("googleLoginBtn").addEventListener("click", () => {
-      const provider = new firebase.auth.GoogleAuthProvider();
-      firebase.auth().signInWithPopup(provider)
-        .then((result) => {
-          const user = result.user;
-          localStorage.setItem("loggedInUser", JSON.stringify({
-            const firebaseConfig = {
-            username: user.displayName || "User",
-            email: user.email,
-            photoURL: user.photoURL
-          }));
-          alert("Google login successful!");
-          window.location.href = "index.html";
-        })
-        .catch((error) => {
-          console.error("Google login error:", error);
-          alert("Login failed: " + error.message);
-        });
-    });
-  </script>
+  // Phone login + OTP
+  let confirmationResult;
+  sendOtpBtn.addEventListener("click", () => {
+    const phone = phoneNumber.value.trim();
+    if (!phone.startsWith("+")) return alert("Include country code, e.g. +91...");
+    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {size: 'invisible'});
+    firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
+      .then(cr => {
+        confirmationResult = cr;
+        otpSection.style.display = "block";
+        alert("OTP sent!");
+      })
+      .catch(e => alert("OTP failed: " + e.message));
+  });
 
-  <!-- Phone OTP Login Script -->
-  <script>
-    let confirmationResult;
-
-    document.getElementById("sendOtpBtn").addEventListener("click", () => {
-      const phoneNumber = document.getElementById("phoneNumber").value.trim();
-      if (!phoneNumber.startsWith("+")) {
-        alert("Phone number must start with country code (e.g., +91)");
-        return;
-      }
-
-      const appVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-        size: 'invisible'
-      });
-
-      firebase.auth().signInWithPhoneNumber(phoneNumber, appVerifier)
-        .then(result => {
-          confirmationResult = result;
-          alert("OTP sent!");
-          document.getElementById("otpSection").style.display = "block";
-        })
-        .catch(error => {
-          console.error("OTP error:", error);
-          alert("Failed to send OTP: " + error.message);
-        });
-    });
-
-    document.getElementById("verifyOtpBtn").addEventListener("click", () => {
-      const code = document.getElementById("otpCode").value.trim();
-      if (!code) return alert("Enter the OTP code.");
-
-      confirmationResult.confirm(code)
-        .then(result => {
-          const user = result.user;
-          localStorage.setItem("loggedInUser", JSON.stringify({
-            const firebaseConfig = {
-            username: user.phoneNumber,
-            phone: user.phoneNumber
-          }));
-          alert("Phone login successful!");
-          window.location.href = "index.html";
-        })
-        .catch(error => {
-          console.error("OTP verification error:", error);
-          alert("Incorrect OTP. Try again.");
-        });
-    });
-  </script>
+  verifyOtpBtn.addEventListener("click", () => {
+    confirmationResult.confirm(otpCode.value.trim())
+      .then(r => {
+        const u = r.user;
+        localStorage.setItem("loggedInUser", JSON.stringify({username: u.phoneNumber}));
+        location.href = "index.html";
+      })
+      .catch(e => alert("Invalid OTP: " + e.message));
+  });
+</script>
 
 </body>
 </html>
