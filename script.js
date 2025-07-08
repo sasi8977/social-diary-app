@@ -140,14 +140,24 @@ function setupTags() {
 }
 
 // === View Entries ===
-function loadEntries() {
+function loadEntries(filter = '') {
   const list = document.getElementById('entriesList');
   if (!list) return;
   list.innerHTML = '';
-  entries.forEach(entry => {
+
+  const lowerFilter = filter.toLowerCase();
+
+  const filteredEntries = entries.filter(entry =>
+    entry.title.toLowerCase().includes(lowerFilter) ||
+    entry.mood.toLowerCase().includes(lowerFilter) ||
+    (entry.tags && entry.tags.some(tag => tag.toLowerCase().includes(lowerFilter)))
+  );
+
+  filteredEntries.forEach(entry => {
     const card = document.createElement('div');
     card.className = 'entry-card';
-    card.innerHTML = `<h3>${entry.title}</h3><p>${entry.date}</p><p>${entry.mood}</p>${entry.image ? `<img src="${entry.image}" class="entry-thumb" alt="entry photo"/>` : ''}`;
+    card.innerHTML = `<h3>${entry.title}</h3><p>${entry.date}</p><p>${entry.mood}</p>` +
+      (entry.image ? `<img src="${entry.image}" class="entry-thumb" alt="entry photo"/>` : '');
     card.addEventListener('click', () => showEntryDetail(entry));
     list.appendChild(card);
   });
@@ -190,7 +200,12 @@ function setupViewEntries() {
   if (!btn) return;
   btn.addEventListener('click', () => showSection('viewEntriesSection'));
 }
-
+const searchInput = document.getElementById('searchInput');
+if (searchInput) {
+  searchInput.addEventListener('input', () => {
+    loadEntries(searchInput.value);
+  });
+}
 // === Theme ===
 function setupTheme() {
   const select = document.getElementById('themeSelect');
