@@ -90,6 +90,30 @@ if (imageInput && imageInput.files[0]) {
     document.getElementById('tagsDisplay').innerHTML = '';
     loadEntries();
   });
+ const imageInput = document.getElementById('imageInput');
+  const imagePreview = document.getElementById('imagePreview');
+  const removeBtn = document.getElementById('removeImageBtn');
+
+  if (imageInput && imagePreview && removeBtn) {
+    imageInput.addEventListener('change', () => {
+      const file = imageInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = e => {
+          imagePreview.src = e.target.result;
+          imagePreview.style.display = 'block';
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
+    removeBtn.addEventListener('click', () => {
+      imageInput.value = '';
+      imagePreview.src = '';
+      imagePreview.style.display = 'none';
+    });
+  }
+}
 function saveEntry(imageData) {
   const entry = {
     id: Date.now(),
@@ -149,16 +173,6 @@ function showEntryDetail(entry) {
   document.getElementById('detailDate').textContent = entry.date;
   document.getElementById('detailMood').textContent = entry.mood;
   document.getElementById('detailContent').textContent = entry.content;
-  const imageEl = document.getElementById('detailImage');
-if (imageEl) {
-  if (entry.image) {
-    imageEl.src = entry.image;
-    imageEl.style.display = 'block';
-  } else {
-    imageEl.style.display = 'none';
-  }
-}
-
   document.getElementById('detailTags').innerHTML = entry.tags.map(t => `<span class="tag">${t}</span>`).join('');
 
   document.getElementById('backToListBtn').onclick = () => showSection('viewEntriesSection');
