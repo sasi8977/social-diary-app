@@ -135,7 +135,8 @@ function loadEntries() {
   entries.forEach(entry => {
     const card = document.createElement('div');
     card.className = 'entry-card';
-    card.innerHTML = `<h3>${entry.title}</h3><p>${entry.date}</p><p>${entry.mood}</p>`;
+    card.innerHTML = `<h3>${entry.title}</h3><p>${entry.date}</p><p>${entry.mood}</p>`${entry.image ?'<img src="${entry.image}"
+      class="entry-thumb" alt="entry photo"/>':''}';
     card.addEventListener('click', () => showEntryDetail(entry));
     list.appendChild(card);
   });
