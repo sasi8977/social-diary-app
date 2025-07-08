@@ -90,33 +90,47 @@
   });
 
   // Phone login + OTP
-  const sendOtpBtn = document.getElementById('sendOtpBtn');
-  const otpSection = document.getElementById('otpSection');
-  let confirmationResult;
-  sendOtpBtn.addEventListener("click", () => {
-    const phone = phoneNumber.value.trim();
-    if (!phone.startsWith("+")) return alert("Include country code, e.g. +91...");
-    window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {size: 'invisible'});
-    firebase.auth().signInWithPhoneNumber(phone, recaptchaVerifier)
-      .then(cr => {
-        confirmationResult = cr;
-        otpSection.style.display = "block";
-        alert("OTP sent!");
-      })
-      .catch(e => alert("OTP failed: " + e.message));
+let confirmationResult;
+
+sendOtpBtn.addEventListener("click", () => {
+  const phone = phoneNumber.value.trim();
+  if (!phone.startsWith("+")) return alert("Include country code, e.g. +91...");
+
+  // Initialize reCAPTCHA
+  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
+    size: 'invisible',
+    callback: function(response) {
+      // reCAPTCHA solved, now send OTP
+      sendPhoneOtp(phone);
+    }
   });
 
-  // OTP verification
-  const verifyOtpBtn = document.getElementById('verifyOtpBtn');
-  verifyOtpBtn.addEventListener("click", () => {
-    confirmationResult.confirm(otpCode.value.trim())
-      .then(r => {
-        const u = r.user;
-        localStorage.setItem("loggedInUser", JSON.stringify({username: u.phoneNumber}));
-        location.href = "index.html";
-      })
-      .catch(e => alert("Invalid OTP: " + e.message));
+  recaptchaVerifier.render().then(() => {
+    sendPhoneOtp(phone); // In case callback doesn't trigger
   });
+});
+
+function sendPhoneOtp(phone) {
+  firebase.auth().signInWithPhoneNumber(phone, window.recaptchaVerifier)
+    .then(cr => {
+      confirmationResult = cr;
+      otpSection.style.display = "block";
+      alert("OTP sent to " + phone);
+    })
+    .catch(e => alert("OTP error: " + e.message));
+}
+
+// OTP verification
+verifyOtpBtn.addEventListener("click", () => {
+  const code = otpCode.value.trim();
+  confirmationResult.confirm(code)
+    .then(result => {
+      const u = result.user;
+      localStorage.setItem("loggedInUser", JSON.stringify({ username: u.phoneNumber }));
+      location.href = "index.html";
+    })
+    .catch(e => alert("Invalid OTP: " + e.message));
+});
 </script>
 
 </body>
