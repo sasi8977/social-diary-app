@@ -192,7 +192,13 @@ textarea#entryContent {
   gap: 1rem;
   margin-top: 1rem;
 }
-
+.entry-thumb {
+  width: 100%
+    max-height: 150px;
+    object-fit: cover;
+  margin-top: 10px;
+  border-radius: 1rem;
+}
 /* Stats */
 .stat-card {
   background: var(--card-bg);
