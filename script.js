@@ -189,16 +189,18 @@ card.innerHTML = `
     card.addEventListener('click', () => showEntryDetail(entry));
     list.appendChild(card);
  setTimeout(() => {
-  new Swiper('.swiper-container', {
-    loop: true,
-    pagination: { el: '.swiper-pagination' },
-    navigation: {
-      nextEl: '.swiper-button-next',
-      prevEl: '.swiper-button-prev'
-    }
+  card.querySelectorAll('.swiper-container').forEach(container => {
+    new Swiper(container, {
+      loop: true,
+      pagination: { el: container.querySelector('.swiper-pagination') },
+      navigation: {
+        nextEl: container.querySelector('.swiper-button-next'),
+        prevEl: container.querySelector('.swiper-button-prev')
+      }
+    });
   });
 }, 100);
-
+}
 function showEntryDetail(entry) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('entryDetailSection').classList.add('active');
