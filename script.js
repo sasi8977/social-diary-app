@@ -166,11 +166,9 @@ if (entry.images && entry.images.length > 0) {
   imageHtml = entry.images.map(img => `<img src="${img}" class="entry-thumb" alt="entry photo" />`).join('');
 }
 
-card.innerHTML = `
-  <h3>${entry.title}</h3>
-  <p>${entry.date}</p>
-  <p>${entry.mood}</p>
-  ${entry.images && entry.images.length > 0 ? `
+let swiperHtml = '';
+if (entry.images && entry.images.length > 0) {
+  swiperHtml = `
     <div class="swiper-container">
       <div class="swiper-wrapper">
         ${entry.images.map(img => `
@@ -182,8 +180,9 @@ card.innerHTML = `
       <div class="swiper-pagination"></div>
       <div class="swiper-button-prev"></div>
       <div class="swiper-button-next"></div>
-    </div>` : ''}
-`;
+    </div>
+  `;
+
     card.addEventListener('click', () => showEntryDetail(entry));
     list.appendChild(card);
  setTimeout(() => {
