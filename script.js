@@ -195,7 +195,7 @@ function loadEntries(filter = '') {
 
     card.innerHTML = `
       <h3>${entry.title}</h3>
-      <p>${entry.date}</p>
+       <p class="entry-date">${entry.date || 'No date'}</p>
       <p>${entry.mood}</p>
       ${swiperHtml}
     `;
@@ -222,7 +222,7 @@ function showEntryDetail(entry) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('entryDetailSection').classList.add('active');
   document.getElementById('detailTitle').textContent = entry.title;
-  document.getElementById('detailDate').textContent = entry.date;
+  document.getElementById('detailDate').textContent = entry.date ||'No date';
   document.getElementById('detailMood').textContent = entry.mood;
   document.getElementById('detailContent').textContent = entry.content;
   document.getElementById('detailTags').innerHTML = entry.tags.map(t => `<span class="tag">${t}</span>`).join('');
