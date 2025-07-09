@@ -50,34 +50,25 @@ function setupMoodPicker() {
 
 // === Diary Form ===
 function setupDiaryForm() {
-  const form = document.getElementById('diaryForm');
-  if (!form) return;
-
-  const dateField = document.getElementById('entryDate');
-  dateField.value = new Date().toISOString().substr(0, 10); // auto-fill today's date
-
   const imageInput = document.getElementById('imageInput');
-const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+const previewContainer = document.getElementById('previewImages');
 const removeBtn = document.getElementById('removeImageBtn');
 let selectedImages = [];
 
-if (imageInput && imagePreviewContainer && removeBtn) {
+if (imageInput && previewContainer && removeBtn) {
   imageInput.addEventListener('change', () => {
-    selectedImages = []; // Clear previous selection
-    imagePreviewContainer.innerHTML = ''; // Clear previews
-
+    selectedImages = [];
+    previewContainer.innerHTML = '';
     const files = Array.from(imageInput.files);
     files.forEach(file => {
       const reader = new FileReader();
       reader.onload = e => {
-        selectedImages.push(e.target.result); // Save base64 image
-
+        selectedImages.push(e.target.result);
         const img = document.createElement('img');
         img.src = e.target.result;
+        img.className = 'entry-thumb';
         img.style.maxWidth = '100px';
-        img.style.height = 'auto';
-        img.style.borderRadius = '8px';
-        imagePreviewContainer.appendChild(img);
+        previewContainer.appendChild(img);
       };
       reader.readAsDataURL(file);
     });
@@ -86,7 +77,7 @@ if (imageInput && imagePreviewContainer && removeBtn) {
   removeBtn.addEventListener('click', () => {
     imageInput.value = '';
     selectedImages = [];
-    imagePreviewContainer.innerHTML = '';
+    previewContainer.innerHTML = '';
   });
 }
 
@@ -112,14 +103,14 @@ if (imageInput && imagePreviewContainer && removeBtn) {
 
 function saveEntry(imageData) {
   const entry = {
-    id: Date.now(),
-    date: document.getElementById('entryDate').value,
-    title: document.getElementById('entryTitle').value,
-    content: document.getElementById('entryContent').value,
-    mood: selectedMood,
-    tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(t => t.textContent),
-    images: selectedImages
-  };
+  id: Date.now(),
+  date: dateField.value,
+  title: document.getElementById('entryTitle').value,
+  content: document.getElementById('entryContent').value,
+  mood: selectedMood,
+  tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(t => t.textContent),
+  images: selectedImages
+};
   entries.push(entry);
   localStorage.setItem('entries', JSON.stringify(entries));
   alert('Saved!');
