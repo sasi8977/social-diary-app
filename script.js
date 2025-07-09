@@ -177,12 +177,32 @@ card.innerHTML = `
   <h3>${entry.title}</h3>
   <p>${entry.date}</p>
   <p>${entry.mood}</p>
-  ${imageHtml}
+  ${entry.images && entry.images.length > 0 ? `
+    <div class="swiper-container">
+      <div class="swiper-wrapper">
+        ${entry.images.map(img => `
+          <div class="swiper-slide">
+            <img src="${img}" class="entry-thumb" alt="photo"/>
+          </div>
+        `).join('')}
+      </div>
+      <div class="swiper-pagination"></div>
+      <div class="swiper-button-prev"></div>
+      <div class="swiper-button-next"></div>
+    </div>` : ''}
 `;
     card.addEventListener('click', () => showEntryDetail(entry));
     list.appendChild(card);
+ setTimeout(() => {
+  new Swiper('.swiper-container', {
+    loop: true,
+    pagination: { el: '.swiper-pagination' },
+    navigation: {
+      nextEl: '.swiper-button-next',
+      prevEl: '.swiper-button-prev'
+    }
   });
-}
+}, 100);
 
 function showEntryDetail(entry) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
