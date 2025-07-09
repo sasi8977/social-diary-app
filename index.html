@@ -107,10 +107,10 @@
             <div id="tagsDisplay"></div>
           </div>
           <div class="form-group">
-  <label for="imageInput">Upload Photo:</label>
-  <input type="file" id="imageInput" accept="image/*" />
-  <img id="imagePreview" class="image-preview" style="display: none; max-width: 100%; margin-top: 10px;" />
-  <button type="button" id="removeImageBtn" style="display: none;">Remove Image</button>
+  <label for="imageInput">Upload Photos:</label>
+<input type="file" id="imageInput" accept="image/*" multiple />
+<div id="imagePreviewContainer" style="display: flex; gap: 10px; flex-wrap: wrap; margin-top: 10px;"></div>
+<button type="button" id="removeImageBtn">Remove All Images</button>
 </div>
          
          <!-- Emojis -->
