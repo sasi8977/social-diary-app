@@ -80,23 +80,23 @@ function setupDiaryForm() {
   }
 
   form.addEventListener('submit', e => {
-    e.preventDefault();
+  e.preventDefault();
 
-    let imageData = '';
-    const imageFile = imageInput && imageInput.files[0];
+  const imageInput = document.getElementById('entryImage');
+  let imageData = '';
 
-    if (imageFile) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        imageData = e.target.result;
-        saveEntry(imageData);
-      };
-      reader.readAsDataURL(imageFile);
-    } else {
-      saveEntry('');
-    }
-  });
-}
+  if (imageInput && imageInput.files[0]) {
+    const reader = new FileReader();
+    reader.onload = function (e) {
+      imageData = e.target.result;
+      saveEntry(imageData); // ✅ Save with image after load
+    };
+    reader.readAsDataURL(imageInput.files[0]);
+  } else {
+    saveEntry(''); // ✅ Save without image
+  }
+});
+
 
 function saveEntry(imageData) {
   const entry = {
@@ -156,8 +156,12 @@ function loadEntries(filter = '') {
   filteredEntries.forEach(entry => {
     const card = document.createElement('div');
     card.className = 'entry-card';
-    card.innerHTML = `<h3>${entry.title}</h3><p>${entry.date}</p><p>${entry.mood}</p>` +
-      $(entry.image ? `<img src="${entry.image}" class="entry-thumb" alt="entry photo"/>` : '')
+    card.innerHTML = `
+  <h3>${entry.title}</h3>
+  <p>${entry.date}</p>
+  <p>${entry.mood}</p>
+  ${entry.image ? `<img src="${entry.image}" class="entry-thumb" alt="entry photo" style="max-width:100px; max-height:100px; object-fit:cover;">` : ''}
+`;
     card.addEventListener('click', () => showEntryDetail(entry));
     list.appendChild(card);
   });
