@@ -52,8 +52,9 @@ function setupMoodPicker() {
 function setupDiaryForm() {
   const form = document.getElementById('diaryForm');
   if (!form) return;
+
   const dateField = document.getElementById('entryDate');
-  dateField.value = new Date().toISOString().substr(0, 10);
+  dateField.value = new Date().toISOString().substr(0, 10); // auto-fill today's date
 
   const imageInput = document.getElementById('entryImage');
   const imagePreview = document.getElementById('imagePreview');
@@ -80,22 +81,23 @@ function setupDiaryForm() {
   }
 
   form.addEventListener('submit', e => {
-  e.preventDefault();
+    e.preventDefault();
 
-  const imageInput = document.getElementById('entryImage');
-  let imageData = '';
+    const imageInput = document.getElementById('entryImage');
+    let imageData = '';
 
-  if (imageInput && imageInput.files[0]) {
-    const reader = new FileReader();
-    reader.onload = function (e) {
-      imageData = e.target.result;
-      saveEntry(imageData); // ✅ Save with image after load
-    };
-    reader.readAsDataURL(imageInput.files[0]);
-  } else {
-    saveEntry(''); // ✅ Save without image
-  }
-});
+    if (imageInput && imageInput.files[0]) {
+      const reader = new FileReader();
+      reader.onload = function (e) {
+        imageData = e.target.result;
+        saveEntry(imageData); // Proceed to save after image is loaded
+      };
+      reader.readAsDataURL(imageInput.files[0]);
+    } else {
+      saveEntry('');
+    }
+  });
+}
 
 
 function saveEntry(imageData) {
