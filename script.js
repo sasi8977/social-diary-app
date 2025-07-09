@@ -2,9 +2,16 @@
 
 let selectedMood = '';
 let entries = JSON.parse(localStorage.getItem('entries')) || [];
-
+function updateDateField() {
+  const dateField = document.getElementById('dateField');
+  if (dateField) {
+    const today = new Date().toISOString().split('T')[0];
+    dateField.value = today;
+  }
+}
 // === PIN Lock ===
 document.addEventListener('DOMContentLoaded', () => {
+  updateDateField();
   const pinLock = document.getElementById('pin-lock');
   const unlockBtn = document.getElementById('unlockBtn');
   const pinInput = document.getElementById('pinInput');
@@ -54,6 +61,7 @@ function setupDiaryForm() {
   const previewContainer = document.getElementById('previewImages');
   const removeBtn = document.getElementById('removeImageBtn');
   const form = document.getElementById('diaryForm');
+  updateDateField();
   let selectedImages = [];
 
   if (imageInput && previewContainer && removeBtn) {
