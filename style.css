@@ -432,3 +432,19 @@ body.green {
   margin: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
+.image-slider {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding-bottom: 0.5rem;
+  scroll-snap-type: x mandatory;
+}
+
+.image-slider img {
+  height: 150px;
+  object-fit: cover;
+  border-radius: 1rem;
+  scroll-snap-align: center;
+  flex-shrink: 0;
+}
