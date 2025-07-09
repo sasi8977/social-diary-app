@@ -123,7 +123,11 @@ function saveEntry(imageData) {
     document.getElementById('imagePreview').src = '';
   }
   loadEntries();
-}
+// ✅ Clear image previews and reset image input
+imageInput.value = '';
+selectedImages = [];
+previewContainer.innerHTML = '';
+});
 
 // === Tags ===
 function setupTags() {
