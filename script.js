@@ -128,6 +128,9 @@ function saveEntry(imageData, selectedImages) {
   localStorage.setItem('entries', JSON.stringify(entries));
   alert('Saved!');
   document.getElementById('diaryForm').reset();
+  document.getElementById('dateField').value=new
+    Date().toISOString().split('T')
+  [0];
   selectedMood = '';
   document.getElementById('selectedMood').textContent = '';
   document.getElementById('tagsDisplay').innerHTML = '';
