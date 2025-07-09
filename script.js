@@ -168,11 +168,16 @@ function loadEntries(filter = '') {
   filteredEntries.forEach(entry => {
     const card = document.createElement('div');
     card.className = 'entry-card';
-    card.innerHTML = `
+    let imageHtml = '';
+if (entry.images && entry.images.length > 0) {
+  imageHtml = entry.images.map(img => `<img src="${img}" class="entry-thumb" alt="entry photo" />`).join('');
+}
+
+card.innerHTML = `
   <h3>${entry.title}</h3>
   <p>${entry.date}</p>
   <p>${entry.mood}</p>
-  ${entry.image ? `<img src="${entry.image}" class="entry-thumb" alt="entry photo" style="max-width:100px; max-height:100px; object-fit:cover;">` : ''}
+  ${imageHtml}
 `;
     card.addEventListener('click', () => showEntryDetail(entry));
     list.appendChild(card);
