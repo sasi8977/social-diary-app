@@ -207,13 +207,16 @@ function showEntryDetail(entry) {
   document.getElementById('detailMood').textContent = entry.mood;
   document.getElementById('detailContent').textContent = entry.content;
   document.getElementById('detailTags').innerHTML = entry.tags.map(t => `<span class="tag">${t}</span>`).join('');
-  const detailImage = document.getElementById('detailImage');
-  if (entry.image && detailImage) {
-    detailImage.src = entry.image;
-    detailImage.style.display = 'block';
-  } else if (detailImage) {
-    detailImage.style.display = 'none';
-  }
+  const imageSlider = document.getElementById('imageSlider');
+imageSlider.innerHTML = '';
+if (entry.images && entry.images.length > 0) {
+  entry.images.forEach(img => {
+    const imgEl = document.createElement('img');
+    imgEl.src = img;
+    imageSlider.appendChild(imgEl);
+  });
+}
+
 
   document.getElementById('backToListBtn').onclick = () => showSection('viewEntriesSection');
   document.getElementById('editEntryBtn').onclick = () => alert('Edit not yet implemented.');
