@@ -51,35 +51,36 @@ function setupMoodPicker() {
 // === Diary Form ===
 function setupDiaryForm() {
   const imageInput = document.getElementById('imageInput');
-const previewContainer = document.getElementById('previewImages');
-const removeBtn = document.getElementById('removeImageBtn');
-let selectedImages = [];
+  const previewContainer = document.getElementById('previewImages');
+  const removeBtn = document.getElementById('removeImageBtn');
+  const form = document.getElementById('diaryForm');
+  let selectedImages = [];
 
-if (imageInput && previewContainer && removeBtn) {
-  imageInput.addEventListener('change', () => {
-    selectedImages = [];
-    previewContainer.innerHTML = '';
-    const files = Array.from(imageInput.files);
-    files.forEach(file => {
-      const reader = new FileReader();
-      reader.onload = e => {
-        selectedImages.push(e.target.result);
-        const img = document.createElement('img');
-        img.src = e.target.result;
-        img.className = 'entry-thumb';
-        img.style.maxWidth = '100px';
-        previewContainer.appendChild(img);
-      };
-      reader.readAsDataURL(file);
+  if (imageInput && previewContainer && removeBtn) {
+    imageInput.addEventListener('change', () => {
+      selectedImages = [];
+      previewContainer.innerHTML = '';
+      const files = Array.from(imageInput.files);
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = e => {
+          selectedImages.push(e.target.result);
+          const img = document.createElement('img');
+          img.src = e.target.result;
+          img.className = 'entry-thumb';
+          img.style.maxWidth = '100px';
+          previewContainer.appendChild(img);
+        };
+        reader.readAsDataURL(file);
+      });
     });
-  });
 
-  removeBtn.addEventListener('click', () => {
-    imageInput.value = '';
-    selectedImages = [];
-    previewContainer.innerHTML = '';
-  });
-}
+    removeBtn.addEventListener('click', () => {
+      imageInput.value = '';
+      selectedImages = [];
+      previewContainer.innerHTML = '';
+    });
+  }
 
   form.addEventListener('submit', e => {
     e.preventDefault();
@@ -91,26 +92,30 @@ if (imageInput && previewContainer && removeBtn) {
       const reader = new FileReader();
       reader.onload = function (e) {
         imageData = e.target.result;
-        saveEntry(imageData); // Proceed to save after image is loaded
+        saveEntry(imageData, selectedImages);
       };
       reader.readAsDataURL(imageInput.files[0]);
     } else {
-      saveEntry('');
+      saveEntry('', selectedImages);
     }
   });
 }
 
+function saveEntry(imageData, selectedImages) {
+  const imageInput = document.getElementById('imageInput');
+  const previewContainer = document.getElementById('previewImages');
 
-function saveEntry(imageData) {
+  const dateField = document.getElementById('today-date');
   const entry = {
-  id: Date.now(),
-  date: dateField.value,
-  title: document.getElementById('entryTitle').value,
-  content: document.getElementById('entryContent').value,
-  mood: selectedMood,
-  tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(t => t.textContent),
-  images: selectedImages
-};
+    id: Date.now(),
+    date: dateField.textContent,
+    title: document.getElementById('entryTitle').value,
+    content: document.getElementById('entryContent').value,
+    mood: selectedMood,
+    tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(t => t.textContent),
+    images: selectedImages
+  };
+
   entries.push(entry);
   localStorage.setItem('entries', JSON.stringify(entries));
   alert('Saved!');
@@ -123,9 +128,9 @@ function saveEntry(imageData) {
     document.getElementById('imagePreview').src = '';
   }
   loadEntries();
-imageInput.value = '';
-selectedImages = [];
-previewContainer.innerHTML = '';
+  imageInput.value = '';
+  previewContainer.innerHTML = '';
+}
 
 // === Tags ===
 function setupTags() {
@@ -161,43 +166,50 @@ function loadEntries(filter = '') {
   filteredEntries.forEach(entry => {
     const card = document.createElement('div');
     card.className = 'entry-card';
-    let imageHtml = '';
-if (entry.images && entry.images.length > 0) {
-  imageHtml = entry.images.map(img => `<img src="${img}" class="entry-thumb" alt="entry photo" />`).join('');
-}
 
-let swiperHtml = '';
-if (entry.images && entry.images.length > 0) {
-  swiperHtml = `
-    <div class="swiper-container">
-      <div class="swiper-wrapper">
-        ${entry.images.map(img => `
-          <div class="swiper-slide">
-            <img src="${img}" class="entry-thumb" alt="photo"/>
+    let swiperHtml = '';
+    if (entry.images && entry.images.length > 0) {
+      swiperHtml = `
+        <div class="swiper-container">
+          <div class="swiper-wrapper">
+            ${entry.images.map(img => `
+              <div class="swiper-slide">
+                <img src="${img}" class="entry-thumb" alt="photo"/>
+              </div>
+            `).join('')}
           </div>
-        `).join('')}
-      </div>
-      <div class="swiper-pagination"></div>
-      <div class="swiper-button-prev"></div>
-      <div class="swiper-button-next"></div>
-    </div>
-  `;
+          <div class="swiper-pagination"></div>
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-button-next"></div>
+        </div>
+      `;
+    }
+
+    card.innerHTML = `
+      <h3>${entry.title}</h3>
+      <p>${entry.date}</p>
+      <p>${entry.mood}</p>
+      ${swiperHtml}
+    `;
 
     card.addEventListener('click', () => showEntryDetail(entry));
     list.appendChild(card);
- setTimeout(() => {
-  card.querySelectorAll('.swiper-container').forEach(container => {
-    new Swiper(container, {
-      loop: true,
-      pagination: { el: container.querySelector('.swiper-pagination') },
-      navigation: {
-        nextEl: container.querySelector('.swiper-button-next'),
-        prevEl: container.querySelector('.swiper-button-prev')
-      }
-    });
+
+    setTimeout(() => {
+      card.querySelectorAll('.swiper-container').forEach(container => {
+        new Swiper(container, {
+          loop: true,
+          pagination: { el: container.querySelector('.swiper-pagination') },
+          navigation: {
+            nextEl: container.querySelector('.swiper-button-next'),
+            prevEl: container.querySelector('.swiper-button-prev')
+          }
+        });
+      });
+    }, 100);
   });
-}, 100);
 }
+
 function showEntryDetail(entry) {
   document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
   document.getElementById('entryDetailSection').classList.add('active');
@@ -207,15 +219,14 @@ function showEntryDetail(entry) {
   document.getElementById('detailContent').textContent = entry.content;
   document.getElementById('detailTags').innerHTML = entry.tags.map(t => `<span class="tag">${t}</span>`).join('');
   const imageSlider = document.getElementById('imageSlider');
-imageSlider.innerHTML = '';
-if (entry.images && entry.images.length > 0) {
-  entry.images.forEach(img => {
-    const imgEl = document.createElement('img');
-    imgEl.src = img;
-    imageSlider.appendChild(imgEl);
-  });
-}
-
+  imageSlider.innerHTML = '';
+  if (entry.images && entry.images.length > 0) {
+    entry.images.forEach(img => {
+      const imgEl = document.createElement('img');
+      imgEl.src = img;
+      imageSlider.appendChild(imgEl);
+    });
+  }
 
   document.getElementById('backToListBtn').onclick = () => showSection('viewEntriesSection');
   document.getElementById('editEntryBtn').onclick = () => alert('Edit not yet implemented.');
@@ -238,12 +249,7 @@ function setupViewEntries() {
   if (!btn) return;
   btn.addEventListener('click', () => showSection('viewEntriesSection'));
 }
-const searchInput = document.getElementById('searchInput');
-if (searchInput) {
-  searchInput.addEventListener('input', () => {
-    loadEntries(searchInput.value);
-  });
-}
+
 // === Theme ===
 function setupTheme() {
   const select = document.getElementById('themeSelect');
@@ -401,7 +407,7 @@ function setupLogout() {
     });
   }
 }
-  });
+
   
 
 
