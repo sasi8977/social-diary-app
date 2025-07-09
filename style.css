@@ -425,10 +425,10 @@ body.green {
 }
 .image-preview,
 .entry-thumb {
-  width: 200px;
-  max-height: 200px;
+  width: 100px;
+  max-height: 100px;
   object-fit: cover;
-  border-radius: 1rem;
-  margin-top: 1rem;
+  border-radius: 8px;
+  margin: 5px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
