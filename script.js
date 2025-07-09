@@ -56,29 +56,39 @@ function setupDiaryForm() {
   const dateField = document.getElementById('entryDate');
   dateField.value = new Date().toISOString().substr(0, 10); // auto-fill today's date
 
-  const imageInput = document.getElementById('entryImage');
-  const imagePreview = document.getElementById('imagePreview');
-  const removeBtn = document.getElementById('removeImageBtn');
+  const imageInput = document.getElementById('imageInput');
+const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+const removeBtn = document.getElementById('removeImageBtn');
+let selectedImages = [];
 
-  if (imageInput && imagePreview && removeBtn) {
-    imageInput.addEventListener('change', () => {
-      const file = imageInput.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = e => {
-          imagePreview.src = e.target.result;
-          imagePreview.style.display = 'block';
-        };
-        reader.readAsDataURL(file);
-      }
-    });
+if (imageInput && imagePreviewContainer && removeBtn) {
+  imageInput.addEventListener('change', () => {
+    selectedImages = []; // Clear previous selection
+    imagePreviewContainer.innerHTML = ''; // Clear previews
 
-    removeBtn.addEventListener('click', () => {
-      imageInput.value = '';
-      imagePreview.src = '';
-      imagePreview.style.display = 'none';
+    const files = Array.from(imageInput.files);
+    files.forEach(file => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        selectedImages.push(e.target.result); // Save base64 image
+
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.style.maxWidth = '100px';
+        img.style.height = 'auto';
+        img.style.borderRadius = '8px';
+        imagePreviewContainer.appendChild(img);
+      };
+      reader.readAsDataURL(file);
     });
-  }
+  });
+
+  removeBtn.addEventListener('click', () => {
+    imageInput.value = '';
+    selectedImages = [];
+    imagePreviewContainer.innerHTML = '';
+  });
+}
 
   form.addEventListener('submit', e => {
     e.preventDefault();
@@ -108,7 +118,7 @@ function saveEntry(imageData) {
     content: document.getElementById('entryContent').value,
     mood: selectedMood,
     tags: Array.from(document.querySelectorAll('#tagsDisplay .tag')).map(t => t.textContent),
-    image: imageData
+    images: selectedImages
   };
   entries.push(entry);
   localStorage.setItem('entries', JSON.stringify(entries));
