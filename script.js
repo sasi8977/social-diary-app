@@ -83,7 +83,7 @@ function setupDiaryForm() {
   form.addEventListener('submit', e => {
     e.preventDefault();
 
-    const imageInput = document.getElementById('entryImage');
+    const imageInput = document.getElementById('imageInput');
     let imageData = '';
 
     if (imageInput && imageInput.files[0]) {
