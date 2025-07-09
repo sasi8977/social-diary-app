@@ -314,6 +314,7 @@ function setupSettings() {
 
   if (settingsBtn) settingsBtn.onclick = () => showSection('settingsSection');
   if (newEntryBtn) newEntryBtn.onclick = () => showSection('newEntrySection');
+  updateDateField();
   if (statsBtn) statsBtn.onclick = () => showSection('statsSection');
   if (saveBtn) saveBtn.onclick = () => alert('Settings saved!');
 
