@@ -250,9 +250,16 @@ function showEntryDetail(entry) {
 }
 
 function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
-  const target = document.getElementById(id);
-  if (target) target.classList.add('active');
+  const sections = document.querySelectorAll('.section');
+  sections.forEach(s => {
+    if (s.id === id) {
+      s.style.display = 'block';
+      setTimeout(() => s.classList.add('active'), 10); // trigger fade
+    } else {
+      s.classList.remove('active');
+      setTimeout(() => s.style.display = 'none', 400); // hide after fade out
+    }
+  });
 }
 
 function setupViewEntries() {
