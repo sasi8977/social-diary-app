@@ -457,6 +457,46 @@ function scheduleReminder() {
     scheduleReminder();
   }, delay);
 }
+function setupFriends() {
+  const btn = document.getElementById('friendsBtn');
+  const nameInput = document.getElementById('friendNameInput');
+  const emojiInput = document.getElementById('friendEmojiInput');
+  const addBtn = document.getElementById('addFriendBtn');
+  const list = document.getElementById('friendList');
+
+  if (!btn || !addBtn || !nameInput || !emojiInput || !list) return;
+
+  const friends = JSON.parse(localStorage.getItem('friends')) || [];
+
+  function renderFriends() {
+    list.innerHTML = '';
+    if (friends.length === 0) {
+      list.innerHTML = '<p>No friends added yet.</p>';
+      return;
+    }
+    friends.forEach(friend => {
+      const card = document.createElement('div');
+      card.className = 'friend-card';
+      card.innerHTML = `<span>${friend.emoji}</span> <strong>${friend.name}</strong>`;
+      list.appendChild(card);
+    });
+  }
+
+  renderFriends();
+
+  btn.addEventListener('click', () => showSection('friendsSection'));
+
+  addBtn.addEventListener('click', () => {
+    const name = nameInput.value.trim();
+    const emoji = emojiInput.value.trim() || '👤';
+    if (!name) return alert('Enter name!');
+    friends.push({ name, emoji });
+    localStorage.setItem('friends', JSON.stringify(friends));
+    nameInput.value = '';
+    emojiInput.value = '';
+    renderFriends();
+  });
+}
 // === Logout ===
 function setupLogout() {
   const logoutBtn = document.getElementById('logoutBtn');
