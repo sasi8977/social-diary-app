@@ -225,7 +225,16 @@
           <input type="file" id="importDataInput" accept=".json" style="display: none;" />
         </form>
       </section>
+<section id="friendsSection" class="section">
+  <h2>👥 Your Friends</h2>
+  <div id="friendList"></div>
 
+  <div class="friend-form">
+    <input type="text" id="friendNameInput" placeholder="Friend name" />
+    <input type="text" id="friendEmojiInput" placeholder="Emoji (e.g. 😊)" maxlength="2" />
+    <button id="addFriendBtn">Add Friend</button>
+  </div>
+</section>
       <!-- Entry Details -->
       <section id="entryDetailSection" class="section">
         <button id="backToListBtn" class="back-button"><i class="fas fa-arrow-left"></i> Back</button>
