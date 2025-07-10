@@ -51,6 +51,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupStickers();
   setupLogout();
   setupDailyReminder();
+  setupFriends();
 });
 
 // === Mood ===
