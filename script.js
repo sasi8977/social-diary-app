@@ -257,14 +257,14 @@ function showEntryDetail(entry) {
 }
 
 function showSection(id) {
-  const sections = document.querySelectorAll('.section');
-  sections.forEach(s => {
-    if (s.id === id) {
-      s.style.display = 'block';
-      setTimeout(() => s.classList.add('active'), 10); // trigger fade
+  const allSections = document.querySelectorAll('.section');
+  allSections.forEach(section => {
+    if (section.id === id) {
+      section.style.display = 'block';
+      setTimeout(() => section.classList.add('active'), 10);
     } else {
-      s.classList.remove('active');
-      setTimeout(() => s.style.display = 'none', 400); // hide after fade out
+      section.classList.remove('active');
+      setTimeout(() => section.style.display = 'none', 400); // Match CSS transition
     }
   });
 }
