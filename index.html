@@ -27,8 +27,8 @@
 
   <!-- Install/Share -->
   <div class="top-actions">
-    <button id="installBtn" class="action-btn" style="display: none;">📲 Install App</button>
-    <button id="shareBtn" class="action-btn" style="display: none;">🔗 Share</button>
+    <button id="installBtn" class="touch-feedback"> 📲 Install App</button>
+    <button id="shareBtn" class="touch-feedback">🔗 Share</button>
   </div>
 
   <!-- PIN Lock -->
@@ -110,7 +110,7 @@
             <label for="tagsInput">Tags:</label>
             <div class="tags-container">
               <input type="text" id="tagsInput" placeholder="e.g., fun, work..." />
-              <button type="button" id="addTagBtn">Add</button>
+              <button type="button" id="addTagBtn" class="touch-feedback">Add</button>
             </div>
             <div id="tagsDisplay"></div>
           </div>
@@ -126,7 +126,7 @@
           <div class="form-group">
             <label>Add Emojis:</label>
             <div id="emojiPicker">
-              <button type="button" id="toggleEmojiPicker">😀 Emoji</button>
+              <button type="button" id="toggleEmojiPicker" class="touch-feedback">😀 Emoji</button>
               <div id="emojiList" style="display: none;"></div>
             </div>
           </div>
