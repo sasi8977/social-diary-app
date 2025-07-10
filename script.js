@@ -11,6 +11,13 @@ function updateDateField() {
 }
 // === PIN Lock ===
 document.addEventListener('DOMContentLoaded', () => {
+  // 🕓 Splash screen fade out
+  const splash = document.getElementById('splashScreen');
+  if (splash) {
+    setTimeout(() => {
+      splash.classList.add('hide');
+    }, 2000); // show splash for 2 seconds
+  }
   updateDateField();
   const pinLock = document.getElementById('pin-lock');
   const unlockBtn = document.getElementById('unlockBtn');
