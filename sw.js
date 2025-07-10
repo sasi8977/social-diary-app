@@ -1,26 +1,45 @@
-const CACHE_NAME = 'social-diary-v1';
+const CACHE_NAME = 'diary-cache-v1';
 const urlsToCache = [
-  './',
-  './index.html',
-  './style.css',
-  './script.js',
-  './manifest.json',
-  './icons/icon-192.png',
-  './icons/icon-512.png'
+  '/',
+  '/index.html',
+  '/style.css',
+  '/script.js',
+  '/manifest.json',
+  '/images/icon-192.png',
+  '/images/icon-512.png',
+  '/offline.html',
+  '/images/offline.png'
 ];
 
-self.addEventListener('install', event => {
+// Install event – cache all necessary files
+self.addEventListener('install', function (event) {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => {
+    caches.open(CACHE_NAME).then(function (cache) {
       return cache.addAll(urlsToCache);
     })
   );
 });
 
-self.addEventListener('fetch', event => {
-  event.respondWith(
-    caches.match(event.request).then(response => {
-      return response || fetch(event.request);
+// Activate event – clean old caches
+self.addEventListener('activate', function (event) {
+  event.waitUntil(
+    caches.keys().then(cacheNames => {
+      return Promise.all(
+        cacheNames.map(name => {
+          if (name !== CACHE_NAME) return caches.delete(name);
+        })
+      );
     })
   );
-})
+});
+
+// Fetch event – serve cached content or fallback to offline.html
+self.addEventListener('fetch', function (event) {
+  event.respondWith(
+    fetch(event.request).catch(() => {
+      if (event.request.destination === 'document') {
+        return caches.match('/offline.html');
+      }
+    })
+  );
+});
