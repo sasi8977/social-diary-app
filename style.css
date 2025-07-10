@@ -495,3 +495,27 @@ body.green {
   transform: translateY(0);
   pointer-events: auto;
 }
+/* 📱 Realistic touch feedback */
+.touch-feedback {
+  position: relative;
+  overflow: hidden;
+}
+
+.touch-feedback::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 100%;
+  transform: translate(-50%, -50%);
+  transition: width 0.4s ease, height 0.4s ease;
+}
+
+.touch-feedback:active::after {
+  width: 200%;
+  height: 200%;
+  transition: 0s;
+}
