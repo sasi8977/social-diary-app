@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupViewEntries();
   setupStickers();
   setupLogout();
+  setupFavoritesFilter();
   setupDailyReminder();
   setupFriends();
 });
@@ -206,11 +207,19 @@ function loadEntries(filter = '') {
     }
 
     card.innerHTML = `
-      <h3>${entry.title}</h3>
-       <p class="entry-date">${entry.date || 'No date'}</p>
-      <p>${entry.mood}</p>
-      ${swiperHtml}
-    `;
+  <h3>${entry.title}</h3>
+  <p class="entry-date">${entry.date || 'No date'}</p>
+  <p>${entry.mood}</p>
+  ${swiperHtml}
+  <button class="favoriteBtn">${entry.favorite ? '💖 Favorited' : '🤍 Add Favorite'}</button>
+`;
+const favoriteBtn = card.querySelector('.favoriteBtn');
+favoriteBtn.addEventListener('click', (e) => {
+  e.stopPropagation(); // Don’t open details
+  entry.favorite = !entry.favorite;
+  localStorage.setItem('entries', JSON.stringify(entries));
+  loadEntries(); // Refresh
+});
 
     card.addEventListener('click', () => showEntryDetail(entry));
     list.appendChild(card);
@@ -276,7 +285,84 @@ function setupViewEntries() {
   if (!btn) return;
   btn.addEventListener('click', () => showSection('viewEntriesSection'));
 }
+function setupFavoritesFilter() {
+  const btn = document.getElementById('filterFavoritesBtn');
+  if (!btn) return;
 
+  let showingFavorites = false;
+
+  btn.addEventListener('click', () => {
+    showingFavorites = !showingFavorites;
+    btn.textContent = showingFavorites ? 'Show All' : 'Show Favorites';
+    loadEntriesFilterFavorites(showingFavorites);
+  });
+}
+
+function loadEntriesFilterFavorites(showOnlyFavorites = false) {
+  const list = document.getElementById('entriesList');
+  if (!list) return;
+  list.innerHTML = '';
+
+  let filtered = [...entries];
+  if (showOnlyFavorites) {
+    filtered = filtered.filter(entry => entry.favorite);
+  }
+
+  filtered.forEach(entry => {
+    const card = document.createElement('div');
+    card.className = 'entry-card';
+
+    let swiperHtml = '';
+    if (entry.images && entry.images.length > 0) {
+      swiperHtml = `
+        <div class="swiper-container">
+          <div class="swiper-wrapper">
+            ${entry.images.map(img => `
+              <div class="swiper-slide">
+                <img src="${img}" class="entry-thumb" alt="photo"/>
+              </div>
+            `).join('')}
+          </div>
+          <div class="swiper-pagination"></div>
+          <div class="swiper-button-prev"></div>
+          <div class="swiper-button-next"></div>
+        </div>
+      `;
+    }
+
+    card.innerHTML = `
+      <h3>${entry.title}</h3>
+      <p class="entry-date">${entry.date || 'No date'}</p>
+      <p>${entry.mood}</p>
+      ${swiperHtml}
+      <button class="favoriteBtn">${entry.favorite ? '💖 Favorited' : '🤍 Add Favorite'}</button>
+    `;
+
+    const favoriteBtn = card.querySelector('.favoriteBtn');
+    favoriteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      entry.favorite = !entry.favorite;
+      localStorage.setItem('entries', JSON.stringify(entries));
+      loadEntriesFilterFavorites(showOnlyFavorites);
+    });
+
+    card.addEventListener('click', () => showEntryDetail(entry));
+    list.appendChild(card);
+
+    setTimeout(() => {
+      card.querySelectorAll('.swiper-container').forEach(container => {
+        new Swiper(container, {
+          loop: true,
+          pagination: { el: container.querySelector('.swiper-pagination') },
+          navigation: {
+            nextEl: container.querySelector('.swiper-button-next'),
+            prevEl: container.querySelector('.swiper-button-prev')
+          }
+        });
+      });
+    }, 100);
+  });
+}
 // === Theme ===
 function setupTheme() {
   const select = document.getElementById('themeSelect');
