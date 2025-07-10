@@ -119,6 +119,22 @@ button {
   margin-top: 1rem;
   transition: background 0.3s;
 }
+/* 🎯 Fancy button interaction styles */
+button {
+  transition: all 0.3s ease;
+  transform-origin: center;
+}
+
+button:hover {
+  background-color: var(--accent-color);
+  color: white;
+  transform: scale(1.05);
+}
+
+button:active {
+  transform: scale(0.95);
+  background-color: var(--secondary-color);
+}
 
 button:hover {
   background: var(--accent-color);
