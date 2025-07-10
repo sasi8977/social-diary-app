@@ -50,6 +50,7 @@ document.addEventListener('DOMContentLoaded', () => {
   setupViewEntries();
   setupStickers();
   setupLogout();
+  setupDailyReminder();
 });
 
 // === Mood ===
@@ -421,7 +422,41 @@ function setupPWA() {
     });
   }
 }
+// === Daily Reminder Notification ===
+function setupDailyReminder() {
+  if (!("Notification" in window)) {
+    console.log("This browser does not support notifications.");
+    return;
+  }
 
+  Notification.requestPermission().then(permission => {
+    if (permission === "granted") {
+      scheduleReminder();
+    }
+  });
+}
+
+function scheduleReminder() {
+  const now = new Date();
+  const reminderHour = 08; // 8 AM
+  const reminderMin = 0;
+  const reminderTime = new Date();
+  reminderTime.setHours(reminderHour, reminderMin, 0, 0);
+
+  let delay = reminderTime.getTime() - now.getTime();
+  if (delay < 0) {
+    delay += 24 * 60 * 60 * 1000; // Next day
+  }
+
+  setTimeout(() => {
+    new Notification("Social Diary Reminder ✍️", {
+      body: "Don't forget to write in your diary today!",
+      icon: "images/icon-192.png"
+    });
+    // Schedule again for tomorrow
+    scheduleReminder();
+  }, delay);
+}
 // === Logout ===
 function setupLogout() {
   const logoutBtn = document.getElementById('logoutBtn');
