@@ -324,9 +324,9 @@ function loadEntries(filter = '', sort = 'date-desc') {
         imageHtml = `
           <div class="swiper-container">
             <div class="swiper-wrapper">
-              ${entry.photos.map(img => `
+              ${entry.photos.map(photo => `
                 <div class="swiper-slide">
-                  <img src="${img}" class="entry-thumb" alt="photo"/>
+                  <img src="${photo}" class="entry-thumb" alt="photo"/>
                 </div>
               `).join('')}
             </div>
