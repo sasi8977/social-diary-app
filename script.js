@@ -227,7 +227,7 @@ function saveEntry(selectedImages) {
     content,
     mood: selectedMood,
     tags: tagsDisplay ? Array.from(tagsDisplay.querySelectorAll('.tag')).map(t => t.textContent) : [],
-    images: selectedImages,
+    photos: selectedImages,
     favorite: false
   };
 
