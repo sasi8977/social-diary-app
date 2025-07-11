@@ -308,6 +308,14 @@ textarea#editContent {
   background-color: #f72585;
 }
 
+.swiper-wrapper {
+  flex-wrap: nowrap !important;
+}
+
+.swiper-slide {
+  width: auto !important;
+}
+
 .stat-card {
   background: var(--card-bg);
   padding: 1rem;
