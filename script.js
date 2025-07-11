@@ -319,12 +319,12 @@ function loadEntries(filter = '', sort = 'date-desc') {
     card.className = 'entry-card';
 
     let imageHtml = '';
-    if (entry.images && entry.images.length > 0) {
+    if (entry.photos && entry.photos.length > 0) {
       if (typeof Swiper !== 'undefined') {
         imageHtml = `
           <div class="swiper-container">
             <div class="swiper-wrapper">
-              ${entry.images.map(img => `
+              ${entry.photos.map(img => `
                 <div class="swiper-slide">
                   <img src="${img}" class="entry-thumb" alt="photo"/>
                 </div>
@@ -336,7 +336,7 @@ function loadEntries(filter = '', sort = 'date-desc') {
           </div>
         `;
       } else {
-        imageHtml = `<div class="image-grid">${entry.images.map(img => `<img src="${img}" class="entry-thumb" alt="photo"/>`).join('')}</div>`;
+        imageHtml = `<div class="image-grid">${entry.photos.map(img => `<img src="${img}" class="entry-thumb" alt="photo"/>`).join('')}</div>`;
       }
     }
 
@@ -411,8 +411,8 @@ function showEntryDetail(entry) {
   const imageSlider = document.getElementById('imageSlider');
   if (imageSlider) {
     imageSlider.innerHTML = '';
-    if (entry.images && entry.images.length > 0) {
-      entry.images.forEach(img => {
+    if (entry.photos && entry.photos.length > 0) {
+      entry.photos.forEach(img => {
         const imgEl = document.createElement('img');
         imgEl.src = img;
         imageSlider.appendChild(imgEl);
