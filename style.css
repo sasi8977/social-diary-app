@@ -1,4 +1,3 @@
-/* Google Fonts */
 @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
 
 :root {
@@ -11,10 +10,13 @@
   --border-radius: 1rem;
   --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
+
 .splash-screen {
   position: fixed;
-  top: 0; left: 0;
-  width: 100%; height: 100%;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   background-color: var(--bg-color);
   display: flex;
   flex-direction: column;
@@ -37,7 +39,6 @@ body {
   color: var(--text-color);
 }
 
-/* Header */
 .app-header {
   background: var(--primary-color);
   color: #fff;
@@ -61,7 +62,7 @@ body {
 .greeting-text h2 {
   margin: 0;
 }
-/* Layout */
+
 .app {
   display: flex;
   flex-wrap: wrap;
@@ -71,7 +72,7 @@ body {
 .sidebar {
   width: 250px;
   padding: 1rem;
-  background: #fff;
+  background: var(--card-bg);
   border-radius: var(--border-radius);
   box-shadow: var(--shadow);
   margin-right: 1rem;
@@ -83,14 +84,22 @@ body {
 }
 
 .section {
+  opacity: 0;
+  transform: translateY(10px);
+  pointer-events: none;
+  transition: opacity 0.4s ease, transform 0.4s ease;
   display: none;
 }
 
 .section.active {
   display: block;
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
 }
 
-form {
+form,
+.edit-form {
   background: var(--card-bg);
   padding: 1.5rem;
   border-radius: var(--border-radius);
@@ -102,7 +111,10 @@ form {
   margin-bottom: 1rem;
 }
 
-input, textarea, select, button {
+input,
+textarea,
+select,
+button {
   width: 100%;
   padding: 0.75rem;
   border: 1px solid #ccc;
@@ -111,36 +123,37 @@ input, textarea, select, button {
   font-size: 1rem;
 }
 
+input:focus,
+textarea:focus,
+select:focus,
+button:focus,
+.mood-option:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
 button {
   background: var(--primary-color);
   color: #fff;
   border: none;
   cursor: pointer;
   margin-top: 1rem;
-  transition: background 0.3s;
-}
-/* 🎯 Fancy button interaction styles */
-button {
-  transition: all 0.3s ease;
+  transition: background 0.3s, transform 0.3s ease;
   transform-origin: center;
 }
 
 button:hover {
-  background-color: var(--accent-color);
-  color: white;
+  background: var(--accent-color);
   transform: scale(1.05);
 }
 
 button:active {
   transform: scale(0.95);
-  background-color: var(--secondary-color);
+  background: var(--secondary-color);
 }
 
-button:hover {
-  background: var(--accent-color);
-}
-
-textarea#entryContent {
+textarea#entryContent,
+textarea#editContent {
   background: url('https://www.transparenttextures.com/patterns/notebook.png') repeat;
   font-family: 'Georgia', serif;
   line-height: 1.6;
@@ -148,11 +161,12 @@ textarea#entryContent {
   border-radius: 10px;
 }
 
-/* Mood Picker */
 .mood-option {
   margin: 0 0.5rem;
   cursor: pointer;
   font-size: 1.5rem;
+  background: none;
+  border: none;
   transition: transform 0.2s;
 }
 
@@ -160,7 +174,6 @@ textarea#entryContent {
   transform: scale(1.3);
 }
 
-/* Avatar */
 .avatar-img {
   width: 64px;
   height: 64px;
@@ -172,7 +185,6 @@ textarea#entryContent {
   cursor: pointer;
 }
 
-/* Tags */
 .tags-container {
   display: flex;
   gap: 0.5rem;
@@ -189,7 +201,20 @@ textarea#entryContent {
   font-size: 0.8rem;
 }
 
-/* Entry Cards */
+.tag-suggestion {
+  background: var(--card-bg);
+  padding: 0.5rem;
+  border-radius: var(--border-radius);
+  margin: 0.2rem 0;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.tag-suggestion:hover {
+  background: var(--secondary-color);
+  color: #fff;
+}
+
 .entries-list {
   display: flex;
   flex-direction: column;
@@ -204,7 +229,6 @@ textarea#entryContent {
   cursor: pointer;
 }
 
-/* Entry Detail */
 .entry-meta {
   margin: 1rem 0;
   font-size: 0.9rem;
@@ -225,14 +249,62 @@ textarea#entryContent {
   gap: 1rem;
   margin-top: 1rem;
 }
-.entry-thumb {
-  width: 100%
-    max-height: 150px;
-    object-fit: cover;
-  margin-top: 10px;
-  border-radius: 1rem;
+
+.entry-thumb,
+.image-preview {
+  width: 30%;
+  max-width: 100px;
+  max-height: 100px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin: 5px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
-/* Stats */
+
+.image-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 10px;
+  margin: 1rem 0;
+}
+
+.image-slider {
+  display: flex;
+  overflow-x: auto;
+  gap: 1rem;
+  margin: 1rem 0;
+  padding-bottom: 0.5rem;
+  scroll-snap-type: x mandatory;
+}
+
+.image-slider img {
+  height: 150px;
+  object-fit: cover;
+  border-radius: 1rem;
+  scroll-snap-align: center;
+  flex-shrink: 0;
+}
+
+.swiper-container {
+  width: 100%;
+  max-width: 600px;
+  margin: 1rem 0;
+}
+
+.swiper-slide {
+  display: flex;
+  justify-content: center;
+}
+
+.swiper-pagination-bullet {
+  background: var(--primary-color);
+}
+
+.swiper-button-prev,
+.swiper-button-next {
+  color: var(--primary-color);
+}
+
 .stat-card {
   background: var(--card-bg);
   padding: 1rem;
@@ -241,33 +313,36 @@ textarea#entryContent {
   margin-bottom: 1rem;
 }
 
-/* Word Cloud */
-.word-cloud {
-  padding: 1rem;
-  background: var(--card-bg);
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow);
+.stats-display {
+  font-size: 1rem;
+  line-height: 1.5;
+  margin: 1rem 0;
+  color: var(--text-color);
 }
 
-/* Buttons */
-.action-btn {
+.action-btn,
+.editFriendBtn,
+.deleteFriendBtn {
   padding: 12px 20px;
   margin: 10px;
   font-size: 1rem;
   border: none;
   border-radius: 10px;
-  background-color: var(--primary-color);
+  background-color: var(--secondary-color);
   color: white;
   box-shadow: var(--shadow);
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: background 0.3s ease, transform 0.3s ease;
 }
 
-.action-btn:hover {
-  background-color: var(--secondary-color);
+.action-btn:hover,
+.editFriendBtn:hover,
+.deleteFriendBtn:hover {
+  background-color: var(--accent-color);
 }
 
-.back-button {
+.back-button,
+.back-friend-button {
   background: transparent;
   border: none;
   font-size: 1rem;
@@ -276,7 +351,6 @@ textarea#entryContent {
   cursor: pointer;
 }
 
-/* Notification */
 .notification {
   position: fixed;
   bottom: 10px;
@@ -289,7 +363,10 @@ textarea#entryContent {
   box-shadow: var(--shadow);
 }
 
-/* PIN Lock */
+.notification[aria-hidden="true"] {
+  display: none;
+}
+
 .pin-lock-screen {
   position: fixed;
   top: 0;
@@ -324,12 +401,12 @@ textarea#entryContent {
   background-color: #6930c3;
 }
 
-.error-msg {
+.error-msg,
+.edit-error {
   color: red;
   margin-top: 0.5rem;
 }
 
-/* Emoji Picker */
 #emojiList {
   display: flex;
   flex-wrap: wrap;
@@ -341,6 +418,10 @@ textarea#entryContent {
   border-radius: 10px;
   border: 1px solid #ccc;
   margin-top: 0.5rem;
+}
+
+#emojiList[aria-hidden="true"] {
+  display: none;
 }
 
 .emoji-btn {
@@ -355,19 +436,6 @@ textarea#entryContent {
   transform: scale(1.3);
 }
 
-/* Stickers */
-.sticker {
-  width: 50px;
-  margin: 5px;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.sticker:hover {
-  transform: scale(1.3);
-}
-
-/* Diary Binding */
 .diary-container {
   position: relative;
   background: #fffef9;
@@ -401,7 +469,53 @@ textarea#entryContent {
   z-index: 20;
 }
 
-/* Responsive */
+.friend-form,
+.edit-friend-form {
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  max-width: 300px;
+}
+
+.friend-card {
+  background: var(--card-bg);
+  border-radius: var(--border-radius);
+  padding: 1rem;
+  margin: 0.5rem 0;
+  box-shadow: var(--shadow);
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.friend-card span {
+  font-size: 2rem;
+}
+
+.touch-feedback {
+  position: relative;
+  overflow: hidden;
+}
+
+.touch-feedback::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  background: rgba(255, 255, 255, 0.4);
+  border-radius: 100%;
+  transform: translate(-50%, -50%);
+  transition: width 0.3s ease, height 0.3s ease;
+}
+
+.touch-feedback:active::after {
+  width: 150%;
+  height: 150%;
+}
+
 @media (max-width: 768px) {
   .app {
     flex-direction: column;
@@ -426,8 +540,36 @@ textarea#entryContent {
     font-size: 1rem;
     padding: 0.75rem;
   }
+
+  .entry-thumb,
+  .image-preview {
+    width: 30%;
+    max-width: 80px;
+  }
+
+  .tag-suggestion,
+  .editFriendBtn,
+  .deleteFriendBtn {
+    font-size: 0.9rem;
+  }
 }
-/* THEME: DARK */
+
+@media (max-width: 400px) {
+  .sidebar {
+    padding: 0.5rem;
+  }
+
+  .diary-container {
+    padding: 1rem;
+    margin: 1rem auto;
+  }
+
+  .app-brand,
+  .greeting-text h2 {
+    font-size: 1rem;
+  }
+}
+
 body.dark {
   --primary-color: #222;
   --secondary-color: #333;
@@ -437,120 +579,21 @@ body.dark {
   --card-bg: #1e1e1e;
 }
 
-/* THEME: BLUE */
 body.blue {
   --primary-color: #0077b6;
   --secondary-color: #00b4d8;
   --accent-color: #90e0ef;
   --bg-color: #caf0f8;
-  --text-color: #012a4a;
+  --text-color: #013a63;
   --card-bg: #ffffff;
 }
 
-/* THEME: GREEN */
 body.green {
   --primary-color: #2e7d32;
   --secondary-color: #81c784;
   --accent-color: #a5d6a7;
   --bg-color: #e8f5e9;
-  --text-color: #1b5e20;
+  --text-color: #1a4314;
   --card-bg: #ffffff;
 }
-.image-preview,
-.entry-thumb {
-  width: 100px;
-  max-height: 100px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin: 5px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-}
-.image-slider {
-  display: flex;
-  overflow-x: auto;
-  gap: 1rem;
-  margin: 1rem 0;
-  padding-bottom: 0.5rem;
-  scroll-snap-type: x mandatory;
-}
 
-.image-slider img {
-  height: 150px;
-  object-fit: cover;
-  border-radius: 1rem;
-  scroll-snap-align: center;
-  flex-shrink: 0;
-}
-.section {
-  opacity: 0;
-  transform: translateY(10px);
-  pointer-events: none;
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  display: none;
-}
-
-.section.active {
-  display: block;
-  opacity: 1;
-  transform: translateY(0);
-  pointer-events: auto;
-}
-/* 📱 Realistic touch feedback */
-.touch-feedback {
-  position: relative;
-  overflow: hidden;
-}
-
-.touch-feedback::after {
-  content: '';
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  width: 0;
-  height: 0;
-  background: rgba(255, 255, 255, 0.4);
-  border-radius: 100%;
-  transform: translate(-50%, -50%);
-  transition: width 0.4s ease, height 0.4s ease;
-}
-
-.touch-feedback:active::after {
-  width: 200%;
-  height: 200%;
-  transition: 0s;
-}
-/* === Section Transitions === */
-.section {
-  transition: opacity 0.4s ease, transform 0.4s ease;
-  opacity: 0;
-  transform: translateX(20px);
-  display: none;
-}
-
-.section.active {
-  display: block;
-  opacity: 1;
-  transform: translateX(0);
-}
-.friend-form {
-  margin-top: 1rem;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  max-width: 300px;
-}
-
-.friend-card {
-  background: var(--card-bg);
-  border-radius: var(--border-radius);
-  padding: 1rem;
-  margin: 0.5rem 0;
-  box-shadow: var(--shadow);
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-}
-
-.friend-card span {
-  font-size: 2rem;
-}
