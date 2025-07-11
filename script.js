@@ -370,11 +370,6 @@ function loadEntries(filter = '', sort = 'date-desc') {
             loop: true,
             slidesPerView: window.innerWidth < 600 ? 1 : 2,
             spaceBetween: 10,
-            pagination: { el: container.querySelector('.swiper-pagination') },
-            navigation: {
-              nextEl: container.querySelector('.swiper-button-next'),
-              prevEl: container.querySelector('.swiper-button-prev')
-            }
           });
         });
       }, 100);
