@@ -12,6 +12,8 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
+   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <body>
   <div id="splashScreen" class="splash-screen">
     <h1>Social Diary</h1>
@@ -279,7 +281,7 @@
       measurementId: "G-6NSE70KRLB"
     };
     firebase.initializeApp(firebaseConfig);
-    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+     const user = JSON.parse(localStorage.getItem("loggedInUser"));
     if (user) {
       const display = document.getElementById("usernameDisplay");
       if (display) {
