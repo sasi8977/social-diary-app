@@ -287,22 +287,25 @@ textarea#editContent {
 
 .swiper-container {
   width: 100%;
-  max-width: 600px;
-  margin: 1rem 0;
+  margin-top: 100px;
+  border-radius: 12px
+  overflow: hidden;
 }
 
-.swiper-slide {
-  display: flex;
-  justify-content: center;
+.swiper-slide img.entry-thumb {
+  width: 100%;
+  height: auto;
+  border-radius: 10px;
+  object-fit: cover;
 }
-
-.swiper-pagination-bullet {
-  background: var(--primary-color);
-}
-
+  
 .swiper-button-prev,
 .swiper-button-next {
-  color: var(--primary-color);
+  color: #5e60ce;
+}
+.swiper-pagination-bullet-active
+{
+  background-color: #f72585;
 }
 
 .stat-card {
