@@ -120,9 +120,7 @@ function setupDiaryForm() {
 
   if (imageInput && previewContainer && removeBtn) {
     imageInput.addEventListener('change', () => {
-      selectedImages = [];
-      previewContainer.innerHTML = '';
-      const files = Array.from(imageInput.files);
+     const files = Array.from(imageInput.files);
       const maxSize = 2 * 1024 * 1024; // 2MB
       let valid = true;
 
@@ -142,7 +140,6 @@ function setupDiaryForm() {
           const img = document.createElement('img');
           img.src = compressedData;
           img.className = 'entry-thumb';
-          img.style.maxWidth = '100px';
           previewContainer.appendChild(img);
         });
       });
