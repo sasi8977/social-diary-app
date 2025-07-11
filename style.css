@@ -287,34 +287,38 @@ textarea#editContent {
 
 .swiper-container {
   width: 100%;
-  max-width: 600px;
+  max-width: 100%;
   margin: 1rem auto;
   overflow: hidden;
-}
-
-.swiper-slide img {
-  width: 100%;
-  max-width: 100%;
-  height: auto;
   border-radius: 1rem;
-  object-fit: cover;
-
 }
-  
+
 .swiper-wrapper {
   display: flex;
-  transition: transform 0.3s
-  ease;
+  transition: transform 0.3s ease;
   will-change: transform;
-  
 }
 
 .swiper-slide {
-  width: 100%;
-  max-width: 100%;
-  height: auto;
+  flex-shrink: 0;
+  width: 100% !important;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.swiper-slide img {
+  width: auto;
+  max-width: 90%;
+  max-height: 220px;
+  object-fit: contain;
   border-radius: 1rem;
-  object-fit: cover;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+.swiper-button-next,
+.swiper-button-prev {
+  color: var(--primary-color);
 }
 
 .stat-card {
@@ -566,14 +570,15 @@ textarea#editContent {
     font-size: 0.9rem;
   }
 }
+
 .diary-binding {
   display: none;
 }
+
 .diary-container {
-  border-left: 10px solid
-    var(--primary-color);
+  border-left: 10px solid var(--primary-color);
 }
-}
+
 @media (max-width: 400px) {
   .sidebar {
     padding: 0.5rem;
@@ -615,34 +620,4 @@ body.green {
   --bg-color: #e8f5e9;
   --text-color: #1a4314;
   --card-bg: #ffffff;
-}
-.entry-slider {
-  width: 100%;
-  max-width: 100%;
-  margin-top: 1rem;
-  margin-bottom: 1rem;
-  position: relative;
-  overflow: hidden;
-}
-
-.swiper-wrapper {
-  display: flex;
-}
-
-.swiper-slide {
-  flex-shrink: 0;
-  width: 100% !important;
-  height: auto;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.entry-slider img.entry-thumb {
-  width: auto;
-  max-width: 90%;
-  max-height: 200px;
-  object-fit: contain;
-  border-radius: 1rem;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
 }
