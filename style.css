@@ -440,8 +440,9 @@ textarea#editContent {
   position: relative;
   background: #fffef9;
   border-radius: 20px;
-  padding: 2rem;
-  margin: 2rem auto;
+  padding: 1rem;
+  margin: 1rem auto;
+  box-sizing: border-box;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
   max-width: 900px;
   min-height: 80vh;
@@ -553,7 +554,14 @@ textarea#editContent {
     font-size: 0.9rem;
   }
 }
-
+.diary-binding {
+  display: none;
+}
+.diary-container {
+  border-left: 10px solid
+    var(--primary-color);
+}
+}
 @media (max-width: 400px) {
   .sidebar {
     padding: 0.5rem;
