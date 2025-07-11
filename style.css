@@ -607,4 +607,33 @@ body.green {
   --text-color: #1a4314;
   --card-bg: #ffffff;
 }
+.entry-slider {
+  width: 100%;
+  max-width: 100%;
+  margin-top: 1rem;
+  margin-bottom: 1rem;
+  position: relative;
+  overflow: hidden;
+}
 
+.swiper-wrapper {
+  display: flex;
+}
+
+.swiper-slide {
+  flex-shrink: 0;
+  width: 100% !important;
+  height: auto;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.entry-slider img.entry-thumb {
+  width: auto;
+  max-width: 90%;
+  max-height: 200px;
+  object-fit: contain;
+  border-radius: 1rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+}
