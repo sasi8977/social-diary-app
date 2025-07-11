@@ -344,6 +344,7 @@ function loadEntries(filter = '', sort = 'date-desc') {
       <h3>${entry.title || 'No title'}</h3>
       <p class="entry-date">${entry.date || 'No date'}</p>
       <p>${entry.mood || 'No mood'}</p>
+       <p class="entry-content">${entry.content || ''}</p>
       ${imageHtml}
       <button class="favoriteBtn">${entry.favorite ? '💖 Favorited' : '🤍 Add Favorite'}</button>
     `;
