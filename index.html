@@ -281,6 +281,7 @@
       measurementId: "G-6NSE70KRLB"
     };
     firebase.initializeApp(firebaseConfig);
+    const db=firebase.firestore();
      const user = JSON.parse(localStorage.getItem("loggedInUser"));
     if (user) {
       const display = document.getElementById("usernameDisplay");
