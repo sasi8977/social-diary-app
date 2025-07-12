@@ -218,14 +218,14 @@ function saveEntry(selectedImages) {
   const errorDiv = document.getElementById('formError');
 
   const entry = {
-    id: Date.now(),
-    date: dateField ? dateField.textContent : 'No date',
+     date: dateField ? dateField.textContent : 'No date',
     title,
     content,
     mood: selectedMood,
     tags: tagsDisplay ? Array.from(tagsDisplay.querySelectorAll('.tag')).map(t => t.textContent) : [],
     photos: selectedImages,
-    favorite: false
+    favorite: false,
+    timestamp: new Date()
   };
 
   entries.push(entry);
@@ -248,8 +248,16 @@ function saveEntry(selectedImages) {
   if (imageInput) imageInput.value = '';
   if (previewContainer) previewContainer.innerHTML = '';
   if (errorDiv) errorDiv.textContent = '';
+  db.collection("entries").add(entry)
+  .then(() => {
+    alert("Entry saved to cloud!");
+    form.reset();
   loadEntries();
-}
+  })
+  .catch((error) => {
+    console.error("Error saving to Firestore:",error);
+  });
+  }
 
 // === Tags ===
 function setupTags() {
@@ -293,10 +301,15 @@ function setupTags() {
 }
 
 // === View Entries ===
-function loadEntries(filter = '', sort = 'date-desc') {
+function loadEntries() {
   const list = document.getElementById('entriesList');
   if (!list) return;
   list.innerHTML = '';
+  db.collection("entries").orderBy("timestamp","desc").get()
+  .then(snapshot => {
+    snapshot.foreach(doc => {
+      const entry =
+        doc.data();
 
   const lowerFilter = filter.toLowerCase();
   let filteredEntries = entries.filter(entry =>
@@ -360,7 +373,10 @@ function loadEntries(filter = '', sort = 'date-desc') {
       }
       loadEntries(filter, sort);
     });
-
+   .catch(error => {
+    console.error("Error loading entries:"'error);
+  });
+    }
     card.addEventListener('click', () => showEntryDetail(entry));
     list.appendChild(card);
 
