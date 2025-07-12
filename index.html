@@ -269,40 +269,55 @@
   </div>
   <div class="notification" id="notification" aria-live="polite"></div>
   <script>
-    // Check network before initializing Firebase
-    if (!navigator.onLine) {
-      const splashError = document.getElementById("splashError");
-      if (splashError) splashError.textContent = "No internet connection. Trying offline mode.";
-      setTimeout(() => {
-        const splashScreen = document.getElementById('splashScreen');
-        if (splashScreen) splashScreen.style.display = 'none';
-      }, 2000);
+    // Load Firebase dynamically
+    function loadFirebase() {
+      return new Promise((resolve, reject) => {
+        const script = document.createElement('script');
+        script.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js';
+        script.onload = () => {
+          const authScript = document.createElement('script');
+          authScript.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js';
+          authScript.onload = () => {
+            const firestoreScript = document.createElement('script');
+            firestoreScript.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js';
+            firestoreScript.onload = resolve;
+            firestoreScript.onerror = reject;
+            document.head.appendChild(firestoreScript);
+          };
+          authScript.onerror = reject;
+          document.head.appendChild(authScript);
+        };
+        script.onerror = reject;
+        document.head.appendChild(script);
+      });
     }
 
-    // Firebase configuration
-    const firebaseConfig = {
-      apiKey: "AIzaSyD0iJWnkuinWVCtsO5vjqohrCA4ws6fb8Q",
-      authDomain: "social-diary-b6754.firebaseapp.com",
-      projectId: "social-diary-b6754",
-      storageBucket: "social-diary-b6754.appspot.com",
-      messagingSenderId: "324502839373",
-      appId: "1:324502839373:web:05b3f62f18dd78f14bbc04",
-      measurementId: "G-6NSE70KRLB"
-    };
-    try {
-      firebase.initializeApp(firebaseConfig);
-      console.log('Firebase initialized successfully');
-    } catch (error) {
-      console.error('Firebase initialization failed:', error);
+    // Initialize Firebase after loading
+    loadFirebase().then(() => {
+      const firebaseConfig = {
+        apiKey: "AIzaSyD0iJWnkuinWVCtsO5vjqohrCA4ws6fb8Q",
+        authDomain: "social-diary-b6754.firebaseapp.com",
+        projectId: "social-diary-b6754",
+        storageBucket: "social-diary-b6754.appspot.com",
+        messagingSenderId: "324502839373",
+        appId: "1:324502839373:web:05b3f62f18dd78f14bbc04",
+        measurementId: "G-6NSE70KRLB"
+      };
+      try {
+        firebase.initializeApp(firebaseConfig);
+        console.log('Firebase initialized successfully');
+      } catch (error) {
+        console.error('Firebase initialization failed:', error);
+        const splashError = document.getElementById("splashError");
+        if (splashError) splashError.textContent = "Firebase initialization error: " + error.message;
+      }
+    }).catch(error => {
+      console.error('Firebase script load failed:', error);
       const splashError = document.getElementById("splashError");
-      if (splashError) splashError.textContent = "Firebase initialization error: " + error.message;
-      setTimeout(() => {
-        const splashScreen = document.getElementById('splashScreen');
-        if (splashScreen) splashScreen.style.display = 'none';
-      }, 2000);
-    }
+      if (splashError) splashError.textContent = "Failed to load Firebase: " + error.message;
+    });
 
-    // Register service worker
+    // Register service worker with better error handling
     if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
       navigator.serviceWorker.register('/sw.js', { scope: '/' })
         .then(reg => console.log('Service Worker registered:', reg.scope))
@@ -310,7 +325,7 @@
           console.error('Service Worker registration failed:', err);
           const splashError = document.getElementById("splashError");
           if (splashError) {
-            splashError.textContent = "Service Worker error: " + err.message;
+            splashError.textContent = "Service Worker error: " + (err.message || 'Unknown error');
           }
         });
     }
