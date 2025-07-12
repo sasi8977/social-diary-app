@@ -12,12 +12,12 @@
   <link rel="stylesheet" href="style.css" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
 </head>
-   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
 <body>
   <div id="splashScreen" class="splash-screen">
     <h1>Social Diary</h1>
     <p>Welcome back, friend!</p>
+    <p id="splashError" class="error-msg" aria-live="polite"></p>
+    <div id="loadingIndicator" style="margin-top: 10px;">Loading...</div>
   </div>
   <div class="top-actions">
     <button id="installBtn" class="touch-feedback" aria-label="Install app">📲 Install App</button>
@@ -268,9 +268,18 @@
     </main>
   </div>
   <div class="notification" id="notification" aria-live="polite"></div>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script>
+    // Check network before initializing Firebase
+    if (!navigator.onLine) {
+      const splashError = document.getElementById("splashError");
+      if (splashError) splashError.textContent = "No internet connection. Trying offline mode.";
+      setTimeout(() => {
+        const splashScreen = document.getElementById('splashScreen');
+        if (splashScreen) splashScreen.style.display = 'none';
+      }, 2000);
+    }
+
+    // Firebase configuration
     const firebaseConfig = {
       apiKey: "AIzaSyD0iJWnkuinWVCtsO5vjqohrCA4ws6fb8Q",
       authDomain: "social-diary-b6754.firebaseapp.com",
@@ -280,23 +289,30 @@
       appId: "1:324502839373:web:05b3f62f18dd78f14bbc04",
       measurementId: "G-6NSE70KRLB"
     };
-    firebase.initializeApp(firebaseConfig);
-    const db=firebase.firestore();
-     const user = JSON.parse(localStorage.getItem("loggedInUser"));
-    if (user) {
-      const display = document.getElementById("usernameDisplay");
-      if (display) {
-        const nameToShow = user.username || user.email || user.phone || "Friend";
-        display.textContent = `Hi, ${nameToShow} 👋`;
-      }
+    try {
+      firebase.initializeApp(firebaseConfig);
+      console.log('Firebase initialized successfully');
+    } catch (error) {
+      console.error('Firebase initialization failed:', error);
+      const splashError = document.getElementById("splashError");
+      if (splashError) splashError.textContent = "Firebase initialization error: " + error.message;
+      setTimeout(() => {
+        const splashScreen = document.getElementById('splashScreen');
+        if (splashScreen) splashScreen.style.display = 'none';
+      }, 2000);
     }
-  </script>
-  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js', { scope: './' })
+
+    // Register service worker
+    if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
+      navigator.serviceWorker.register('/sw.js', { scope: '/' })
         .then(reg => console.log('Service Worker registered:', reg.scope))
-        .catch(err => console.error('Service Worker registration failed:', err));
+        .catch(err => {
+          console.error('Service Worker registration failed:', err);
+          const splashError = document.getElementById("splashError");
+          if (splashError) {
+            splashError.textContent = "Service Worker error: " + err.message;
+          }
+        });
     }
   </script>
   <script src="script.js" defer></script>
