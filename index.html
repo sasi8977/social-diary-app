@@ -16,8 +16,6 @@
   <div id="splashScreen" class="splash-screen">
     <h1>Social Diary</h1>
     <p>Welcome back, friend!</p>
-    <p id="splashError" class="error-msg" aria-live="polite"></p>
-    <div id="loadingIndicator" style="margin-top: 10px;">Loading...</div>
   </div>
   <div class="top-actions">
     <button id="installBtn" class="touch-feedback" aria-label="Install app">📲 Install App</button>
@@ -268,66 +266,34 @@
     </main>
   </div>
   <div class="notification" id="notification" aria-live="polite"></div>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
   <script>
-    // Load Firebase dynamically
-    function loadFirebase() {
-      return new Promise((resolve, reject) => {
-        const script = document.createElement('script');
-        script.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js';
-        script.onload = () => {
-          const authScript = document.createElement('script');
-          authScript.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js';
-          authScript.onload = () => {
-            const firestoreScript = document.createElement('script');
-            firestoreScript.src = 'https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js';
-            firestoreScript.onload = resolve;
-            firestoreScript.onerror = reject;
-            document.head.appendChild(firestoreScript);
-          };
-          authScript.onerror = reject;
-          document.head.appendChild(authScript);
-        };
-        script.onerror = reject;
-        document.head.appendChild(script);
-      });
-    }
-
-    // Initialize Firebase after loading
-    loadFirebase().then(() => {
-      const firebaseConfig = {
-        apiKey: "AIzaSyD0iJWnkuinWVCtsO5vjqohrCA4ws6fb8Q",
-        authDomain: "social-diary-b6754.firebaseapp.com",
-        projectId: "social-diary-b6754",
-        storageBucket: "social-diary-b6754.appspot.com",
-        messagingSenderId: "324502839373",
-        appId: "1:324502839373:web:05b3f62f18dd78f14bbc04",
-        measurementId: "G-6NSE70KRLB"
-      };
-      try {
-        firebase.initializeApp(firebaseConfig);
-        console.log('Firebase initialized successfully');
-      } catch (error) {
-        console.error('Firebase initialization failed:', error);
-        const splashError = document.getElementById("splashError");
-        if (splashError) splashError.textContent = "Firebase initialization error: " + error.message;
+    const firebaseConfig = {
+      apiKey: "AIzaSyD0iJWnkuinWVCtsO5vjqohrCA4ws6fb8Q",
+      authDomain: "social-diary-b6754.firebaseapp.com",
+      projectId: "social-diary-b6754",
+      storageBucket: "social-diary-b6754.appspot.com",
+      messagingSenderId: "324502839373",
+      appId: "1:324502839373:web:05b3f62f18dd78f14bbc04",
+      measurementId: "G-6NSE70KRLB"
+    };
+    firebase.initializeApp(firebaseConfig);
+    const user = JSON.parse(localStorage.getItem("loggedInUser"));
+    if (user) {
+      const display = document.getElementById("usernameDisplay");
+      if (display) {
+        const nameToShow = user.username || user.email || user.phone || "Friend";
+        display.textContent = `Hi, ${nameToShow} 👋`;
       }
-    }).catch(error => {
-      console.error('Firebase script load failed:', error);
-      const splashError = document.getElementById("splashError");
-      if (splashError) splashError.textContent = "Failed to load Firebase: " + error.message;
-    });
-
-    // Register service worker with better error handling
-    if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost')) {
-      navigator.serviceWorker.register('/sw.js', { scope: '/' })
+    }
+  </script>
+  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
+  <script>
+    if ('serviceWorker' in navigator) {
+      navigator.serviceWorker.register('sw.js', { scope: './' })
         .then(reg => console.log('Service Worker registered:', reg.scope))
-        .catch(err => {
-          console.error('Service Worker registration failed:', err);
-          const splashError = document.getElementById("splashError");
-          if (splashError) {
-            splashError.textContent = "Service Worker error: " + (err.message || 'Unknown error');
-          }
-        });
+        .catch(err => console.error('Service Worker registration failed:', err));
     }
   </script>
   <script src="script.js" defer></script>
