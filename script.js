@@ -1,7 +1,6 @@
 let selectedMood = '';
 let entries = JSON.parse(localStorage.getItem('entries')) || [];
 let friends = JSON.parse(localStorage.getItem('friends')) || [];
-const db = typeof firebase !== 'undefined' ? firebase.firestore() : null;
 
 function updateDateField() {
   const dateField = document.getElementById('dateField');
@@ -10,25 +9,73 @@ function updateDateField() {
   }
 }
 
-function hideSplashScreen() {
-  const splashScreen = document.getElementById('splashScreen');
-  if (splashScreen) {
-    splashScreen.classList.add('hide');
-    setTimeout(() => { if (splashScreen) splashScreen.style.display = 'none'; }, 400);
+// === PIN Lock ===
+document.addEventListener('DOMContentLoaded', () => {
+  const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
+  if (!loggedInUser) {
+    window.location.href = 'login.html';
+    return;
   }
-}
 
-function showApp() {
-  const pinLock = document.getElementById('pin-lock');
-  if (localStorage.getItem('pinUnlocked')) {
-    if (pinLock) pinLock.style.display = 'none';
-    hideSplashScreen();
-  } else {
-    if (pinLock) pinLock.style.display = 'flex';
+  const splash = document.getElementById('splashScreen');
+  if (splash) {
+    setTimeout(() => {
+      splash.classList.add('hide');
+    }, 2000);
   }
+
   updateDateField();
+  const pinLock = document.getElementById('pin-lock');
+  const unlockBtn = document.getElementById('unlockBtn');
+  const pinInput = document.getElementById('pinInput');
+  const pinError = document.getElementById('pinError');
+  let retryCount = parseInt(localStorage.getItem('pinRetries')) || 0;
+  const maxRetries = 3;
+  const lockoutTime = 60000; // 1 minute
+
+  if (!localStorage.getItem('pinUnlocked')) {
+    if (pinLock) pinLock.style.display = 'flex';
+
+    if (retryCount >= maxRetries) {
+      if (pinInput) pinInput.disabled = true;
+      if (pinError) pinError.textContent = 'Too many attempts. Try again in 1 minute.';
+      setTimeout(() => {
+        retryCount = 0;
+        localStorage.setItem('pinRetries', retryCount);
+        if (pinInput) pinInput.disabled = false;
+        if (pinError) pinError.textContent = '';
+      }, lockoutTime);
+    }
+  }
+
+  if (unlockBtn && pinInput) {
+    unlockBtn.addEventListener('click', () => {
+      const savedPin = localStorage.getItem('userPin') || '1234';
+      if (pinInput.value === savedPin) {
+        localStorage.setItem('pinUnlocked', 'true');
+        localStorage.setItem('pinRetries', '0');
+        if (pinLock) pinLock.style.display = 'none';
+      } else {
+        retryCount++;
+        localStorage.setItem('pinRetries', retryCount);
+        if (pinError) pinError.textContent = `Incorrect PIN. ${maxRetries - retryCount} attempts left.`;
+        if (retryCount >= maxRetries) {
+          if (pinInput) pinInput.disabled = true;
+          if (pinError) pinError.textContent = 'Too many attempts. Try again in 1 minute.';
+          setTimeout(() => {
+            retryCount = 0;
+            localStorage.setItem('pinRetries', retryCount);
+            if (pinInput) pinInput.disabled = false;
+            if (pinError) pinError.textContent = '';
+          }, lockoutTime);
+        }
+      }
+    });
+  }
+
   const todayDate = document.getElementById('today-date');
   if (todayDate) todayDate.textContent = new Date().toDateString();
+
   loadEntries();
   setupMoodPicker();
   setupDiaryForm();
@@ -45,131 +92,9 @@ function showApp() {
   setupFriends();
   setupStats();
   setupSearch();
-}
-
-document.addEventListener('DOMContentLoaded', () => {
-  const splashError = document.getElementById('splashError');
-  const loadingIndicator = document.getElementById('loadingIndicator');
-
-  if (typeof firebase === 'undefined') {
-    console.error('Firebase is not defined');
-    if (splashError) splashError.textContent = 'Firebase failed to load. Check your internet connection.';
-    if (loadingIndicator) loadingIndicator.style.display = 'none';
-    hideSplashScreen();
-    showApp();
-    return;
-  }
-
-  firebase.auth().onAuthStateChanged(user => {
-    console.log('Auth state changed, user:', user ? user.uid : 'null');
-    const usernameDisplay = document.getElementById('usernameDisplay');
-    const sidebarUsername = document.getElementById('sidebarUsername');
-
-    if (user) {
-      if (!db) {
-        console.error('Firestore is not initialized');
-        if (splashError) splashError.textContent = 'Firestore failed to initialize.';
-        if (loadingIndicator) loadingIndicator.style.display = 'none';
-        hideSplashScreen();
-        showApp();
-        return;
-      }
-
-      db.collection('users').doc(user.uid).get()
-        .then(doc => {
-          const nameToShow = doc.exists ? (doc.data().username || user.email || 'Friend') : user.email || 'Friend';
-          console.log('User data fetched, name:', nameToShow);
-          if (usernameDisplay) usernameDisplay.textContent = `Hi, ${nameToShow} 👋`;
-          if (sidebarUsername) sidebarUsername.textContent = nameToShow;
-          localStorage.setItem('loggedInUser', JSON.stringify({ uid: user.uid, username: nameToShow }));
-          if (loadingIndicator) loadingIndicator.style.display = 'none';
-          showApp();
-        })
-        .catch(error => {
-          console.error('Error fetching user data:', error);
-          if (splashError) splashError.textContent = 'Error loading user: ' + error.message;
-          if (usernameDisplay) usernameDisplay.textContent = `Hi, ${user.email || 'Friend'} 👋`;
-          localStorage.setItem('loggedInUser', JSON.stringify({ uid: user.uid, username: user.email || 'Friend' }));
-          if (loadingIndicator) loadingIndicator.style.display = 'none';
-          showApp();
-        });
-    } else {
-      if (loadingIndicator) loadingIndicator.style.display = 'none';
-      hideSplashScreen();
-      window.location.href = 'login.html';
-    }
-
-    setTimeout(() => {
-      console.log('Timeout triggered, hiding splash screen');
-      if (loadingIndicator) loadingIndicator.style.display = 'none';
-      hideSplashScreen();
-      const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-      if (!loggedInUser) {
-        window.location.href = 'login.html';
-      }
-    }, 5000); // Increased to 5 seconds for debugging
-  });
-
-  const pinLock = document.getElementById('pin-lock');
-  const unlockBtn = document.getElementById('unlockBtn');
-  const pinInput = document.getElementById('pinInput');
-  const pinError = document.getElementById('pinError');
-  let retryCount = parseInt(localStorage.getItem('pinRetries')) || 0;
-  const maxRetries = 3;
-  const lockoutTime = 60000;
-
-  console.log('PIN setup - pinLock:', pinLock, 'unlockBtn:', unlockBtn, 'pinInput:', pinInput, 'pinError:', pinError);
-
-  if (!localStorage.getItem('pinUnlocked') && pinLock) {
-    pinLock.style.display = 'flex';
-    if (retryCount >= maxRetries) {
-      if (pinInput) pinInput.disabled = true;
-      if (pinError) pinError.textContent = 'Too many attempts. Try again in 1 minute.';
-      setTimeout(() => {
-        retryCount = 0;
-        localStorage.setItem('pinRetries', retryCount);
-        if (pinInput) pinInput.disabled = false;
-        if (pinError) pinError.textContent = '';
-      }, lockoutTime);
-    }
-  }
-
-  if (unlockBtn && pinInput) {
-    console.log('Attaching unlock event listener');
-    unlockBtn.addEventListener('click', () => {
-      console.log('Unlock button clicked, pinInput.value:', pinInput.value);
-      const savedPin = localStorage.getItem('userPin') || '1234';
-      console.log('Saved PIN:', savedPin);
-      if (pinInput.value === savedPin) {
-        console.log('PIN matched, unlocking');
-        localStorage.setItem('pinUnlocked', 'true');
-        localStorage.setItem('pinRetries', '0');
-        if (pinLock) pinLock.style.display = 'none';
-        hideSplashScreen();
-        showApp();
-      } else {
-        retryCount++;
-        localStorage.setItem('pinRetries', retryCount);
-        if (pinError) pinError.textContent = `Incorrect PIN. ${maxRetries - retryCount} attempts left.`;
-        console.log('PIN mismatch, retryCount:', retryCount);
-        if (retryCount >= maxRetries) {
-          if (pinInput) pinInput.disabled = true;
-          if (pinError) pinError.textContent = 'Too many attempts. Try again in 1 minute.';
-          setTimeout(() => {
-            retryCount = 0;
-            localStorage.setItem('pinRetries', retryCount);
-            if (pinInput) pinInput.disabled = false;
-            if (pinError) pinError.textContent = '';
-          }, lockoutTime);
-        }
-      }
-    });
-  } else {
-    console.error('Unlock button or pin input not found');
-    if (splashError) splashError.textContent = 'Error: Unlock button or PIN input not found.';
-  }
 });
 
+// === Mood ===
 function setupMoodPicker() {
   const moodOptions = document.querySelectorAll('.mood-option');
   if (moodOptions) {
@@ -183,6 +108,7 @@ function setupMoodPicker() {
   }
 }
 
+// === Diary Form ===
 function setupDiaryForm() {
   const imageInput = document.getElementById('imageInput');
   const previewContainer = document.getElementById('previewImages');
@@ -194,8 +120,8 @@ function setupDiaryForm() {
 
   if (imageInput && previewContainer && removeBtn) {
     imageInput.addEventListener('change', () => {
-      const files = Array.from(imageInput.files);
-      const maxSize = 2 * 1024 * 1024;
+     const files = Array.from(imageInput.files);
+      const maxSize = 2 * 1024 * 1024; // 2MB
       let valid = true;
 
       files.forEach(file => {
@@ -290,61 +216,42 @@ function saveEntry(selectedImages) {
   const imageInput = document.getElementById('imageInput');
   const previewContainer = document.getElementById('previewImages');
   const errorDiv = document.getElementById('formError');
-  const user = firebase.auth().currentUser;
-
-  if (!user) {
-    if (errorDiv) errorDiv.textContent = 'Please log in to save entries.';
-    window.location.href = 'login.html';
-    return;
-  }
 
   const entry = {
+    id: Date.now(),
     date: dateField ? dateField.textContent : 'No date',
     title,
     content,
     mood: selectedMood,
     tags: tagsDisplay ? Array.from(tagsDisplay.querySelectorAll('.tag')).map(t => t.textContent) : [],
     photos: selectedImages,
-    favorite: false,
-    timestamp: new Date()
+    favorite: false
   };
 
   entries.push(entry);
   try {
     localStorage.setItem('entries', JSON.stringify(entries));
   } catch (e) {
-    console.warn('Failed to save entries to localStorage:', e);
-    if (errorDiv) errorDiv.textContent = 'Error saving entry locally. Storage may be full.';
+    console.warn('Failed to save entries:', e);
+    if (errorDiv) errorDiv.textContent = 'Error saving entry. Storage may be full.';
     return;
   }
 
-  if (db) {
-    db.collection('users').doc(user.uid).collection('entries').add(entry)
-      .then(() => {
-        console.log('Entry saved to cloud');
-        alert('Entry saved to cloud!');
-        const form = document.getElementById('diaryForm');
-        if (form) form.reset();
-        updateDateField();
-        selectedMood = '';
-        const selectedMoodEl = document.getElementById('selectedMood');
-        if (selectedMoodEl) selectedMoodEl.textContent = '';
-        if (tagsDisplay) tagsDisplay.innerHTML = '';
-        if (imageInput) imageInput.value = '';
-        if (previewContainer) previewContainer.innerHTML = '';
-        if (errorDiv) errorDiv.textContent = '';
-        loadEntries();
-      })
-      .catch(error => {
-        console.error('Error saving to Firestore:', error);
-        if (errorDiv) errorDiv.textContent = 'Error saving to cloud: ' + error.message;
-      });
-  } else {
-    if (errorDiv) errorDiv.textContent = 'Firestore not available.';
-    loadEntries();
-  }
+  alert('Saved!');
+  const form = document.getElementById('diaryForm');
+  if (form) form.reset();
+  updateDateField();
+  selectedMood = '';
+  const selectedMoodEl = document.getElementById('selectedMood');
+  if (selectedMoodEl) selectedMoodEl.textContent = '';
+  if (tagsDisplay) tagsDisplay.innerHTML = '';
+  if (imageInput) imageInput.value = '';
+  if (previewContainer) previewContainer.innerHTML = '';
+  if (errorDiv) errorDiv.textContent = '';
+  loadEntries();
 }
 
+// === Tags ===
 function setupTags() {
   const addBtn = document.getElementById('addTagBtn');
   const input = document.getElementById('tagsInput');
@@ -385,68 +292,23 @@ function setupTags() {
   input.addEventListener('input', () => updateSuggestions(input.value));
 }
 
-function loadEntries(filter = '', sort = 'date-desc', showFavorites = false) {
+// === View Entries ===
+function loadEntries(filter = '', sort = 'date-desc') {
   const list = document.getElementById('entriesList');
-  const splashError = document.getElementById('splashError');
   if (!list) return;
-
   list.innerHTML = '';
-  const user = firebase.auth().currentUser;
 
-  if (!user) {
-    if (splashError) splashError.textContent = 'Please log in to view entries.';
-    window.location.href = 'login.html';
-    return;
-  }
-
-  if (db) {
-    db.collection('users').doc(user.uid).collection('entries').orderBy('timestamp', 'desc').get()
-      .then(snapshot => {
-        entries = [];
-        snapshot.forEach(doc => {
-          const entry = { id: doc.id, ...doc.data() };
-          entries.push(entry);
-        });
-
-        try {
-          localStorage.setItem('entries', JSON.stringify(entries));
-        } catch (e) {
-          console.warn('Failed to save entries to localStorage:', e);
-        }
-
-        renderEntries(entries, filter, sort, showFavorites);
-      })
-      .catch(error => {
-        console.error('Error loading entries from Firestore:', error);
-        if (splashError) splashError.textContent = 'Error loading entries: ' + error.message;
-        renderEntries(entries, filter, sort, showFavorites);
-        if (navigator.onLine === false) {
-          const offlineWarning = document.createElement('p');
-          offlineWarning.textContent = 'You are offline. Showing local entries.';
-          list.prepend(offlineWarning);
-        }
-      });
-  } else {
-    renderEntries(entries, filter, sort, showFavorites);
-    if (splashError) splashError.textContent = 'Firestore not available. Using local data.';
-  }
-}
-
-function renderEntries(entries, filter, sort, showFavorites) {
-  const list = document.getElementById('entriesList');
-  if (!list) return;
-
-  let filteredEntries = showFavorites ? entries.filter(e => e.favorite) : [...entries];
   const lowerFilter = filter.toLowerCase();
-  filteredEntries = filteredEntries.filter(entry =>
+  let filteredEntries = entries.filter(entry =>
     (entry.title || '').toLowerCase().includes(lowerFilter) ||
     (entry.mood || '').toLowerCase().includes(lowerFilter) ||
     (entry.tags && entry.tags.some(tag => tag.toLowerCase().includes(lowerFilter)))
   );
 
+  // Sorting
   filteredEntries.sort((a, b) => {
-    if (sort === 'date-desc') return b.timestamp - a.timestamp;
-    if (sort === 'date-asc') return a.timestamp - b.timestamp;
+    if (sort === 'date-desc') return b.id - a.id;
+    if (sort === 'date-asc') return a.id - b.id;
     if (sort === 'title') return a.title.localeCompare(b.title);
     if (sort === 'mood') return a.mood.localeCompare(b.mood);
     return 0;
@@ -462,9 +324,9 @@ function renderEntries(entries, filter, sort, showFavorites) {
         imageHtml = `
           <div class="swiper-container">
             <div class="swiper-wrapper">
-              ${entry.photos.map(photo => `
+              ${entry.photos.map(img => `
                 <div class="swiper-slide">
-                  <img src="${photo}" class="entry-thumb" alt="photo"/>
+                  <img src="${img}" class="entry-thumb" alt="photo"/>
                 </div>
               `).join('')}
             </div>
@@ -482,7 +344,6 @@ function renderEntries(entries, filter, sort, showFavorites) {
       <h3>${entry.title || 'No title'}</h3>
       <p class="entry-date">${entry.date || 'No date'}</p>
       <p>${entry.mood || 'No mood'}</p>
-      <p class="entry-content">${entry.content || ''}</p>
       ${imageHtml}
       <button class="favoriteBtn">${entry.favorite ? '💖 Favorited' : '🤍 Add Favorite'}</button>
     `;
@@ -491,16 +352,12 @@ function renderEntries(entries, filter, sort, showFavorites) {
     favoriteBtn.addEventListener('click', (e) => {
       e.stopPropagation();
       entry.favorite = !entry.favorite;
-      if (db) {
-        db.collection('users').doc(firebase.auth().currentUser.uid).collection('entries').doc(entry.id).update({ favorite: entry.favorite })
-          .catch(error => console.error('Error updating favorite in Firestore:', error));
-      }
       try {
         localStorage.setItem('entries', JSON.stringify(entries));
       } catch (e) {
         console.warn('Failed to save entries:', e);
       }
-      loadEntries(filter, sort, showFavorites);
+      loadEntries(filter, sort);
     });
 
     card.addEventListener('click', () => showEntryDetail(entry));
@@ -513,11 +370,22 @@ function renderEntries(entries, filter, sort, showFavorites) {
             loop: true,
             slidesPerView: window.innerWidth < 600 ? 1 : 2,
             spaceBetween: 10,
+            pagination: { el: container.querySelector('.swiper-pagination') },
+            navigation: {
+              nextEl: container.querySelector('.swiper-button-next'),
+              prevEl: container.querySelector('.swiper-button-prev')
+            }
           });
         });
       }, 100);
     }
   });
+
+  if (navigator.onLine === false) {
+    const offlineWarning = document.createElement('p');
+    offlineWarning.textContent = 'You are offline. Some features may be limited.';
+    list.prepend(offlineWarning);
+  }
 }
 
 function showEntryDetail(entry) {
@@ -552,7 +420,8 @@ function showEntryDetail(entry) {
     }
   }
 
-  let editSelectedImages = [...(entry.photos || [])];
+  // Setup edit form
+  let editSelectedImages = [...(entry.images || [])];
   document.getElementById('editTitle').value = entry.title || '';
   document.getElementById('editContent').value = entry.content || '';
   document.getElementById('editMood').value = entry.mood || '';
@@ -562,36 +431,37 @@ function showEntryDetail(entry) {
 
   if (editImageInput) {
     editImageInput.addEventListener('change', () => {
-      editImages.innerHTML = '';
-      editSelectedImages = [];
-      const files = Array.from(editImageInput.files);
-      const maxSize = 2 * 1024 * 1024;
-      let valid = true;
-      const errorDiv = document.getElementById('editFormError');
+  editImages.innerHTML = '';
+  editSelectedImages = [];
+  const files = Array.from(imageInput.files);
+  const maxSize = 2 * 1024 * 1024; // 2MB
+  let valid = true;
+  const errorDiv = document.getElementById('editFormError');
 
-      files.forEach(file => {
-        if (!['image/jpeg', 'image/png'].includes(file.type)) {
-          if (errorDiv) errorDiv.textContent = 'Only JPEG/PNG images are allowed.';
-          valid = false;
-          return;
-        }
-        if (file.size > maxSize) {
-          if (errorDiv) errorDiv.textContent = 'Each image must be under 2MB.';
-          valid = false;
-          return;
-        }
-        compressImage(file, (compressedData) => {
-          editSelectedImages.push(compressedData);
-          const img = document.createElement('img');
-          img.src = compressedData;
-          img.className = 'entry-thumb';
-          img.style.maxWidth = '100px';
-          editImages.appendChild(img);
-        });
-      });
+  files.forEach(file => {
+    if (!['image/jpeg', 'image/png'].includes(file.type)) {
+      if (errorDiv) errorDiv.textContent = 'Only JPEG/PNG images are allowed.';
+      valid = false;
+      return;
+    }
+    if (file.size > maxSize) {
+      if (errorDiv) errorDiv.textContent = 'Each image must be under 2MB.';
+      valid = false;
+      return;
+    }
+    compressImage(file, (compressedData) => {
+      editSelectedImages.push(compressedData);
+      const img = document.createElement('img');
+      img.src = compressedData;
+      img.className = 'entry-thumb';
+      img.style.maxWidth = '100px';
+      editImages.appendChild(img);
+    });
+  });
 
-      if (valid && errorDiv) errorDiv.textContent = '';
-    }, { once: true });
+  if (valid && errorDiv) errorDiv.textContent = '';
+}, { once: true });
+
   }
 
   if (removeEditImages) {
@@ -613,41 +483,22 @@ function showEntryDetail(entry) {
       return;
     }
 
-    const updatedEntry = {
-      title,
-      content,
-      mood: document.getElementById('editMood').value,
-      tags: Array.from(document.getElementById('editTagsDisplay')?.querySelectorAll('.tag') || []).map(t => t.textContent),
-      photos: editSelectedImages,
-      timestamp: new Date()
-    };
+    entry.title = title;
+    entry.content = content;
+    entry.mood = document.getElementById('editMood').value;
+    entry.tags = Array.from(document.getElementById('editTagsDisplay')?.querySelectorAll('.tag') || []).map(t => t.textContent);
+    entry.images = editSelectedImages;
 
-    if (db) {
-      db.collection('users').doc(firebase.auth().currentUser.uid).collection('entries').doc(entry.id).update(updatedEntry)
-        .then(() => {
-          entries = entries.map(e => e.id === entry.id ? { id: entry.id, ...updatedEntry } : e);
-          try {
-            localStorage.setItem('entries', JSON.stringify(entries));
-          } catch (e) {
-            console.warn('Failed to save entries:', e);
-          }
-          showSection('viewEntriesSection');
-          loadEntries();
-        })
-        .catch(error => {
-          console.error('Error updating Firestore:', error);
-          if (errorDiv) errorDiv.textContent = 'Error saving to cloud: ' + error.message;
-        });
-    } else {
-      entries = entries.map(e => e.id === entry.id ? { id: entry.id, ...updatedEntry } : e);
-      try {
-        localStorage.setItem('entries', JSON.stringify(entries));
-      } catch (e) {
-        console.warn('Failed to save entries:', e);
-      }
-      showSection('viewEntriesSection');
-      loadEntries();
+    try {
+      localStorage.setItem('entries', JSON.stringify(entries));
+    } catch (e) {
+      console.warn('Failed to save entries:', e);
+      if (errorDiv) errorDiv.textContent = 'Error saving entry. Storage may be full.';
+      return;
     }
+
+    showSection('viewEntriesSection');
+    loadEntries();
   }, { once: true });
 
   const backBtn = document.getElementById('backToListBtn');
@@ -656,29 +507,14 @@ function showEntryDetail(entry) {
   const deleteBtn = document.getElementById('deleteEntryBtn');
   if (deleteBtn) {
     deleteBtn.onclick = () => {
-      if (db) {
-        db.collection('users').doc(firebase.auth().currentUser.uid).collection('entries').doc(entry.id).delete()
-          .then(() => {
-            entries = entries.filter(e => e.id !== entry.id);
-            try {
-              localStorage.setItem('entries', JSON.stringify(entries));
-            } catch (e) {
-              console.warn('Failed to save entries:', e);
-            }
-            showSection('viewEntriesSection');
-            loadEntries();
-          })
-          .catch(error => console.error('Error deleting from Firestore:', error));
-      } else {
-        entries = entries.filter(e => e.id !== entry.id);
-        try {
-          localStorage.setItem('entries', JSON.stringify(entries));
-        } catch (e) {
-          console.warn('Failed to save entries:', e);
-        }
-        showSection('viewEntriesSection');
-        loadEntries();
+      entries = entries.filter(e => e.id !== entry.id);
+      try {
+        localStorage.setItem('entries', JSON.stringify(entries));
+      } catch (e) {
+        console.warn('Failed to save entries:', e);
       }
+      showSection('viewEntriesSection');
+      loadEntries();
     };
   }
 }
@@ -768,6 +604,7 @@ function setupStats() {
   };
 }
 
+// === Theme ===
 function setupTheme() {
   const select = document.getElementById('themeSelect');
   if (!select) return;
@@ -780,11 +617,14 @@ function setupTheme() {
   });
 }
 
+// === Avatar/Profile ===
 function setupProfile() {
   const input = document.getElementById('profilePicInput');
   const img = document.getElementById('profilePic');
   const saved = localStorage.getItem('avatarImage');
+  const headerAvatar = document.getElementById('profilePicHeader');
   if (saved && img) img.src = saved;
+  if (saved && headerAvatar) headerAvatar.src = saved;
 
   if (input) {
     input.addEventListener('change', function () {
@@ -792,6 +632,7 @@ function setupProfile() {
       if (file) {
         compressImage(file, (compressedData) => {
           if (img) img.src = compressedData;
+          if (headerAvatar) headerAvatar.src = compressedData;
           try {
             localStorage.setItem('avatarImage', compressedData);
           } catch (e) {
@@ -801,8 +642,17 @@ function setupProfile() {
       }
     });
   }
+
+  const user = JSON.parse(localStorage.getItem('loggedInUser'));
+  if (user && user.username) {
+    const display = document.getElementById('usernameDisplay');
+    const sidebarDisplay = document.getElementById('sidebarUsername');
+    if (display) display.textContent = `Hi, ${user.username} 👋`;
+    if (sidebarDisplay) sidebarDisplay.textContent = user.username;
+  }
 }
 
+// === Settings ===
 function setupSettings() {
   const settingsBtn = document.getElementById('settingsBtn');
   const newEntryBtn = document.getElementById('newEntryBtn');
@@ -861,26 +711,10 @@ function setupSettings() {
       const reader = new FileReader();
       reader.onload = e => {
         try {
-          const importedEntries = JSON.parse(e.target.result);
-          const user = firebase.auth().currentUser;
-          if (user && db) {
-            const batch = db.batch();
-            importedEntries.forEach(entry => {
-              const docRef = db.collection('users').doc(user.uid).collection('entries').doc();
-              batch.set(docRef, { ...entry, timestamp: new Date() });
-            });
-            batch.commit().then(() => {
-              entries = importedEntries;
-              localStorage.setItem('entries', JSON.stringify(entries));
-              alert('Data imported!');
-              loadEntries();
-            }).catch(error => console.error('Error importing to Firestore:', error));
-          } else {
-            entries = importedEntries;
-            localStorage.setItem('entries', JSON.stringify(entries));
-            alert('Data imported locally!');
-            loadEntries();
-          }
+          entries = JSON.parse(e.target.result);
+          localStorage.setItem('entries', JSON.stringify(entries));
+          alert('Data imported!');
+          loadEntries();
         } catch {
           alert('Invalid file.');
         }
@@ -890,6 +724,7 @@ function setupSettings() {
   }
 }
 
+// === Emoji / Stickers ===
 function setupStickers() {
   const stickerBtn = document.getElementById('toggleEmojiPicker');
   const list = document.getElementById('emojiList');
@@ -912,6 +747,7 @@ function setupStickers() {
   });
 }
 
+// === PWA Installation + Sharing ===
 function setupPWA() {
   let deferredPrompt;
   const installBtn = document.getElementById('installBtn');
@@ -950,8 +786,14 @@ function setupPWA() {
       }
     });
   }
+
+  // Register service worker for offline support
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js').catch(e => console.warn('Service Worker registration failed:', e));
+  }
 }
 
+// === Daily Reminder Notification ===
 function setupDailyReminder() {
   if (!("Notification" in window)) {
     console.warn("This browser does not support notifications.");
@@ -977,7 +819,7 @@ function scheduleReminder() {
 
   let delay = reminderDate.getTime() - now.getTime();
   if (delay < 0) {
-    delay += 24 * 60 * 60 * 1000;
+    delay += 24 * 60 * 60 * 1000; // Next day
   }
 
   setTimeout(() => {
@@ -989,6 +831,7 @@ function scheduleReminder() {
   }, delay);
 }
 
+// === Friends ===
 function setupFriends() {
   const btn = document.getElementById('friendsBtn');
   const nameInput = document.getElementById('friendNameInput');
@@ -1072,20 +915,20 @@ function setupFriends() {
   });
 }
 
+// === Logout ===
 function setupLogout() {
   const logoutBtn = document.getElementById('logoutBtn');
   if (logoutBtn) {
     logoutBtn.addEventListener('click', () => {
-      firebase.auth().signOut().then(() => {
-        try {
-          localStorage.removeItem('loggedInUser');
-          localStorage.removeItem('pinUnlocked');
-          localStorage.removeItem('pinRetries');
-        } catch (e) {
-          console.warn('Failed to clear localStorage:', e);
-        }
-        window.location.href = 'login.html';
-      }).catch(error => console.error('Error signing out:', error));
+      try {
+        localStorage.removeItem('loggedInUser');
+        localStorage.removeItem('pinUnlocked');
+        localStorage.removeItem('pinRetries');
+      } catch (e) {
+        console.warn('Failed to clear localStorage:', e);
+      }
+      window.location.href = 'login.html';
     });
   }
 }
+
