@@ -118,6 +118,8 @@ document.addEventListener('DOMContentLoaded', () => {
   const maxRetries = 3;
   const lockoutTime = 60000;
 
+  console.log('PIN setup - pinLock:', pinLock, 'unlockBtn:', unlockBtn, 'pinInput:', pinInput, 'pinError:', pinError);
+
   if (!localStorage.getItem('pinUnlocked') && pinLock) {
     pinLock.style.display = 'flex';
     if (retryCount >= maxRetries) {
@@ -133,10 +135,13 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   if (unlockBtn && pinInput) {
+    console.log('Attaching unlock event listener');
     unlockBtn.addEventListener('click', () => {
-      console.log('PIN unlock attempt');
+      console.log('Unlock button clicked, pinInput.value:', pinInput.value);
       const savedPin = localStorage.getItem('userPin') || '1234';
+      console.log('Saved PIN:', savedPin);
       if (pinInput.value === savedPin) {
+        console.log('PIN matched, unlocking');
         localStorage.setItem('pinUnlocked', 'true');
         localStorage.setItem('pinRetries', '0');
         if (pinLock) pinLock.style.display = 'none';
@@ -146,6 +151,7 @@ document.addEventListener('DOMContentLoaded', () => {
         retryCount++;
         localStorage.setItem('pinRetries', retryCount);
         if (pinError) pinError.textContent = `Incorrect PIN. ${maxRetries - retryCount} attempts left.`;
+        console.log('PIN mismatch, retryCount:', retryCount);
         if (retryCount >= maxRetries) {
           if (pinInput) pinInput.disabled = true;
           if (pinError) pinError.textContent = 'Too many attempts. Try again in 1 minute.';
@@ -158,6 +164,9 @@ document.addEventListener('DOMContentLoaded', () => {
         }
       }
     });
+  } else {
+    console.error('Unlock button or pin input not found');
+    if (splashError) splashError.textContent = 'Error: Unlock button or PIN input not found.';
   }
 });
 
