@@ -1,0 +1,94 @@
+{
+  "header": {
+    "title": "Diario Social",
+    "logout": "Cerrar sesión"
+  },
+  "sidebar": {
+    "title": "Menú",
+    "new_entry": "Nueva entrada",
+    "view_entries": "Ver entradas",
+    "friends": "Amigos",
+    "stats": "Estadísticas",
+    "settings": "Configuración"
+  },
+  "diary": {
+    "title": "Nueva entrada de diario",
+    "title_label": "Título",
+    "content_label": "Tus pensamientos",
+    "add_sticker": "Agregar sticker",
+    "tags_label": "Etiquetas",
+    "add_tag": "Agregar",
+    "image_label": "Agregar imágenes",
+    "video_label": "Agregar videos",
+    "voice_label": "Agregar voz",
+    "record_voice": "Grabar voz",
+    "remove_media": "Eliminar multimedia",
+    "save": "Guardar entrada"
+  },
+  "mood": {
+    "select": "Selecciona un estado de ánimo",
+    "selected": "Estado de ánimo seleccionado: {{mood}}"
+  },
+  "prompt": {
+    "default": "¿Cómo te sientes hoy?"
+  },
+  "entries": {
+    "title": "Tus entradas",
+    "search": "Buscar entradas...",
+    "sort_date_desc": "Fecha (Más reciente)",
+    "sort_date_asc": "Fecha (Más antigua)",
+    "sort_title": "Título",
+    "sort_mood": "Estado de ánimo",
+    "favorites": "Solo favoritos"
+  },
+  "detail": {
+    "title": "Detalles de la entrada",
+    "edit_title": "Editar título",
+    "edit_content": "Editar contenido",
+    "edit_mood": "Editar estado de ánimo",
+    "edit_tags": "Editar etiquetas",
+    "edit_images": "Editar imágenes",
+    "edit_videos": "Editar videos",
+    "add_tag": "Agregar"
+  },
+  "calendar": {
+    "switch": "Cambiar a calendario",
+    "list": "Cambiar a lista"
+  },
+  "error": {
+    "image_format": "Solo se admiten imágenes JPEG/PNG.",
+    "image_size": "El tamaño de la imagen debe ser menor a 2MB.",
+    "video_format": "Solo se admiten videos MP4/WebM.",
+    "video_size": "El tamaño del video debe ser menor a 10MB.",
+    "audio_format": "Solo se admiten audios MP3/WAV.",
+    "audio_size": "El tamaño del audio debe ser menor a 5MB.",
+    "enter_text_mood": "Por favor, ingresa título, contenido y selecciona un estado de ánimo.",
+    "storage_full": "El almacenamiento está lleno. Por favor, elimina algunas entradas."
+  },
+  "success": {
+    "saved": "¡Entrada guardada con éxito!",
+    "updated": "¡Entrada actualizada con éxito!",
+    "imported": "¡Entradas importadas con éxito!",
+    "settings_saved": "¡Configuración guardada con éxito!"
+  },
+  "warning": {
+    "offline": "Estás sin conexión. Las entradas se sincronizarán cuando estés en línea."
+  },
+  "confirm": {
+    "delete": "¿Estás seguro de que quieres eliminar esta entrada?"
+  },
+  "prompt": {
+    "group_name": "Ingresa el nombre del grupo",
+    "add_member": "Ingresa el correo del miembro"
+  },
+  "stats": {
+    "tag_frequency": "Frecuencia de etiquetas"
+  },
+  "reminder": {
+    "message": "Recordatorio de Diario Social",
+    "body": "¡Es hora de escribir en tu diario!"
+  },
+  "pwa": {
+    "install": "Instalar Diario Social"
+  }
+}
