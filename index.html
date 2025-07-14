@@ -1,274 +1,24 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <link rel="stylesheet" href="https://unpkg.com/swiper/swiper-bundle.min.css" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Social Diary</title>
-  <link rel="manifest" href="manifest.json" />
-  <link rel="icon" href="icons/icon-192.png" />
-  <link rel="apple-touch-icon" href="icons/icon-512.png" />
-  <meta name="theme-color" content="#5e60ce" />
-  <link rel="stylesheet" href="style.css" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-</head>
-<body>
-  <div id="splashScreen" class="splash-screen">
-    <h1>Social Diary</h1>
-    <p>Welcome back, friend!</p>
-  </div>
-  <div class="top-actions">
-    <button id="installBtn" class="touch-feedback" aria-label="Install app">📲 Install App</button>
-    <button id="shareBtn" class="touch-feedback" aria-label="Share app">🔗 Share</button>
-  </div>
-  <div id="pin-lock" class="pin-lock-screen">
-    <h2>Enter PIN to Unlock</h2>
-    <input type="password" id="pinInput" maxlength="4" placeholder="4-digit PIN" aria-label="Enter PIN" />
-    <button id="unlockBtn" aria-label="Unlock diary">Unlock</button>
-    <p id="pinError" class="error-msg" aria-live="polite"></p>
-  </div>
-  <header class="app-header">
-    <div class="header-left">
-      <div class="greeting-text">
-        <h2 id="usernameDisplay">Hi 👋</h2>
-        <p id="today-date"></p>
-      </div>
-    </div>
-    <div class="header-right">
-      <span class="app-brand">Social Diary</span>
-    </div>
-  </header>
-  <div class="app">
-    <aside class="sidebar" role="navigation" aria-label="Main navigation">
-      <div class="user-profile">
-        <label for="profilePicInput">
-          <img id="profilePic" src="images/default-avatar.png" alt="User avatar" class="avatar-img" />
-        </label>
-        <input type="file" id="profilePicInput" accept="image/*" style="display: none;" aria-hidden="true" />
-        <h3 id="sidebarUsername">User</h3>
-      </div>
-      <nav>
-        <ul>
-          <li><button id="newEntryBtn" aria-label="Create new entry"><i class="fas fa-pen-alt"></i> New Entry</button></li>
-          <li><button id="viewEntriesBtn" aria-label="View entries"><i class="fas fa-book-open"></i> View Entries</button></li>
-          <li><button id="statsBtn" aria-label="View statistics"><i class="fas fa-chart-bar"></i> Statistics</button></li>
-          <li><button id="friendsBtn" aria-label="View friends"><i class="fas fa-user-friends"></i> Friends</button></li>
-          <li><button id="settingsBtn" aria-label="Open settings"><i class="fas fa-cog"></i> Settings</button></li>
-          <li><button id="logoutBtn" aria-label="Log out"><i class="fas fa-sign-out-alt"></i> Logout</button></li>
-        </ul>
-      </nav>
-      <div class="mood-tracker">
-        <h3>Today's Mood</h3>
-        <div class="mood-options">
-          <button class="mood-option" data-mood="happy" aria-label="Happy mood">😊</button>
-          <button class="mood-option" data-mood="neutral" aria-label="Neutral mood">😐</button>
-          <button class="mood-option" data-mood="sad" aria-label="Sad mood">😢</button>
-          <button class="mood-option" data-mood="angry" aria-label="Angry mood">😠</button>
-          <button class="mood-option" data-mood="excited" aria-label="Excited mood">🤩</button>
-        </div>
-        <div id="selectedMood"></div>
-      </div>
-    </aside>
-    <main class="diary-container">
-      <div class="diary-binding"></div>
-      <section id="newEntrySection" class="section active" role="region" aria-label="New Diary Entry">
-        <h2>New Diary Entry</h2>
-        <form id="diaryForm">
-          <div class="form-group">
-            <label for="entryDate">Date:</label>
-            <input type="date" id="dateField" required />
-          </div>
-          <div class="form-group">
-            <label for="entryTitle">Title:</label>
-            <input type="text" id="entryTitle" placeholder="Highlight of your day..." required />
-          </div>
-          <div class="form-group">
-            <label for="entryContent">Your Entry:</label>
-            <textarea id="entryContent" rows="8" placeholder="Write about your day..." required></textarea>
-          </div>
-          <div class="form-group">
-            <label for="tagsInput">Tags:</label>
-            <div class="tags-container">
-              <input type="text" id="tagsInput" placeholder="e.g., fun, work..." />
-              <button type="button" id="addTagBtn" class="touch-feedback" aria-label="Add tag">Add</button>
-            </div>
-            <div id="tagsDisplay"></div>
-            <div id="tagSuggestions"></div>
-          </div>
-          <div class="form-group">
-            <label for="imageInput">Upload Photos:</label>
-            <input type="file" id="imageInput" accept="image/*" multiple />
-            <div id="previewImages" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;"></div>
-            <button type="button" id="removeImageBtn" aria-label="Remove all images">Remove All</button>
-          </div>
-          <div class="form-group">
-            <label>Add Emojis:</label>
-            <div id="emojiPicker">
-              <button type="button" id="toggleEmojiPicker" class="touch-feedback" aria-label="Toggle emoji picker">😀 Emoji</button>
-              <div id="emojiList" style="display: none;"></div>
-            </div>
-          </div>
-          <div id="formError" class="error-msg" aria-live="polite"></div>
-          <button type="submit" id="saveEntryBtn" aria-label="Save diary entry">Save Entry</button>
-        </form>
-      </section>
-      <section id="viewEntriesSection" class="section" role="region" aria-label="View Diary Entries">
-        <h2>Your Entries</h2>
-        <div class="search-filter">
-          <input type="text" id="searchInput" placeholder="Search..." aria-label="Search entries" />
-          <select id="sortSelect" aria-label="Sort entries">
-            <option value="date-desc">Newest First</option>
-            <option value="date-asc">Oldest First</option>
-            <option value="title">Title A-Z</option>
-            <option value="mood">Mood A-Z</option>
-          </select>
-          <select id="filterMood" aria-label="Filter by mood">
-            <option value="">All Moods</option>
-            <option value="happy">Happy</option>
-            <option value="neutral">Neutral</option>
-            <option value="sad">Sad</option>
-            <option value="angry">Angry</option>
-            <option value="excited">Excited</option>
-          </select>
-          <button id="filterFavoritesBtn" aria-label="Show favorite entries">Show Favorites</button>
-        </div>
-        <div id="entriesList" class="entries-list"></div>
-      </section>
-      <section id="statsSection" class="section" role="region" aria-label="Statistics">
-        <h2>Statistics</h2>
-        <div class="stats">
-          <div class="stat-card">
-            <h3>Total Entries</h3>
-            <p id="totalEntries">0</p>
-          </div>
-          <div class="stat-card">
-            <h3>Most Active Day</h3>
-            <p id="mostActiveDay">-</p>
-          </div>
-          <div class="stat-card">
-            <h3>Mood Distribution</h3>
-            <canvas id="moodChart"></canvas>
-          </div>
-          <div id="statsDisplay"></div>
-        </div>
-      </section>
-      <section id="settingsSection" class="section" role="region" aria-label="Settings">
-        <h2>Settings</h2>
-        <form id="settingsForm">
-          <div class="form-group">
-            <label for="username">Your Name:</label>
-            <input type="text" id="username" placeholder="Enter your name" />
-          </div>
-          <div class="form-group">
-            <label for="themeSelect">Theme:</label>
-            <select id="themeSelect" aria-label="Select theme">
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="blue">Blue</option>
-              <option value="green">Green</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="reminderToggle">Enable Notifications:</label>
-            <input type="checkbox" id="reminderToggle" />
-          </div>
-          <div class="form-group">
-            <label for="reminderTime">Daily Reminder Time:</label>
-            <input type="time" id="reminderTime" />
-          </div>
-          <div class="form-group">
-            <label for="newPinInput">Change PIN:</label>
-            <input type="password" id="newPinInput" maxlength="4" placeholder="New 4-digit PIN" aria-label="Enter new PIN" />
-          </div>
-          <button type="submit" id="saveSettingsBtn" aria-label="Save settings">Save Settings</button>
-          <button type="button" id="changePinBtn" aria-label="Change PIN">Change PIN</button>
-          <button type="button" id="exportDataBtn" aria-label="Export data">Export Data</button>
-          <button type="button" id="importDataBtn" aria-label="Import data">Import Data</button>
-          <input type="file" id="importDataInput" accept=".json" style="display: none;" aria-hidden="true" />
-        </form>
-      </section>
-      <section id="friendsSection" class="section" role="region" aria-label="Friends List">
-        <h2>👥 Your Friends</h2>
-        <div id="friendList"></div>
-        <div class="friend-form">
-          <input type="text" id="friendNameInput" placeholder="Friend name" aria-label="Enter friend name" />
-          <input type="text" id="friendEmojiInput" placeholder="Emoji (e.g. 😊)" maxlength="2" aria-label="Enter friend emoji" />
-          <button id="addFriendBtn" aria-label="Add friend">Add Friend</button>
-        </div>
-      </section>
-      <section id="editFriendSection" class="section" role="region" aria-label="Edit Friend">
-        <h2>Edit Friend</h2>
-        <form id="editFriendForm">
-          <div class="form-group">
-            <label for="editFriendName">Friend Name:</label>
-            <input type="text" id="editFriendName" placeholder="Enter friend name" aria-label="Edit friend name" />
-          </div>
-          <div class="form-group">
-            <label for="editFriendEmoji">Emoji:</label>
-            <input type="text" id="editFriendEmoji" placeholder="Emoji (e.g. 😊)" maxlength="2" aria-label="Edit friend emoji" />
-          </div>
-          <button type="submit" id="saveFriendEdit" aria-label="Save friend changes">Save Changes</button>
-        </form>
-        <button id="backToFriendsBtn" class="back-button" aria-label="Back to friends list"><i class="fas fa-arrow-left"></i> Back</button>
-      </section>
-      <section id="entryDetailSection" class="section" role="region" aria-label="Entry Details">
-        <button id="backToListBtn" class="back-button" aria-label="Back to entries list"><i class="fas fa-arrow-left"></i> Back</button>
-        <h2 id="detailTitle"></h2>
-        <div class="entry-meta">
-          <span id="detailDate"></span>
-          <span id="detailMood"></span>
-        </div>
-        <div id="detailContent" class="entry-content"></div>
-        <div id="detailTags" class="entry-tags"></div>
-        <div id="imageSlider" class="image-slider"></div>
-        <form id="editEntryForm">
-          <div class="form-group">
-            <label for="editTitle">Title:</label>
-            <input type="text" id="editTitle" placeholder="Edit title..." required />
-          </div>
-          <div class="form-group">
-            <label for="editContent">Your Entry:</label>
-            <textarea id="editContent" rows="8" placeholder="Edit your entry..." required></textarea>
-          </div>
-          <div class="form-group">
-            <label for="editMood">Mood:</label>
-            <select id="editMood" aria-label="Select mood">
-              <option value="happy">Happy</option>
-              <option value="neutral">Neutral</option>
-              <option value="sad">Sad</option>
-              <option value="angry">Angry</option>
-              <option value="excited">Excited</option>
-            </select>
-          </div>
-          <div class="form-group">
-            <label for="tagsEditInput">Tags:</label>
-            <div class="tags-container">
-              <input type="text" id="tagsEditInput" placeholder="e.g., fun, work..." />
-              <button type="button" id="addEditTagBtn" class="touch-feedback" aria-label="Add tag">Add</button>
-            </div>
-            <div id="editTagsDisplay"></div>
-            <div id="tagSuggestions"></div>
-          </div>
-          <div class="form-group">
-            <label for="editImageInput">Upload Photos:</label>
-            <input type="file" id="editImageInput" accept="image/*" multiple />
-            <div id="editImages" style="display:flex; flex-wrap:wrap; gap:10px; margin-top:10px;"></div>
-            <button type="button" id="removeEditImages" aria-label="Remove all images">Remove All</button>
-          </div>
-          <div id="editFormError" class="error-msg" aria-live="polite"></div>
-          <button type="submit" aria-label="Save edited entry">Save Changes</button>
-        </form>
-        <div class="entry-actions">
-          <button id="editEntryBtn" aria-label="Edit entry">Edit</button>
-          <button id="deleteEntryBtn" aria-label="Delete entry">Delete</button>
-        </div>
-      </section>
-    </main>
-  </div>
-  <div class="notification" id="notification" aria-live="polite"></div>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-  <script>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+  <!-- FullCalendar for calendar view -->
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.js"></script>
+  <!-- Chart.js for mood and tag charts -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+  <!-- Firebase 10.x modular SDKs -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    import { getFirestore } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+    import { getStorage } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
+    import { getFunctions } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
+    import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js';
     const firebaseConfig = {
       apiKey: "AIzaSyD0iJWnkuinWVCtsO5vjqohrCA4ws6fb8Q",
       authDomain: "social-diary-b6754.firebaseapp.com",
@@ -278,24 +28,97 @@
       appId: "1:324502839373:web:05b3f62f18dd78f14bbc04",
       measurementId: "G-6NSE70KRLB"
     };
-    firebase.initializeApp(firebaseConfig);
-    const user = JSON.parse(localStorage.getItem("loggedInUser"));
-    if (user) {
-      const display = document.getElementById("usernameDisplay");
-      if (display) {
-        const nameToShow = user.username || user.email || user.phone || "Friend";
-        display.textContent = `Hi, ${nameToShow} 👋`;
-      }
-    }
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const storage = getStorage(app);
+    const functions = getFunctions(app);
+    const analytics = getAnalytics(app);
   </script>
-  <script src="https://unpkg.com/swiper/swiper-bundle.min.js"></script>
-  <script>
-    if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('sw.js', { scope: './' })
-        .then(reg => console.log('Service Worker registered:', reg.scope))
-        .catch(err => console.error('Service Worker registration failed:', err));
-    }
-  </script>
-  <script src="script.js" defer></script>
+</head>
+<body>
+  <!-- Error banner for displaying messages -->
+  <div id="error-banner" class="error-banner" role="alert" hidden></div>
+
+  <!-- Main app container -->
+  <div class="container">
+    <!-- Header with title and settings -->
+    <header>
+      <h1>Social Diary</h1>
+      <div class="settings">
+        <select id="language-select" aria-label="Select language">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+          <option value="zh">中文</option>
+          <option value="hi">हिन्दी</option>
+        </select>
+        <button id="theme-toggle" aria-label="Toggle eye-protection theme">🌙</button>
+        <button id="export-entries" aria-label="Export entries">Export</button>
+      </div>
+    </header>
+
+    <!-- Diary form for new entries -->
+    <section id="diary-form" class="diary-form">
+      <h2 aria-label="Write a new diary entry">New Entry</h2>
+      <div id="ai-prompt" class="ai-prompt" hidden></div>
+      <textarea id="entry-text" aria-label="Diary entry text" placeholder="Write your thoughts..."></textarea>
+      <select id="mood-select" aria-label="Select mood">
+        <option value="happy">Happy</option>
+        <option value="neutral">Neutral</option>
+        <option value="sad">Sad</option>
+        <option value="angry">Angry</option>
+        <option value="excited">Excited</option>
+      </select>
+      <input type="file" id="image-upload" accept="image/*" aria-label="Upload image">
+      <input type="file" id="video-upload" accept="video/*" aria-label="Upload video">
+      <input type="file" id="voice-upload" accept="audio/*" aria-label="Upload voice note">
+      <button id="voice-record" aria-label="Record voice note">🎙️ Record</button>
+      <button id="save-entry" aria-label="Save diary entry">Save</button>
+    </section>
+
+    <!-- View entries with calendar/list toggle -->
+    <section id="view-entries" class="view-entries">
+      <h2 aria-label="Your diary entries">Your Entries</h2>
+      <button id="toggle-view" aria-label="Toggle calendar/list view">Switch to Calendar</button>
+      <div id="calendar" class="calendar-view" hidden></div>
+      <div id="entry-list" class="entry-list"></div>
+    </section>
+
+    <!-- Stats section for mood and tag trends -->
+    <section id="stats" class="stats">
+      <h2 aria-label="Mood and tag statistics">Statistics</h2>
+      <canvas id="mood-chart" aria-label="Mood trend chart"></canvas>
+      <canvas id="tag-chart" aria-label="Tag frequency chart"></canvas>
+    </section>
+
+    <!-- Friends and group diaries -->
+    <section id="friends" class="friends">
+      <h2 aria-label="Friends and group diaries">Friends & Groups</h2>
+      <input id="friend-email" type="email" placeholder="Add friend by email" aria-label="Add friend">
+      <button id="add-friend" aria-label="Add friend">Add Friend</button>
+      <div id="friend-list" class="friend-list"></div>
+      <div id="group-diaries" class="group-diaries">
+        <button id="create-group" aria-label="Create group diary">Create Group Diary</button>
+        <div id="group-list" class="group-list"></div>
+      </div>
+    </section>
+
+    <!-- AI chatbot section -->
+    <section id="chatbot" class="chatbot">
+      <h2 aria-label="Chat with AI companion">AI Companion</h2>
+      <div id="chat-messages" class="chat-messages"></div>
+      <input id="chat-input" type="text" placeholder="Talk about your entry..." aria-label="Chat input">
+      <button id="send-chat" aria-label="Send chat message">Send</button>
+    </section>
+
+    <!-- Footer with privacy and app store links -->
+    <footer>
+      <a href="privacy.html" aria-label="Privacy policy">Privacy Policy</a>
+      <a href="https://play.google.com/store" aria-label="Google Play Store">Get on Google Play</a>
+      <a href="https://www.apple.com/app-store" aria-label="Apple App Store">Get on App Store</a>
+    </footer>
+  </div>
+
+  <script src="script.js" type="module"></script>
 </body>
 </html>
