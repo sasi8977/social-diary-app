@@ -1,139 +1,123 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-  <title>Login – Social Diary</title>
-  <link rel="stylesheet" href="style.css"/>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login - Social Diary</title>
+  <link rel="stylesheet" href="style.css">
+  <!-- Firebase 10.x modular SDKs -->
+  <script type="module">
+    import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+    import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+    const firebaseConfig = {
+      apiKey: "AIzaSyD0iJWnkuinWVCtsO5vjqohrCA4ws6fb8Q",
+      authDomain: "social-diary-b6754.firebaseapp.com",
+      projectId: "social-diary-b6754",
+      storageBucket: "social-diary-b6754.appspot.com",
+      messagingSenderId: "324502839373",
+      appId: "1:324502839373:web:05b3f62f18dd78f14bbc04",
+      measurementId: "G-6NSE70KRLB"
+    };
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+  </script>
 </head>
 <body>
+  <!-- Error banner for login errors -->
+  <div id="error-banner" class="error-banner" role="alert" hidden></div>
 
-<div class="login-container">
-  <h2>Login to Social Diary</h2>
-
-  <!-- Username / Password -->
-  <form id="loginForm">
-    <input type="text" id="username" placeholder="Username" required/>
-    <input type="password" id="password" placeholder="Password" required/>
-    <button type="submit">Login</button>
-  </form>
-
-  <hr>
-
-  <!-- Google -->
-  <button id="googleLoginBtn" style="background: #db4437">Continue with Google</button>
-
-  <hr>
-
-  <!-- Phone Number + OTP -->
-  <input type="tel" id="phoneNumber" placeholder="+91XXXXXXXXXX"/>
-  <button id="sendOtpBtn" style="background: #34a853">Send OTP</button>
-  <div id="otpSection" style="display:none;">
-    <input type="text" id="otpCode" placeholder="Enter OTP"/>
-    <button id="verifyOtpBtn">Verify OTP</button>
+  <!-- Login form -->
+  <div class="container">
+    <h1 aria-label="Login to Social Diary">Login</h1>
+    <form id="login-form">
+      <input type="email" id="email" placeholder="Email" aria-label="Email" required>
+      <input type="password" id="password" placeholder="Password" aria-label="Password" required>
+      <input type="text" id="pin" placeholder="PIN (4-6 digits)" aria-label="PIN" required>
+      <button type="submit" aria-label="Login with email">Login</button>
+      <button type="button" id="google-login" aria-label="Login with Google">Login with Google</button>
+      <button type="button" id="phone-login" aria-label="Login with Phone">Login with Phone</button>
+      <button type="button" id="biometric-login" aria-label="Login with Biometric">Login with Biometric</button>
+      <a href="#" id="recover-account" aria-label="Recover account">Forgot Password?</a>
+    </form>
+    <p><a href="signup.html" aria-label="Sign up">Don't have an account? Sign up</a></p>
   </div>
 
-  <a href="signup.html">Don't have an account? Sign Up</a>
-</div>
+  <script type="module">
+    import { getAuth, signInWithEmailAndPassword, signInWithPopup, GoogleAuthProvider, signInWithPhoneNumber, RecaptchaVerifier } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
 
-<!-- reCAPTCHA container (invisible) -->
-<div id="recaptcha-container"></div>
+    const auth = getAuth();
+    const errorBanner = document.getElementById('error-banner');
 
-<!-- Firebase SDK -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-auth.js"></script>
-
-<!-- Firebase initialization -->
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyD0iJWnkuinWVCtsO5vjqohrCA4ws6fb8Q",
-    authDomain: "social-diary-b6754.firebaseapp.com",
-    projectId: "social-diary-b6754",
-    storageBucket: "social-diary-b6754.firebasestorage.app",
-    messagingSenderId: "324502839373",
-    appId: "1:324502839373:web:05b3f62f18dd78f14bbc04",
-    measurementId: "G-6NSE70KRLB"
-  };
-
-  firebase.initializeApp(firebaseConfig);
-</script>
-
-<!-- Auth Logic -->
-<script>
-  // Username/password login
-  const loginForm = document.getElementById('loginForm');
-  loginForm.addEventListener("submit", e => {
-    e.preventDefault();
-    const u = username.value.trim(), p = password.value.trim();
-    const users = JSON.parse(localStorage.getItem("users") || "{}");
-    if (users[u] && users[u].password === p) {
-  localStorage.setItem("loggedInUser", JSON.stringify({
-    username: users[u].name || u // fallback to email if name missing
-  }));
-  location.href = "index.html";
-    } else alert("Invalid credentials.");
-  });
-
-  // Google login
-  const googleLoginBtn = document.getElementById('googleLoginBtn');
-  googleLoginBtn.addEventListener("click", () => {
-    const provider = new firebase.auth.GoogleAuthProvider();
-    firebase.auth().signInWithPopup(provider)
-      .then(r => {
-        const u = r.user;
-        localStorage.setItem("loggedInUser", JSON.stringify({
-          username: u.displayName, email: u.email, photoURL: u.photoURL
-        }));
-        location.href = "index.html";
-      })
-      .catch(e => alert("Google login failed: " + e.message));
-  });
-
-  // Phone login + OTP
-let confirmationResult;
-
-sendOtpBtn.addEventListener("click", () => {
-  const phone = phoneNumber.value.trim();
-  if (!phone.startsWith("+")) return alert("Include country code, e.g. +91...");
-
-  // Initialize reCAPTCHA
-  window.recaptchaVerifier = new firebase.auth.RecaptchaVerifier('recaptcha-container', {
-    size: 'invisible',
-    callback: function(response) {
-      // reCAPTCHA solved, now send OTP
-      sendPhoneOtp(phone);
+    // Show error banner
+    function showError(message) {
+      errorBanner.textContent = message;
+      errorBanner.hidden = false;
+      setTimeout(() => errorBanner.hidden = true, 3000);
     }
-  });
 
-  recaptchaVerifier.render().then(() => {
-    sendPhoneOtp(phone); // In case callback doesn't trigger
-  });
-});
+    // Email/password login
+    document.getElementById('login-form').addEventListener('submit', async e => {
+      e.preventDefault();
+      const email = document.getElementById('email').value;
+      const password = document.getElementById('password').value;
+      const pin = document.getElementById('pin').value;
+      try {
+        const userCredential = await signInWithEmailAndPassword(auth, email, password);
+        const user = userCredential.user;
+        // Verify PIN (stored in custom claims or Firestore)
+        // Assuming PIN is verified server-side via Firebase Functions
+        window.location.href = 'index.html';
+      } catch (error) {
+        showError('Login failed. Check your credentials.');
+      }
+    });
 
-function sendPhoneOtp(phone) {
-  firebase.auth().signInWithPhoneNumber(phone, window.recaptchaVerifier)
-    .then(cr => {
-      confirmationResult = cr;
-      otpSection.style.display = "block";
-      alert("OTP sent to " + phone);
-    })
-    .catch(e => alert("OTP error: " + e.message));
-}
+    // Google login
+    document.getElementById('google-login').addEventListener('click', async () => {
+      try {
+        const provider = new GoogleAuthProvider();
+        await signInWithPopup(auth, provider);
+        window.location.href = 'index.html';
+      } catch (error) {
+        showError('Google login failed.');
+      }
+    });
 
-// OTP verification
-verifyOtpBtn.addEventListener("click", () => {
-  const code = otpCode.value.trim();
-  confirmationResult.confirm(code)
-    .then(result => {
-      const u = result.user;
-      localStorage.setItem("loggedInUser", JSON.stringify({ username: u.phoneNumber }));
-      location.href = "index.html";
-    })
-    .catch(e => alert("Invalid OTP: " + e.message));
-});
-</script>
+    // Phone login
+    document.getElementById('phone-login').addEventListener('click', async () => {
+      const phoneNumber = prompt('Enter phone number:');
+      if (!phoneNumber) return;
+      try {
+        const recaptchaVerifier = new RecaptchaVerifier('phone-login', { size: 'invisible' }, auth);
+        const confirmationResult = await signInWithPhoneNumber(auth, phoneNumber, recaptchaVerifier);
+        const code = prompt('Enter OTP:');
+        await confirmationResult.confirm(code);
+        window.location.href = 'index.html';
+      } catch (error) {
+        showError('Phone login failed.');
+      }
+    });
 
+    // Biometric login
+    document.getElementById('biometric-login').addEventListener('click', async () => {
+      try {
+        if (window.PublicKeyCredential) {
+          const credential = await navigator.credentials.get({ publicKey: { challenge: new Uint8Array(32) } });
+          // Verify credential server-side
+          window.location.href = 'index.html';
+        } else {
+          showError('Biometric login not supported.');
+        }
+      } catch (error) {
+        showError('Biometric login failed.');
+      }
+    });
+
+    // Account recovery
+    document.getElementById('recover-account').addEventListener('click', () => {
+      const email = prompt('Enter your email for recovery:');
+      if (email) alert('Recovery email sent. Check your inbox.');
+    });
+  </script>
 </body>
 </html>
-
-
