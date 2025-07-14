@@ -1,0 +1,94 @@
+{
+  "header": {
+    "title": "社交日记",
+    "logout": "登出"
+  },
+  "sidebar": {
+    "title": "菜单",
+    "new_entry": "新建日记",
+    "view_entries": "查看日记",
+    "friends": "朋友",
+    "stats": "统计",
+    "settings": "设置"
+  },
+  "diary": {
+    "title": "新建日记条目",
+    "title_label": "标题",
+    "content_label": "你的想法",
+    "add_sticker": "添加表情",
+    "tags_label": "标签",
+    "add_tag": "添加",
+    "image_label": "添加图片",
+    "video_label": "添加视频",
+    "voice_label": "添加语音",
+    "record_voice": "录制语音",
+    "remove_media": "移除多媒体",
+    "save": "保存条目"
+  },
+  "mood": {
+    "select": "选择心情",
+    "selected": "已选心情：{{mood}}"
+  },
+  "prompt": {
+    "default": "你今天感觉如何？"
+  },
+  "entries": {
+    "title": "你的日记",
+    "search": "搜索日记...",
+    "sort_date_desc": "日期（最新）",
+    "sort_date_asc": "日期（最旧）",
+    "sort_title": "标题",
+    "sort_mood": "心情",
+    "favorites": "仅收藏"
+  },
+  "detail": {
+    "title": "日记详情",
+    "edit_title": "编辑标题",
+    "edit_content": "编辑内容",
+    "edit_mood": "编辑心情",
+    "edit_tags": "编辑标签",
+    "edit_images": "编辑图片",
+    "edit_videos": "编辑视频",
+    "add_tag": "添加"
+  },
+  "calendar": {
+    "switch": "切换到日历",
+    "list": "切换到列表"
+  },
+  "error": {
+    "image_format": "仅支持JPEG/PNG图片。",
+    "image_size": "图片大小必须小于2MB。",
+    "video_format": "仅支持MP4/WebM视频。",
+    "video_size": "视频大小必须小于10MB。",
+    "audio_format": "仅支持MP3/WAV音频。",
+    "audio_size": "音频大小必须小于5MB。",
+    "enter_text_mood": "请输入标题、内容并选择心情。",
+    "storage_full": "存储已满，请删除一些条目。"
+  },
+  "success": {
+    "saved": "条目保存成功！",
+    "updated": "条目更新成功！",
+    "imported": "条目导入成功！",
+    "settings_saved": "设置保存成功！"
+  },
+  "warning": {
+    "offline": "您当前离线，日记将在联网时同步。"
+  },
+  "confirm": {
+    "delete": "您确定要删除此条目吗？"
+  },
+  "prompt": {
+    "group_name": "输入群组名称",
+    "add_member": "输入成员的邮箱"
+  },
+  "stats": {
+    "tag_frequency": "标签频率"
+  },
+  "reminder": {
+    "message": "社交日记提醒",
+    "body": "是时候写日记了！"
+  },
+  "pwa": {
+    "install": "安装社交日记"
+  }
+}
