@@ -1,17 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Social Diary</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="manifest" href="manifest.json">
-  <!-- FullCalendar for calendar view -->
+  <link rel="stylesheet" href="style.css"/>
+  <!-- FullCalendar CSS for calendar view -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.css" rel="stylesheet">
-  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.js"></script>
-  <!-- Chart.js for mood and tag charts -->
+  <!-- Chart.js for mood analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-  <!-- Firebase 10.x modular SDKs -->
+  <!-- i18next for localization -->
+  <script src="https://cdn.jsdelivr.net/npm/i18next@21.9.2/dist/umd/i18next.min.js"></script>
+  <!-- jsPDF for PDF exports -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <!-- Firebase SDKs (10.x modular) -->
   <script type="module">
     import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
     import { getAuth } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
@@ -29,96 +31,328 @@
       measurementId: "G-6NSE70KRLB"
     };
     const app = initializeApp(firebaseConfig);
-    const auth = getAuth(app);
-    const db = getFirestore(app);
-    const storage = getStorage(app);
-    const functions = getFunctions(app);
-    const analytics = getAnalytics(app);
+    window.firebaseApp = app;
+    window.auth = getAuth(app);
+    window.db = getFirestore(app);
+    window.storage = getStorage(app);
+    window.functions = getFunctions(app);
+    window.analytics = getAnalytics(app);
   </script>
 </head>
 <body>
-  <!-- Error banner for displaying messages -->
-  <div id="error-banner" class="error-banner" role="alert" hidden></div>
-
-  <!-- Main app container -->
-  <div class="container">
-    <!-- Header with title and settings -->
-    <header>
-      <h1>Social Diary</h1>
-      <div class="settings">
-        <select id="language-select" aria-label="Select language">
-          <option value="en">English</option>
-          <option value="es">Español</option>
-          <option value="zh">中文</option>
-          <option value="hi">हिन्दी</option>
-        </select>
-        <button id="theme-toggle" aria-label="Toggle eye-protection theme">🌙</button>
-        <button id="export-entries" aria-label="Export entries">Export</button>
-      </div>
-    </header>
-
-    <!-- Diary form for new entries -->
-    <section id="diary-form" class="diary-form">
-      <h2 aria-label="Write a new diary entry">New Entry</h2>
-      <div id="ai-prompt" class="ai-prompt" hidden></div>
-      <textarea id="entry-text" aria-label="Diary entry text" placeholder="Write your thoughts..."></textarea>
-      <select id="mood-select" aria-label="Select mood">
-        <option value="happy">Happy</option>
-        <option value="neutral">Neutral</option>
-        <option value="sad">Sad</option>
-        <option value="angry">Angry</option>
-        <option value="excited">Excited</option>
-      </select>
-      <input type="file" id="image-upload" accept="image/*" aria-label="Upload image">
-      <input type="file" id="video-upload" accept="video/*" aria-label="Upload video">
-      <input type="file" id="voice-upload" accept="audio/*" aria-label="Upload voice note">
-      <button id="voice-record" aria-label="Record voice note">🎙️ Record</button>
-      <button id="save-entry" aria-label="Save diary entry">Save</button>
-    </section>
-
-    <!-- View entries with calendar/list toggle -->
-    <section id="view-entries" class="view-entries">
-      <h2 aria-label="Your diary entries">Your Entries</h2>
-      <button id="toggle-view" aria-label="Toggle calendar/list view">Switch to Calendar</button>
-      <div id="calendar" class="calendar-view" hidden></div>
-      <div id="entry-list" class="entry-list"></div>
-    </section>
-
-    <!-- Stats section for mood and tag trends -->
-    <section id="stats" class="stats">
-      <h2 aria-label="Mood and tag statistics">Statistics</h2>
-      <canvas id="mood-chart" aria-label="Mood trend chart"></canvas>
-      <canvas id="tag-chart" aria-label="Tag frequency chart"></canvas>
-    </section>
-
-    <!-- Friends and group diaries -->
-    <section id="friends" class="friends">
-      <h2 aria-label="Friends and group diaries">Friends & Groups</h2>
-      <input id="friend-email" type="email" placeholder="Add friend by email" aria-label="Add friend">
-      <button id="add-friend" aria-label="Add friend">Add Friend</button>
-      <div id="friend-list" class="friend-list"></div>
-      <div id="group-diaries" class="group-diaries">
-        <button id="create-group" aria-label="Create group diary">Create Group Diary</button>
-        <div id="group-list" class="group-list"></div>
-      </div>
-    </section>
-
-    <!-- AI chatbot section -->
-    <section id="chatbot" class="chatbot">
-      <h2 aria-label="Chat with AI companion">AI Companion</h2>
-      <div id="chat-messages" class="chat-messages"></div>
-      <input id="chat-input" type="text" placeholder="Talk about your entry..." aria-label="Chat input">
-      <button id="send-chat" aria-label="Send chat message">Send</button>
-    </section>
-
-    <!-- Footer with privacy and app store links -->
-    <footer>
-      <a href="privacy.html" aria-label="Privacy policy">Privacy Policy</a>
-      <a href="https://play.google.com/store" aria-label="Google Play Store">Get on Google Play</a>
-      <a href="https://www.apple.com/app-store" aria-label="Apple App Store">Get on App Store</a>
-    </footer>
+  <!-- Splash Screen -->
+  <div id="splashScreen" class="splash-screen">
+    <h1>Social Diary</h1>
+    <img src="icons/icon-192.png" alt="App Icon">
   </div>
 
-  <script src="script.js" type="module"></script>
+  <!-- PIN Lock Screen -->
+  <div id="pin-lock" class="pin-lock-screen">
+    <h2>Enter PIN</h2>
+    <input type="password" id="pinInput" placeholder="PIN" maxlength="6" aria-label="Enter PIN to unlock">
+    <button id="unlockBtn">Unlock</button>
+    <div id="pinError" class="error-msg"></div>
+  </div>
+
+  <!-- Header -->
+  <header class="app-header">
+    <div class="header-left">
+      <img id="profilePicHeader" class="avatar-img" src="icons/icon-192.png" alt="Profile Picture">
+      <div class="greeting-text">
+        <h2 id="usernameDisplay">Hi, Guest 👋</h2>
+      </div>
+    </div>
+    <div class="app-brand">Social Diary</div>
+  </header>
+
+  <!-- Main App -->
+  <div class="app">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+      <h3 id="sidebarUsername">Guest</h3>
+      <button id="newEntryBtn" class="action-btn" aria-label="Create new diary entry">New Entry</button>
+      <button id="viewEntriesBtn" class="action-btn" aria-label="View all entries">View Entries</button>
+      <button id="friendsBtn" class="action-btn" aria-label="Manage friends">Friends</button>
+      <button id="statsBtn" class="action-btn" aria-label="View statistics">Stats</button>
+      <button id="settingsBtn" class="action-btn" aria-label="Open settings">Settings</button>
+      <button id="logoutBtn" class="action-btn" aria-label="Log out">Logout</button>
+    </aside>
+
+    <!-- Content Area -->
+    <main class="content-area">
+      <!-- Error Banner -->
+      <div id="error-banner" class="error-banner" hidden aria-hidden="true"></div>
+
+      <!-- New Entry Section -->
+      <section id="newEntrySection" class="section active">
+        <div class="diary-container">
+          <div class="diary-binding"></div>
+          <h2>Write Today's Entry</h2>
+          <p id="today-date"></p>
+          <!-- AI Writing Prompt -->
+          <div id="ai-prompt" class="ai-prompt" aria-live="polite"></div>
+          <form id="diaryForm">
+            <div class="form-group">
+              <label for="entryTitle">Title</label>
+              <input type="text" id="entryTitle" placeholder="Entry Title" required aria-required="true">
+            </div>
+            <div class="form-group">
+              <label for="entryContent">Your Thoughts</label>
+              <textarea id="entryContent" rows="5" placeholder="What's on your mind?" required aria-required="true"></textarea>
+            </div>
+            <div class="form-group">
+              <label>Mood</label>
+              <div class="mood-options">
+                <button type="button" class="mood-option" data-mood="Happy" aria-label="Happy mood">😊</button>
+                <button type="button" class="mood-option" data-mood="Sad" aria-label="Sad mood">😢</button>
+                <button type="button" class="mood-option" data-mood="Excited" aria-label="Excited mood">🎉</button>
+                <button type="button" class="mood-option" data-mood="Angry" aria-label="Angry mood">😣</button>
+                <button type="button" class="mood-option" data-mood="Calm" aria-label="Calm mood">😌</button>
+              </div>
+              <p id="selectedMood"></p>
+            </div>
+            <div class="form-group">
+              <label for="imageInput">Add Photos</label>
+              <input type="file" id="imageInput" accept="image/*" multiple>
+              <!-- Video Upload -->
+              <input type="file" id="videoInput" accept="video/*" aria-label="Upload video">
+              <!-- Voice Note Upload -->
+              <input type="file" id="voiceInput" accept="audio/*" aria-label="Upload voice note">
+              <!-- Voice Recording -->
+              <button type="button" id="recordVoiceBtn" aria-label="Record voice note">🎙️ Record</button>
+              <div id="previewImages"></div>
+              <button type="button" id="removeImageBtn">Remove Media</button>
+            </div>
+            <div class="form-group">
+              <label for="tagsInput">Tags</label>
+              <input type="text" id="tagsInput" placeholder="Add tags (e.g., work, family)">
+              <button type="button" id="addTagBtn">Add Tag</button>
+              <div id="tagsDisplay" class="tags-container"></div>
+              <div id="tagSuggestions"></div>
+            </div>
+            <button type="submit">Save Entry</button>
+            <div id="formError" class="error-msg"></div>
+          </form>
+          <!-- Emoji Picker -->
+          <button id="toggleEmojiPicker">Add Emoji</button>
+          <div id="emojiList" aria-hidden="true"></div>
+        </div>
+      </section>
+
+      <!-- View Entries Section -->
+      <section id="viewEntriesSection" class="section">
+        <div class="diary-container">
+          <div class="diary-binding"></div>
+          <!-- Calendar View Toggle -->
+          <button id="toggle-view" aria-label="Toggle calendar view">Switch to Calendar</button>
+          <!-- Calendar View -->
+          <div id="calendar" class="calendar-view" style="display: none;"></div>
+          <div class="form-group">
+            <input type="text" id="searchInput" placeholder="Search entries..." aria-label="Search entries">
+            <select id="sortSelect" aria-label="Sort entries">
+              <option value="date-desc">Newest First</option>
+              <option value="date-asc">Oldest First</option>
+              <option value="title">Title</option>
+              <option value="mood">Mood</option>
+            </select>
+            <button id="filterFavoritesBtn">Show Favorites</button>
+          </div>
+          <div id="entriesList" class="entries-list"></div>
+        </div>
+      </section>
+
+      <!-- Entry Detail Section -->
+      <section id="entryDetailSection" class="section">
+        <div class="diary-container">
+          <div class="diary-binding"></div>
+          <h2 id="detailTitle"></h2>
+          <p id="detailDate" class="entry-meta"></p>
+          <p id="detailMood" class="entry-meta"></p>
+          <div id="detailTags" class="entry-tags"></div>
+          <p id="detailContent" class="entry-content"></p>
+          <div id="imageSlider" class="image-slider"></div>
+          <div class="entry-actions">
+            <button id="backToListBtn" class="back-button">Back</button>
+            <button id="deleteEntryBtn">Delete</button>
+          </div>
+          <form id="editEntryForm" class="edit-form">
+            <div class="form-group">
+              <label for="editTitle">Title</label>
+              <input type="text" id="editTitle" required aria-required="true">
+            </div>
+            <div class="form-group">
+              <label for="editContent">Content</label>
+              <textarea id="editContent" rows="5" required aria-required="true"></textarea>
+            </div>
+            <div class="form-group">
+              <label for="editMood">Mood</label>
+              <select id="editMood">
+                <option value="Happy">Happy</option>
+                <option value="Sad">Sad</option>
+                <option value="Excited">Excited</option>
+                <option value="Angry">Angry</option>
+                <option value="Calm">Calm</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label for="editImageInput">Add Photos</label>
+              <input type="file" id="editImageInput" accept="image/*" multiple>
+              <input type="file" id="editVideoInput" accept="video/*" aria-label="Edit video">
+              <input type="file" id="editVoiceInput" accept="audio/*" aria-label="Edit voice note">
+              <div id="editImages"></div>
+              <button type="button" id="removeEditImages">Remove Media</button>
+            </div>
+            <div class="form-group">
+              <label for="editTagsInput">Tags</label>
+              <input type="text" id="editTagsInput" placeholder="Add tags">
+              <button type="button" id="editAddTagBtn">Add Tag</button>
+              <div id="editTagsDisplay" class="tags-container"></div>
+            </div>
+            <button type="submit">Save Changes</button>
+            <div id="editFormError" class="edit-error"></div>
+          </form>
+        </div>
+      </section>
+
+      <!-- Friends Section -->
+      <section id="friendsSection" class="section">
+        <div class="diary-container">
+          <div class="diary-binding"></div>
+          <h2>Friends</h2>
+          <!-- Group Diaries -->
+          <div id="group-diaries">
+            <button id="create-group" class="action-btn" aria-label="Create group diary">Create Group Diary</button>
+            <div id="group-list"></div>
+          </div>
+          <form class="friend-form">
+            <input type="text" id="friendNameInput" placeholder="Friend's Name" aria-label="Friend's name">
+            <input type="text" id="friendEmojiInput" placeholder="Emoji (optional)" maxlength="2" aria-label="Friend's emoji">
+            <button type="button" id="addFriendBtn">Add Friend</button>
+          </form>
+          <div id="friendList"></div>
+        </div>
+      </section>
+
+      <!-- Edit Friend Section -->
+      <section id="editFriendSection" class="section">
+        <div class="diary-container">
+          <div class="diary-binding"></div>
+          <h2>Edit Friend</h2>
+          <form id="editFriendForm" class="edit-friend-form">
+            <input type="text" id="editFriendName" placeholder="Friend's Name" aria-label="Edit friend's name">
+            <input type="text" id="editFriendEmoji" placeholder="Emoji (optional)" maxlength="2" aria-label="Edit friend's emoji">
+            <button id="saveFriendEdit">Save</button>
+            <button type="button" id="backFriendBtn" class="back-friend-button">Back</button>
+          </form>
+        </div>
+      </section>
+
+      <!-- Stats Section -->
+      <section id="statsSection" class="section">
+        <div class="diary-container">
+          <div class="diary-binding"></div>
+          <h2>Statistics</h2>
+          <!-- Mood Chart -->
+          <canvas id="moodChart" class="mood-chart"></canvas>
+          <!-- Tag Chart -->
+          <canvas id="tagChart" class="tag-chart"></canvas>
+          <div id="statsDisplay" class="stats-display"></div>
+        </div>
+      </section>
+
+      <!-- Settings Section -->
+      <section id="settingsSection" class="section">
+        <div class="diary-container">
+          <div class="diary-binding"></div>
+          <h2>Settings</h2>
+          <div class="form-group">
+            <label for="profilePicInput">Profile Picture</label>
+            <img id="profilePic" class="avatar-img" src="icons/icon-192.png" alt="Profile Picture">
+            <input type="file" id="profilePicInput" accept="image/*">
+          </div>
+          <div class="form-group">
+            <label for="themeSelect">Theme</label>
+            <select id="themeSelect">
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="blue">Blue</option>
+              <option value="green">Green</option>
+              <!-- Eye-Protection Theme -->
+              <option value="eye-protection">Eye Protection</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label for="newPinInput">Set PIN (4-6 digits)</label>
+            <input type="password" id="newPinInput" placeholder="New PIN" maxlength="6">
+          </div>
+          <div class="form-group">
+            <label for="reminderTime">Daily Reminder</label>
+            <input type="time" id="reminderTime">
+            <label><input type="checkbox" id="reminderToggle"> Enable Reminder</label>
+          </div>
+          <!-- Language Selection -->
+          <div class="form-group">
+            <label for="language-select">Language</label>
+            <select id="language-select" aria-label="Select language">
+              <option value="en">English</option>
+              <option value="es">Spanish</option>
+              <option value="zh">Mandarin</option>
+              <option value="hi">Hindi</option>
+            </select>
+          </div>
+          <button id="saveSettingsBtn">Save Settings</button>
+          <button id="exportDataBtn">Export Data</button>
+          <button id="importDataBtn">Import Data</button>
+          <input type="file" id="importDataInput" accept=".json" hidden>
+          <!-- Export PDF -->
+          <button id="export-entries" aria-label="Export entries as PDF">Export as PDF</button>
+        </div>
+      </section>
+
+      <!-- AI Chatbot Section -->
+      <section id="chatbotSection" class="section">
+        <div class="diary-container">
+          <div class="diary-binding"></div>
+          <h2>Chat with AI</h2>
+          <div id="chat-messages" class="chat-messages"></div>
+          <input type="text" id="chat-input" placeholder="Ask your AI companion..." aria-label="Chat with AI">
+          <button id="send-chat" aria-label="Send chat message">Send</button>
+        </div>
+      </section>
+    </main>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <a href="privacy.html" aria-label="Privacy policy">Privacy Policy</a> |
+    <a href="https://play.google.com/store" target="_blank" aria-label="Google Play Store">Get on Google Play</a> |
+    <a href="https://www.apple.com/app-store/" target="_blank" aria-label="App Store">Get on App Store</a>
+  </footer>
+
+  <!-- reCAPTCHA for Phone Auth -->
+  <div id="recaptcha-container"></div>
+
+  <!-- Firebase 8.x SDKs (preserved from original) -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyD0iJWnkuinWVCtsO5vjqohrCA4ws6fb8Q",
+      authDomain: "social-diary-b6754.firebaseapp.com",
+      projectId: "social-diary-b6754",
+      storageBucket: "social-diary-b6754.firebasestorage.app",
+      messagingSenderId: "324502839373",
+      appId: "1:324502839373:web:05b3f62f18dd78f14bbc04",
+      measurementId: "G-6NSE70KRLB"
+    };
+    firebase.initializeApp(firebaseConfig);
+  </script>
+
+  <!-- Swiper for Image Sliders -->
+  <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
+  <!-- FullCalendar JS -->
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.js"></script>
+  <!-- Main Script -->
+  <script src="script.js"></script>
 </body>
 </html>
