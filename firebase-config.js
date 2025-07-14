@@ -6,13 +6,13 @@ import { getFunctions } from 'https://www.gstatic.com/firebasejs/10.12.2/firebas
 import { getAnalytics } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js';
 
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY",
-  authDomain: "YOUR_AUTH_DOMAIN",
-  projectId: "YOUR_PROJECT_ID",
-  storageBucket: "YOUR_STORAGE_BUCKET",
-  messagingSenderId: "YOUR_MESSAGING_SENDER_ID",
-  appId: "YOUR_APP_ID",
-  measurementId: "YOUR_MEASUREMENT_ID"
+  apiKey: "AIzaSyD0iJWnkuinWVCtsO5vjqohrCA4ws6fb8Q",
+      authDomain: "social-diary-b6754.firebaseapp.com",
+      projectId: "social-diary-b6754",
+      storageBucket: "social-diary-b6754.appspot.com",
+      messagingSenderId: "324502839373",
+      appId: "1:324502839373:web:05b3f62f18dd78f14bbc04",
+      measurementId: "G-6NSE70KRLB"
 };
 
 // Initialize Firebase
