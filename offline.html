@@ -1,31 +1,47 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Offline</title>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      text-align: center;
-      padding: 50px;
-      background-color: #f2f2f2;
-      color: #333;
-    }
-    h1 {
-      font-size: 2rem;
-      margin-bottom: 1rem;
-    }
-    img {
-      width: 150px;
-      margin-top: 20px;
-    }
-  </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Offline - Social Diary</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>You're Offline 😔</h1>
-  <p>It looks like you lost your internet connection.</p>
-  <p>Please reconnect to continue using Social Diary.</p>
-  <img src="images/offline.png" alt="Offline illustration" />
+  <div class="container">
+    <h1 aria-label="Offline mode">You're Offline</h1>
+    <p aria-label="Offline message">You're currently offline. View cached entries below or try reconnecting.</p>
+    <button id="retry-connection" aria-label="Retry connection">Retry</button>
+    <div id="cached-entries" class="entry-list"></div>
+  </div>
+
+  <script type="module">
+    // Load cached entries from IndexedDB
+    const cachedEntries = document.getElementById('cached-entries');
+    const dbRequest = indexedDB.open('SocialDiaryDB', 1);
+    dbRequest.onsuccess = () => {
+      const idb = dbRequest.result;
+      const tx = idb.transaction('entries', 'readonly');
+      tx.objectStore('entries').getAll().onsuccess = e => {
+        e.target.result.forEach(entry => {
+          const div = document.createElement('div');
+          div.className = 'entry';
+          div.innerHTML = `
+            <p>${entry.text}</p>
+            <p>Mood: ${entry.mood}</p>
+            ${entry.image ? `<img src="${entry.image}" alt="Entry image">` : ''}
+            ${entry.video ? `<video src="${entry.video}" controls></video>` : ''}
+            ${entry.voice ? `<audio src="${entry.voice}" controls></audio>` : ''}
+            <p>Tags: ${entry.tags.join(', ')}</p>
+          `;
+          cachedEntries.appendChild(div);
+        });
+      };
+    };
+
+    // Retry connection
+    document.getElementById('retry-connection').addEventListener('click', () => {
+      if (navigator.onLine) window.location.href = 'index.html';
+    });
+  </script>
 </body>
 </html>
