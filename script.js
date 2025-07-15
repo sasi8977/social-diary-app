@@ -3,11 +3,10 @@ let entries = JSON.parse(localStorage.getItem('entries')) || [];
 let friends = JSON.parse(localStorage.getItem('friends')) || [];
 
 // === Firebase Imports ===
+import { auth, db, storage, functions, analytics } from './firebase-config.js';
 import { getDoc, setDoc, doc, collection, getDocs, query, where, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
-import { auth, db, storage, functions } from './
-  firebase-config.js';
 
 // === Utility Functions ===
 function updateDateField() {
