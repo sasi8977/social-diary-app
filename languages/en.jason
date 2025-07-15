@@ -1,94 +1,21 @@
 {
-  "header": {
-    "title": "Social Diary",
-    "logout": "Logout"
-  },
-  "sidebar": {
-    "title": "Menu",
-    "new_entry": "New Entry",
-    "view_entries": "View Entries",
-    "friends": "Friends",
-    "stats": "Stats",
-    "settings": "Settings"
-  },
-  "diary": {
-    "title": "New Diary Entry",
-    "title_label": "Title",
-    "content_label": "Your Thoughts",
-    "add_sticker": "Add Sticker",
-    "tags_label": "Tags",
-    "add_tag": "Add",
-    "image_label": "Add Images",
-    "video_label": "Add Videos",
-    "voice_label": "Add Voice",
-    "record_voice": "Record Voice",
-    "remove_media": "Remove Media",
-    "save": "Save Entry"
-  },
   "mood": {
-    "select": "Select a mood",
-    "selected": "Selected mood: {{mood}}"
-  },
-  "prompt": {
-    "default": "How are you feeling today?"
-  },
-  "entries": {
-    "title": "Your Entries",
-    "search": "Search entries...",
-    "sort_date_desc": "Date (Newest)",
-    "sort_date_asc": "Date (Oldest)",
-    "sort_title": "Title",
-    "sort_mood": "Mood",
-    "favorites": "Favorites Only"
-  },
-  "detail": {
-    "title": "Entry Details",
-    "edit_title": "Edit Title",
-    "edit_content": "Edit Content",
-    "edit_mood": "Edit Mood",
-    "edit_tags": "Edit Tags",
-    "edit_images": "Edit Images",
-    "edit_videos": "Edit Videos",
-    "add_tag": "Add"
-  },
-  "calendar": {
-    "switch": "Switch to Calendar",
-    "list": "Switch to List"
+    "selected": "You feel: {{mood}}"
   },
   "error": {
-    "image_format": "Only JPEG/PNG images are supported.",
-    "image_size": "Image size must be under 2MB.",
-    "video_format": "Only MP4/WebM videos are supported.",
-    "video_size": "Video size must be under 10MB.",
-    "audio_format": "Only MP3/WAV audio is supported.",
-    "audio_size": "Audio size must be under 5MB.",
-    "enter_text_mood": "Please enter title, content, and select a mood.",
-    "storage_full": "Storage is full. Please delete some entries."
+    "image_format": "Only JPG and PNG images are allowed.",
+    "image_size": "Image size must be less than 2MB.",
+    "video_format": "Only MP4 and WebM videos are allowed.",
+    "video_size": "Video size must be less than 10MB.",
+    "audio_format": "Only MP3 and WAV audio files are allowed.",
+    "audio_size": "Audio size must be less than 5MB.",
+    "enter_text_mood": "Please enter a title, content, and select a mood.",
+    "storage_full": "Local storage is full. Please clear some space."
   },
   "success": {
-    "saved": "Entry saved successfully!",
-    "updated": "Entry updated successfully!",
-    "imported": "Entries imported successfully!",
-    "settings_saved": "Settings saved successfully!"
-  },
-  "warning": {
-    "offline": "You are offline. Entries will sync when you're back online."
-  },
-  "confirm": {
-    "delete": "Are you sure you want to delete this entry?"
+    "saved": "Your entry has been saved successfully!"
   },
   "prompt": {
-    "group_name": "Enter group name",
-    "add_member": "Enter member's email"
-  },
-  "stats": {
-    "tag_frequency": "Tag Frequency"
-  },
-  "reminder": {
-    "message": "Social Diary Reminder",
-    "body": "Time to write in your diary!"
-  },
-  "pwa": {
-    "install": "Install Social Diary"
+    "default": "Describe your thoughts or mood..."
   }
 }
