@@ -28,37 +28,39 @@ function showErrorBanner(message) {
 }
 
 // === DOM Content Loaded ===
+import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+
 document.addEventListener('DOMContentLoaded', () => {
-  const loggedInUser = JSON.parse(localStorage.getItem('loggedInUser'));
-  if (!loggedInUser) {
-    window.location.href = 'login.html';
-    return;
-  }
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
+      window.location.href = 'login.html';
+      return;
+    }
 
-  const splash = document.getElementById('splashScreen');
-  if (splash) {
-    setTimeout(() => splash.classList.add('hide'), 2000);
-  }
-
-  updateDateField();
-  setupEnhancedPinLock();
-  setupLocalization();
-  setupMoodPicker();
-  setupDiaryForm();
-  setupTags();
-  setupViewEntries();
-  setupFriends();
-  setupStats();
-  setupSettings();
-  setupCalendar();
-  setupChatbot();
-  setupExportImport();
-  setupPWA();
-  setupFavoritesFilter();
-  setupDailyReminder();
-  setupStickers();
-  setupLogout();
-  setupSearch();
+    localStorage.setItem('loggedInUser', JSON.stringify(user)); // Optional
+    updateDateField();
+    setupEnhancedPinLock();
+    setupLocalization();
+    setupMoodPicker();
+    setupDiaryForm();
+    setupTags();
+    setupViewEntries();
+    setupFriends();
+    setupStats();
+    setupSettings();
+    setupCalendar();
+    setupChatbot();
+    setupExportImport();
+    setupPWA();
+    setupFavoritesFilter();
+    setupDailyReminder();
+    setupStickers();
+    setupLogout();
+    setupSearch();
+    
+    const splash = document.getElementById('splashScreen');
+    if (splash) setTimeout(() => splash.classList.add('hide'), 2000);
+  });
 });
 
 // === Enhanced PIN Lock ===
