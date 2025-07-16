@@ -312,9 +312,9 @@
 
   <script>
     if ('serviceWorker' in navigator) {
-      navigator.serviceWorker.register('/sw.js')
-        .then(() => console.log('Service Worker registered'))
-        .catch(err => console.error('Service Worker registration failed:', err));
+    navigator.serviceWorker.register('/social-diary-app/sw.js') // Updated path
+      .then(() => console.log('Service Worker registered'))
+      .catch(err => console.error('Service Worker registration failed:', err));
     }
   </script>
   <script type="module" src="firebase-config.js"></script>
