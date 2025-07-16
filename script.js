@@ -3,7 +3,7 @@ let entries = JSON.parse(localStorage.getItem('entries')) || [];
 let friends = JSON.parse(localStorage.getItem('friends')) || [];
 
 // === Firebase Imports ===
-import { auth, db, storage, functions, analytics } from './firebase-config.js';
+import { auth, db, storage, functions, analytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { getDoc, setDoc, doc, collection, getDocs, query, where, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
 import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
 import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
@@ -64,38 +64,46 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 // === Enhanced PIN Lock ===
-async function setupEnhancedPinLock() {
-  const pinLock = document.getElementById('pin-lock');
-  const unlockBtn = document.getElementById('unlockBtn');
-  const pinInput = document.getElementById('pinInput');
-  const pinError = document.getElementById('pinError');
-  let retryCount = parseInt(localStorage.getItem('pinRetries')) || 0;
-  const maxRetries = 3;
-  const lockoutTime = 60000;
+const userId = user.uid;
+const pinLock = document.getElementById("pin-lock");
+const unlockBtn = document.getElementById("unlockBtn");
+const pinInput = document.getElementById("pinInput");
+const pinError = document.getElementById("pinError");
 
-  if (!localStorage.getItem('pinUnlocked')) {
-    if (pinLock) pinLock.style.display = 'flex';
-    if (retryCount >= maxRetries) {
-      pinInput.disabled = true;
-      pinError.textContent = 'Too many attempts. Try again in 1 minute.';
-      setTimeout(() => {
-        retryCount = 0;
-        localStorage.setItem('pinRetries', retryCount);
-        pinInput.disabled = false;
-        pinError.textContent = '';
-      }, lockoutTime);
+const userDocRef = doc(db, "users", userId);
+getDoc(userDocRef).then((docSnap) => {
+  if (docSnap.exists()) {
+    const data = docSnap.data();
+    const savedPin = data.pin;
+
+    if (savedPin) {
+      pinLock.style.display = "flex";
+
+      unlockBtn.addEventListener("click", () => {
+        const enteredPin = pinInput.value.trim();
+        if (enteredPin === savedPin) {
+          pinLock.style.display = "none";
+          pinInput.value = "";
+          pinError.textContent = "";
+          showSection("newEntrySection");
+        } else {
+          pinError.textContent = "Incorrect PIN. Try again.";
+        }
+      });
+    } else {
+      pinLock.style.display = "none";
+      showSection("newEntrySection");
     }
+  } else {
+    setDoc(userDocRef, { pin: "" });
+    pinLock.style.display = "none";
+    showSection("newEntrySection");
   }
-
-  if (unlockBtn && pinInput) {
-    unlockBtn.addEventListener('click', async () => {
-      const pin = pinInput.value;
-      const valid = await checkPinWithFirestore(pin);
-      if (valid) {
-        localStorage.setItem('pinUnlocked', 'true');
-        localStorage.setItem('pinRetries', '0');
-        pinLock.style.display = 'none';
-      } else {
+}).catch((error) => {
+  console.error("Error checking PIN:", error);
+  pinLock.style.display = "none";
+  showSection("newEntrySection");
+});
         retryCount++;
         localStorage.setItem('pinRetries', retryCount);
         pinError.textContent = `Incorrect PIN. ${maxRetries - retryCount} attempts left.`;
