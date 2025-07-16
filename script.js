@@ -1024,8 +1024,8 @@ if (viewEntriesBtn) {
 viewEntriesBtn.addEventListener('click', () => {
 showSection('viewEntriesSection');
 loadEntries(); // Ensure loadEntries is defined
-    }
-  });
+    });
+  }
 
   if (typeof Swiper !== 'undefined') {
     setTimeout(() => {
