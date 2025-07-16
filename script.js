@@ -3,10 +3,11 @@ let entries = JSON.parse(localStorage.getItem('entries')) || [];
 let friends = JSON.parse(localStorage.getItem('friends')) || [];
 
 // === Firebase Imports ===
-import { auth, db, storage, functions, analytics } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import { getDoc, setDoc, doc, collection, getDocs, query, where, updateDoc, deleteDoc } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
-import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js';
-import { httpsCallable } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js';
+import { auth, db, storage, functions, analytics } from './firebase-config.js';
+import { getDoc, setDoc, doc, collection, getDocs, query, where, updateDoc, deleteDoc } from './firebase-config.js';
+import { ref as storageRef, uploadBytes, getDownloadURL, deleteObject } from './firebase-config.js';
+import { httpsCallable } from './firebase-config.js';
+import { onAuthStateChanged } from './firebase-config.js';
 
 // === Utility Functions ===
 function updateDateField() {
@@ -28,18 +29,19 @@ function showErrorBanner(message) {
 }
 
 // === DOM Content Loaded ===
-import { onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
-
 document.addEventListener('DOMContentLoaded', () => {
+  console.log('=== DOM Content Loaded ===');
   onAuthStateChanged(auth, (user) => {
+    console.log('Authentication state changed, user:', user ? user.uid : 'null');
     if (!user) {
       window.location.href = 'login.html';
+      console.log('No user, redirecting to login.html');
       return;
     }
 
     localStorage.setItem('loggedInUser', JSON.stringify(user)); // Optional
     updateDateField();
-    setupEnhancedPinLock();
+    setupEnhancedPinLock(user);
     setupLocalization();
     setupMoodPicker();
     setupDiaryForm();
@@ -57,69 +59,95 @@ document.addEventListener('DOMContentLoaded', () => {
     setupStickers();
     setupLogout();
     setupSearch();
-    
+   
     const splash = document.getElementById('splashScreen');
-    if (splash) setTimeout(() => splash.classList.add('hide'), 2000);
+    if (splash) {
+      console.log('Splash screen found, hiding in 2s');
+      setTimeout(() => {
+        console.log('Hiding splash screen');
+        splash.classList.add('hide');
+      }, 2000);
+    } else {
+      console.log('Splash screen element not found');
+    }
   });
 });
 
 // === Enhanced PIN Lock ===
-const userId = user.uid;
-const pinLock = document.getElementById("pin-lock");
-const unlockBtn = document.getElementById("unlockBtn");
-const pinInput = document.getElementById("pinInput");
-const pinError = document.getElementById("pinError");
+function setupEnhancedPinLock(user) {
+  console.log('=== Starting setupEnhancedPinLock with user:', user ? user.uid : 'null');
+  const pinLock = document.getElementById("pin-lock");
+  const unlockBtn = document.getElementById("unlockBtn");
+  const pinInput = document.getElementById("pinInput");
+  const pinError = document.getElementById("pinError");
+  let retryCount = 0;
+  const maxRetries = 3;
+  const lockoutTime = 60000; // 1 minute in ms
 
-const userDocRef = doc(db, "users", userId);
-getDoc(userDocRef).then((docSnap) => {
-  if (docSnap.exists()) {
-    const data = docSnap.data();
-    const savedPin = data.pin;
+  console.log('Checking PIN lock elements:', { pinLock, pinInput, unlockBtn, pinError });
+  if (!pinLock || !pinInput || !unlockBtn || !pinError) {
+    console.log('One or more PIN lock elements missing, aborting setup');
+    return;
+  }
 
-    if (savedPin) {
-      pinLock.style.display = "flex";
+  const userId = user.uid;
+  const userDocRef = doc(db, "users", userId);
+  getDoc(userDocRef).then((docSnap) => {
+    console.log('Firestore doc check completed, exists:', docSnap.exists);
+    if (docSnap.exists()) {
+      const data = docSnap.data();
+      const savedPin = data.pin;
+      console.log('Retrieved saved PIN:', savedPin);
 
-      unlockBtn.addEventListener("click", () => {
-        const enteredPin = pinInput.value.trim();
-        if (enteredPin === savedPin) {
-          pinLock.style.display = "none";
-          pinInput.value = "";
-          pinError.textContent = "";
-          showSection("newEntrySection");
-        } else {
-          pinError.textContent = "Incorrect PIN. Try again.";
-        }
-      });
+      if (savedPin) {
+        pinLock.style.display = "flex";
+        console.log('PIN lock screen displayed');
+
+        unlockBtn.addEventListener("click", () => {
+          console.log('Unlock button clicked, entered PIN:', pinInput.value);
+          const enteredPin = pinInput.value.trim();
+          if (enteredPin === savedPin) {
+            pinLock.style.display = "none";
+            pinInput.value = "";
+            pinError.textContent = "";
+            showSection("newEntrySection");
+            console.log('PIN validated, showing new entry section');
+          } else {
+            retryCount++;
+            localStorage.setItem('pinRetries', retryCount);
+            pinError.textContent = `Incorrect PIN. ${maxRetries - retryCount} attempts left.`;
+            console.log('Incorrect PIN, retries left:', maxRetries - retryCount);
+            if (retryCount >= maxRetries) {
+              pinInput.disabled = true;
+              pinError.textContent = 'Too many attempts. Try again in 1 minute.';
+              console.log('Max retries reached, locking PIN input');
+              setTimeout(() => {
+                retryCount = 0;
+                localStorage.setItem('pinRetries', retryCount);
+                pinInput.disabled = false;
+                pinError.textContent = '';
+                console.log('PIN lockout cleared');
+              }, lockoutTime);
+            }
+          }
+        });
+      } else {
+        pinLock.style.display = "none";
+        showSection("newEntrySection");
+        console.log('No saved PIN, showing new entry section');
+      }
     } else {
-      pinLock.style.display = "none";
-      showSection("newEntrySection");
+      setDoc(userDocRef, { pin: "1234" }).then(() => { // Set default PIN from your data
+        pinLock.style.display = "none";
+        showSection("newEntrySection");
+        console.log('No user doc, initialized with default PIN: 1234');
+      });
     }
-  } else {
-    setDoc(userDocRef, { pin: "" });
+  }).catch((error) => {
+    console.error("Error checking PIN:", error);
     pinLock.style.display = "none";
     showSection("newEntrySection");
-  }
-}).catch((error) => {
-  console.error("Error checking PIN:", error);
-  pinLock.style.display = "none";
-  showSection("newEntrySection");
-});
-        retryCount++;
-        localStorage.setItem('pinRetries', retryCount);
-        pinError.textContent = `Incorrect PIN. ${maxRetries - retryCount} attempts left.`;
-        if (retryCount >= maxRetries) {
-          pinInput.disabled = true;
-          pinError.textContent = 'Too many attempts. Try again in 1 minute.';
-          setTimeout(() => {
-            retryCount = 0;
-            localStorage.setItem('pinRetries', retryCount);
-            pinInput.disabled = false;
-            pinError.textContent = '';
-          }, lockoutTime);
-        }
-      }
-    });
-  }
+  });
 }
 
 async function checkPinWithFirestore(pin) {
@@ -422,7 +450,7 @@ async function saveEntry(selectedImages, selectedVideos, selectedVoice) {
         await uploadBytes(ref, file);
         return await getDownloadURL(ref);
       }));
-      await setDoc(doc(db, 'entries', user.uid, 'userEntries', String(entry.id)), entry);
+      await setDoc(doc(db, 'start', user.uid, 'diary entries', String(entry.id)), entry); // Adjusted collection path
     } catch (e) {
       console.warn('Failed to save to Firestore:', e);
       queueEntryOffline(entry);
@@ -480,7 +508,7 @@ async function syncEntries() {
       const offlineEntries = evt.target.result;
       for (const entry of offlineEntries) {
         try {
-          await setDoc(doc(db, 'entries', user.uid, 'userEntries', String(entry.id)), entry);
+          await setDoc(doc(db, 'start', user.uid, 'diary entries', String(entry.id)), entry);
           store.delete(entry.id);
         } catch (e) {
           console.warn('Sync failed:', e);
@@ -508,7 +536,7 @@ async function analyzeMood(entry) {
     const analyze = httpsCallable(functions, 'analyzeMood');
     const result = await analyze({ text: entry.content });
     const sentiment = result.data.sentiment;
-    await setDoc(doc(db, 'entries', auth.currentUser.uid, 'userEntries', String(entry.id)), { sentiment }, { merge: true });
+    await setDoc(doc(db, 'start', auth.currentUser.uid, 'diary entries', String(entry.id)), { sentiment }, { merge: true });
     updateStats();
   } catch (e) {
     console.warn('Mood analysis failed:', e);
@@ -521,7 +549,7 @@ async function autoTagEntry(entry) {
     const result = await autoTag({ text: entry.content });
     const tags = result.data.tags || [];
     entry.tags = [...new Set([...entry.tags, ...tags])];
-    await setDoc(doc(db, 'entries', auth.currentUser.uid, 'userEntries', String(entry.id)), { tags: entry.tags }, { merge: true });
+    await setDoc(doc(db, 'start', auth.currentUser.uid, 'diary entries', String(entry.id)), { tags: entry.tags }, { merge: true });
     localStorage.setItem('entries', JSON.stringify(entries));
   } catch (e) {
     console.warn('Auto-tagging failed:', e);
@@ -620,7 +648,7 @@ async function loadEntries(filter = '', sort = 'date-desc', favoritesOnly = fals
   let firestoreEntries = [];
   if (user && navigator.onLine) {
     try {
-      const querySnapshot = await getDocs(collection(db, 'entries', user.uid, 'userEntries'));
+      const querySnapshot = await getDocs(collection(db, 'start', user.uid, 'diary entries'));
       firestoreEntries = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
       entries = firestoreEntries;
       localStorage.setItem('entries', JSON.stringify(entries));
@@ -703,7 +731,7 @@ async function loadEntries(filter = '', sort = 'date-desc', favoritesOnly = fals
       try {
         localStorage.setItem('entries', JSON.stringify(entries));
         if (user && navigator.onLine) {
-          await setDoc(doc(db, 'entries', user.uid, 'userEntries', String(entry.id)), { favorite: entry.favorite }, { merge: true });
+          await setDoc(doc(db, 'start', user.uid, 'diary entries', String(entry.id)), { favorite: entry.favorite }, { merge: true });
         }
       } catch (e) {
         console.warn('Failed to save entries:', e);
@@ -767,7 +795,7 @@ async function filterEntriesByDate(date) {
     end.setDate(end.getDate() + 1);
     try {
       const q = query(
-        collection(db, 'entries', user.uid, 'userEntries'),
+        collection(db, 'start', user.uid, 'diary entries'),
         where('date', '>=', start.toISOString()),
         where('date', '<', end.toISOString())
       );
@@ -944,7 +972,7 @@ function showEntryDetail(entry) {
           await uploadBytes(ref, file);
           return await getDownloadURL(ref);
         }));
-        await setDoc(doc(db, 'entries', user.uid, 'userEntries', String(entry.id)), updatedEntry, { merge: true });
+        await setDoc(doc(db, 'start', user.uid, 'diary entries', String(entry.id)), updatedEntry, { merge: true });
       } catch (e) {
         console.warn('Failed to update Firestore:', e);
       }
@@ -969,7 +997,7 @@ function showEntryDetail(entry) {
       const user = auth.currentUser;
       if (user && navigator.onLine) {
         try {
-          await deleteDoc(doc(db, 'entries', user.uid, 'userEntries', String(entry.id)));
+          await deleteDoc(doc(db, 'start', user.uid, 'diary entries', String(entry.id)));
           for (let i = 0; i < entry.photos?.length; i++) {
             await deleteObject(storageRef(storage, `entries/${user.uid}/${entry.id}/photo-${i}.jpg`));
           }
@@ -1316,7 +1344,7 @@ function setupExportImport() {
           const user = auth.currentUser;
           if (user && navigator.onLine) {
             for (const entry of importedEntries) {
-              await setDoc(doc(db, 'entries', user.uid, 'userEntries', String(entry.id)), entry);
+              await setDoc(doc(db, 'start', user.uid, 'diary entries', String(entry.id)), entry);
             }
           }
           loadEntries();
