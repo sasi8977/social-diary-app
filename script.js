@@ -1320,11 +1320,12 @@ function setupCalendar() {
 
 // === Export/Import ===
 function setupExportImport() {
+  console.log('===Setting up Export/Import===');
   const exportBtn = document.getElementById('exportDataBtn');
   const importBtn = document.getElementById('importDataBtn');
   const importInput = document.getElementById('importDataInput');
   const exportPDFBtn = document.getElementById('export-entries');
-
+ if(exportBtn) {  
   exportBtn.addEventListener('click', () => {
     const dataStr = JSON.stringify(entries);
     const blob = new Blob([dataStr], { type: 'application/json' });
@@ -1336,54 +1337,58 @@ function setupExportImport() {
     URL.revokeObjectURL(url);
   });
 
-  importBtn.addEventListener('click', () => {
-    importInput.click();
-  });
+   if (importBtn && importInput) {
+    importBtn.addEventListener('click', () => {
+      importInput.click();
+    });
 
-  importInput.addEventListener('change', async () => {
-    const file = importInput.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = async e => {
-        try {
-          const importedEntries = JSON.parse(e.target.result);
-          entries = [...entries, ...importedEntries];
-          localStorage.setItem('entries', JSON.stringify(entries));
-          const user = auth.currentUser;
-          if (user && navigator.onLine) {
-            for (const entry of importedEntries) {
-              await setDoc(doc(db, 'start', user.uid, 'diary entries', String(entry.id)), entry);
+    importInput.addEventListener('change', async () => {
+      const file = importInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = async e => {
+          try {
+            const importedEntries = JSON.parse(e.target.result);
+            entries = [...entries, ...importedEntries];
+            localStorage.setItem('entries', JSON.stringify(entries));
+            const user = auth.currentUser;
+            if (user && navigator.onLine) {
+              for (const entry of importedEntries) {
+                await setDoc(doc(db, 'start', user.uid, 'diary entries', String(entry.id)), entry);
+              }
             }
+            loadEntries();
+            showErrorBanner(i18next.t('success.imported'));
+          } catch (e) {
+            showErrorBanner('Import failed: ' + e.message);
           }
-          loadEntries();
-          showErrorBanner(i18next.t('success.imported'));
-        } catch (e) {
-          showErrorBanner('Import failed: ' + e.message);
-        }
-      };
-      reader.readAsText(file);
-    }
-  });
-
-  exportPDFBtn.addEventListener('click', () => {
-    const { jsPDF } = window.jspdf;
-    const doc = new jsPDF();
-    let y = 10;
-    entries.forEach((entry, i) => {
-      doc.text(`${entry.date}: ${entry.title}`, 10, y);
-      doc.text(entry.content.substring(0, 100), 10, y + 10);
-      y += 30;
-      if (y > 280) {
-        doc.addPage();
-        y = 10;
+        };
+        reader.readAsText(file);
       }
     });
-    doc.save('social_diary.pdf');
-  });
-}
+  }
 
+  if (exportPDFBtn) {
+    exportPDFBtn.addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let y = 10;
+      entries.forEach((entry, i) => {
+        doc.text(`${entry.date}: ${entry.title}`, 10, y);
+        doc.text(entry.content.substring(0, 100), 10, y + 10);
+        y += 30;
+        if (y > 280) {
+          doc.addPage();
+          y = 10;
+        }
+      });
+      doc.save('social_diary.pdf');
+    });
+  }
+}
 // === PWA ===
 function setupPWA() {
+  console.log('===Setting up PWA===');
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     const installBtn = document.createElement('button');
