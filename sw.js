@@ -1,4 +1,4 @@
-const CACHE_NAME = 'social-diary-v2';
+const CACHE_NAME = 'social-diary-v3';
 const urlsToCache = [
   '/',
   '/index.html',
@@ -131,4 +131,3 @@ async function syncOfflineEntries() {
     }
   };
 }
-
