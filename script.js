@@ -344,7 +344,7 @@ function setupDiaryForm() {
           audio.className = 'audio-preview';
           audio.controls = true;
           previewContainer.appendChild(audio);
-          transcribeVoice(blob);
+          await transcribeVoice(blob);
         };
         mediaRecorder.start();
         recordVoiceBtn.textContent = '⏹️ Stop';
@@ -380,6 +380,7 @@ function setupDiaryForm() {
     });
   }
 }
+
 
 function compressImage(file, callback) {
   const reader = new FileReader();
