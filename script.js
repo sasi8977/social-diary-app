@@ -151,8 +151,6 @@ function setupEnhancedPinLock(user) {
   });
 }
 
-  
-
 async function checkPinWithFirestore(pin) {
   const user = auth.currentUser;
   if (!user) {
@@ -779,12 +777,12 @@ async function loadEntries(filter = '', sort = 'date-desc', favoritesOnly = fals
             navigation: {
               nextEl: container.querySelector('.swiper-button-next'),
               prevEl: container.querySelector('.swiper-button-prev')
-             }
-           });
-         });
-       }, 100);
-     }
-   });
+            }
+          });
+        });
+      }, 100);
+    }
+  });
 
   if (navigator.onLine === false) {
     const offlineWarning = document.createElement('p');
@@ -1018,32 +1016,14 @@ function showEntryDetail(entry) {
           console.warn('Failed to delete from Firestore:', e);
         }
       }
-      console.log('=== Setting up View Entries ===');
-const viewEntriesBtn = document.getElementById('viewEntriesBtn');
-if (viewEntriesBtn) {
-viewEntriesBtn.addEventListener('click', () => {
-showSection('viewEntriesSection');
-loadEntries(); // Ensure loadEntries is defined
-        });
-       }
-
-  if (typeof Swiper !== 'undefined') {
-    setTimeout(() => {
-      imageSlider.querySelectorAll('.swiper-container').forEach(container => {
-        new Swiper(container, {
-          loop: true,
-          slidesPerView: window.innerWidth < 600 ? 1 : 2,
-          spaceBetween: 10,
-          pagination: { el: container.querySelector('.swiper-pagination') },
-          navigation: {
-            nextEl: container.querySelector('.swiper-button-next'),
-            prevEl: container.querySelector('.swiper-button-prev')
-          }
-        });
-      });
-    }, 100);
-  }
-}
+      entries = entries.filter(e => e.id !== entry.id);
+      localStorage.setItem('entries', JSON.stringify(entries));
+      document.getElementById('viewEntriesSection').classList.add('active');
+      detailSection.classList.remove('active');
+      loadEntries();
+    }
+  }); // Corrected: Added closing brace for deleteEntryBtn event listener
+}); // Corrected: Added closing brace for showEntryDetail function
 
 // === Friends ===
 function setupFriends() {
@@ -1195,7 +1175,7 @@ function setupFriends() {
 
   loadFriends();
   loadGroups();
-}
+}); // Corrected: Added closing brace for setupFriends function
 
 // === Statistics ===
 function setupStats() {
@@ -1325,68 +1305,69 @@ function setupExportImport() {
   const importBtn = document.getElementById('importDataBtn');
   const importInput = document.getElementById('importDataInput');
   const exportPDFBtn = document.getElementById('export-entries');
- if(exportBtn) {  
-  exportBtn.addEventListener('click', () => {
-    const dataStr = JSON.stringify(entries);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'social_diary_export.json';
-    a.click();
-    URL.revokeObjectURL(url);
-  });
-
-   if (importBtn && importInput) {
-    importBtn.addEventListener('click', () => {
-      importInput.click();
+  if (exportBtn) {  
+    exportBtn.addEventListener('click', () => {
+      const dataStr = JSON.stringify(entries);
+      const blob = new Blob([dataStr], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'social_diary_export.json';
+      a.click();
+      URL.revokeObjectURL(url);
     });
 
-    importInput.addEventListener('change', async () => {
-      const file = importInput.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = async e => {
-          try {
-            const importedEntries = JSON.parse(e.target.result);
-            entries = [...entries, ...importedEntries];
-            localStorage.setItem('entries', JSON.stringify(entries));
-            const user = auth.currentUser;
-            if (user && navigator.onLine) {
-              for (const entry of importedEntries) {
-                await setDoc(doc(db, 'start', user.uid, 'diary entries', String(entry.id)), entry);
+    if (importBtn && importInput) {
+      importBtn.addEventListener('click', () => {
+        importInput.click();
+      });
+
+      importInput.addEventListener('change', async () => {
+        const file = importInput.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = async e => {
+            try {
+              const importedEntries = JSON.parse(e.target.result);
+              entries = [...entries, ...importedEntries];
+              localStorage.setItem('entries', JSON.stringify(entries));
+              const user = auth.currentUser;
+              if (user && navigator.onLine) {
+                for (const entry of importedEntries) {
+                  await setDoc(doc(db, 'start', user.uid, 'diary entries', String(entry.id)), entry);
+                }
               }
+              loadEntries();
+              showErrorBanner(i18next.t('success.imported'));
+            } catch (e) {
+              showErrorBanner('Import failed: ' + e.message);
             }
-            loadEntries();
-            showErrorBanner(i18next.t('success.imported'));
-          } catch (e) {
-            showErrorBanner('Import failed: ' + e.message);
-          }
-        };
-        reader.readAsText(file);
-      }
-    });
-  }
-
-  if (exportPDFBtn) {
-    exportPDFBtn.addEventListener('click', () => {
-      const { jsPDF } = window.jspdf;
-      const doc = new jsPDF();
-      let y = 10;
-      entries.forEach((entry, i) => {
-        doc.text(`${entry.date}: ${entry.title}`, 10, y);
-        doc.text(entry.content.substring(0, 100), 10, y + 10);
-        y += 30;
-        if (y > 280) {
-          doc.addPage();
-          y = 10;
+          };
+          reader.readAsText(file);
         }
       });
-      doc.save('social_diary.pdf');
-    });
+    }
+
+    if (exportPDFBtn) {
+      exportPDFBtn.addEventListener('click', () => {
+        const { jsPDF } = window.jspdf;
+        const doc = new jsPDF();
+        let y = 10;
+        entries.forEach((entry, i) => {
+          doc.text(`${entry.date}: ${entry.title}`, 10, y);
+          doc.text(entry.content.substring(0, 100), 10, y + 10);
+          y += 30;
+          if (y > 280) {
+            doc.addPage();
+            y = 10;
+          }
+        });
+        doc.save('social_diary.pdf');
+      });
+    }
   }
 }
-}
+
 // === PWA ===
 function setupPWA() {
   console.log('===Setting up PWA===');
