@@ -1386,6 +1386,7 @@ function setupExportImport() {
     });
   }
 }
+}
 // === PWA ===
 function setupPWA() {
   console.log('===Setting up PWA===');
