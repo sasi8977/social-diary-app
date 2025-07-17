@@ -779,12 +779,12 @@ async function loadEntries(filter = '', sort = 'date-desc', favoritesOnly = fals
             navigation: {
               nextEl: container.querySelector('.swiper-button-next'),
               prevEl: container.querySelector('.swiper-button-prev')
-            }
-          });
-        });
-      }, 100);
-    }
-  });
+             }
+           });
+         });
+       }, 100);
+     }
+   });
 
   if (navigator.onLine === false) {
     const offlineWarning = document.createElement('p');
