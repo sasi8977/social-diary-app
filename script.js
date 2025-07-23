@@ -60,16 +60,19 @@ document.addEventListener('DOMContentLoaded', () => {
     setupLogout();
     setupSearch();
    
-    const splash = document.getElementById('splashScreen');
-    if (splash) {
-      console.log('Splash screen found, hiding in 2s');
-      setTimeout(() => {
-        console.log('Hiding splash screen');
-        splash.classList.add('hide');
-      }, 2000);
-    } else {
-      console.log('Splash screen element not found');
-    }
+    document.addEventListener('DOMContentLoaded', () => {
+  console.log('DOM fully loaded');
+  const splash = document.getElementById('splashScreen');
+  console.log('Splash element:', splash);
+  if (splash) {
+    console.log('Hiding splash screen in 2s');
+    setTimeout(() => {
+      console.log('Applying hide class');
+      splash.classList.add('hide');
+    }, 2000);
+  } else {
+    console.error('Splash screen element not found');
+  }
   });
 });
 
