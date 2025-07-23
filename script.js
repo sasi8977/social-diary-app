@@ -1033,6 +1033,11 @@ function setupFriends() {
   const createGroupBtn = document.getElementById('create-group');
   const groupList = document.getElementById('group-list');
 
+  if (!friendForm || !friendList || !createGroupBtn || !groupList) {
+    console.log('One or more friend elements missing');
+    return;
+  }
+
   friendForm.addEventListener('submit', e => {
     e.preventDefault();
     const name = document.getElementById('friendNameInput').value.trim();
@@ -1157,7 +1162,10 @@ function setupFriends() {
     document.getElementById('editFriendName').value = friend.name;
     document.getElementById('editFriendEmoji').value = friend.emoji;
 
-    document.getElementById('editFriendForm').addEventListener('submit', e => {
+    const editForm = document.getElementById('editFriendForm');
+    const backBtn = document.getElementById('backFriendBtn');
+
+    const submitHandler = e => {
       e.preventDefault();
       const newName = document.getElementById('editFriendName').value.trim();
       const newEmoji = document.getElementById('editFriendEmoji').value.trim();
@@ -1166,17 +1174,22 @@ function setupFriends() {
       document.getElementById('friendsSection').classList.add('active');
       editSection.classList.remove('active');
       loadFriends();
-    });
+      editForm.removeEventListener('submit', submitHandler); // Clean up
+    };
 
-    document.getElementById('backFriendBtn').addEventListener('click', () => {
+    const backHandler = () => {
       document.getElementById('friendsSection').classList.add('active');
       editSection.classList.remove('active');
-    });
+      backBtn.removeEventListener('click', backHandler); // Clean up
+    };
+
+    editForm.addEventListener('submit', submitHandler);
+    backBtn.addEventListener('click', backHandler);
   }
 
   loadFriends();
   loadGroups();
-}); // Corrected: Added closing brace for setupFriends function
+}
 
 // === Statistics ===
 function setupStats() {
