@@ -830,6 +830,11 @@ function showEntryDetail(entry) {
   let selectedEditVideos = entry.videos || [];
   let selectedEditVoice = entry.voice || [];
 
+  if (!detailSection || !editForm || !editImages || !editImageInput || !editVideoInput || !editVoiceInput || !removeEditImages) {
+    console.error('Missing DOM elements in showEntryDetail');
+    return;
+  }
+
   sections.forEach(s => s.classList.remove('active'));
   detailSection.classList.add('active');
 
@@ -907,7 +912,7 @@ function showEntryDetail(entry) {
     editImages.appendChild(audioEl);
   });
 
-  editImageInput.addEventListener('change', () => {
+  const handleImageChange = () => {
     const files = Array.from(editImageInput.files);
     files.forEach(file => {
       compressImage(file, (compressedData) => {
@@ -918,9 +923,9 @@ function showEntryDetail(entry) {
         editImages.appendChild(img);
       });
     });
-  });
+  };
 
-  editVideoInput.addEventListener('change', () => {
+  const handleVideoChange = () => {
     const files = Array.from(editVideoInput.files);
     files.forEach(file => {
       const url = URL.createObjectURL(file);
@@ -931,9 +936,9 @@ function showEntryDetail(entry) {
       video.controls = true;
       editImages.appendChild(video);
     });
-  });
+  };
 
-  editVoiceInput.addEventListener('change', () => {
+  const handleVoiceChange = () => {
     const files = Array.from(editVoiceInput.files);
     files.forEach(file => {
       const url = URL.createObjectURL(file);
@@ -944,9 +949,9 @@ function showEntryDetail(entry) {
       audio.controls = true;
       editImages.appendChild(audio);
     });
-  });
+  };
 
-  removeEditImages.addEventListener('click', () => {
+  const handleRemoveImages = () => {
     selectedEditImages = [];
     selectedEditVideos = [];
     selectedEditVoice = [];
@@ -954,9 +959,9 @@ function showEntryDetail(entry) {
     editImageInput.value = '';
     editVideoInput.value = '';
     editVoiceInput.value = '';
-  });
+  };
 
-  editForm.addEventListener('submit', async e => {
+  const handleEditSubmit = async e => {
     e.preventDefault();
     const updatedEntry = {
       title: document.getElementById('editTitle').value.trim(),
@@ -994,14 +999,14 @@ function showEntryDetail(entry) {
     document.getElementById('viewEntriesSection').classList.add('active');
     detailSection.classList.remove('active');
     loadEntries();
-  });
+  };
 
-  document.getElementById('backToListBtn').addEventListener('click', () => {
+  const handleBackToList = () => {
     document.getElementById('viewEntriesSection').classList.add('active');
     detailSection.classList.remove('active');
-  });
+  };
 
-  document.getElementById('deleteEntryBtn').addEventListener('click', async () => {
+  const handleDeleteEntry = async () => {
     if (confirm(i18next.t('confirm.delete'))) {
       const user = auth.currentUser;
       if (user && navigator.onLine) {
@@ -1026,8 +1031,45 @@ function showEntryDetail(entry) {
       detailSection.classList.remove('active');
       loadEntries();
     }
-  }); // Corrected: Added closing brace for deleteEntryBtn event listener
-}); // Corrected: Added closing brace for showEntryDetail function
+  };
+
+  // Remove existing listeners to prevent duplicates
+  editImageInput.removeEventListener('change', handleImageChange);
+  editVideoInput.removeEventListener('change', handleVideoChange);
+  editVoiceInput.removeEventListener('change', handleVoiceChange);
+  removeEditImages.removeEventListener('click', handleRemoveImages);
+  editForm.removeEventListener('submit', handleEditSubmit);
+  document.getElementById('backToListBtn').removeEventListener('click', handleBackToList);
+  document.getElementById('deleteEntryBtn').removeEventListener('click', handleDeleteEntry);
+
+  // Add new listeners
+  editImageInput.addEventListener('change', handleImageChange);
+  editVideoInput.addEventListener('change', handleVideoChange);
+  editVoiceInput.addEventListener('change', handleVoiceChange);
+  removeEditImages.addEventListener('click', handleRemoveImages);
+  editForm.addEventListener('submit', handleEditSubmit);
+  document.getElementById('backToListBtn').addEventListener('click', handleBackToList);
+  document.getElementById('deleteEntryBtn').addEventListener('click', handleDeleteEntry);
+
+  // Initialize Swiper for media slider
+  if (typeof Swiper !== 'undefined') {
+    setTimeout(() => {
+      imageSlider.querySelectorAll('.swiper-container').forEach(container => {
+        new Swiper(container, {
+          loop: true,
+          slidesPerView: window.innerWidth < 600 ? 1 : 2,
+          spaceBetween: 10,
+          pagination: { el: container.querySelector('.swiper-pagination') },
+          navigation: {
+            nextEl: container.querySelector('.swiper-button-next'),
+            prevEl: container.querySelector('.swiper-button-prev')
+          }
+        });
+      });
+    }, 100);
+  }
+}
+
 
 // === Friends ===
 function setupFriends() {
