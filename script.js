@@ -1289,6 +1289,11 @@ function setupSettings() {
   const newPinInput = document.getElementById('newPinInput');
   const saveSettingsBtn = document.getElementById('saveSettingsBtn');
 
+  if (!profilePicInput || !themeSelect || !newPinInput || !saveSettingsBtn) {
+    console.error('Missing settings elements');
+    return;
+  }
+
   profilePicInput.addEventListener('change', async () => {
     const file = profilePicInput.files[0];
     if (file) {
@@ -1297,11 +1302,15 @@ function setupSettings() {
         document.getElementById('profilePicHeader').src = compressedData;
         const user = auth.currentUser;
         if (user && navigator.onLine) {
-          const ref = storageRef(storage, `profiles/${user.uid}/profile.jpg`);
-          const blob = await (await fetch(compressedData)).blob();
-          await uploadBytes(ref, blob);
-          const url = await getDownloadURL(ref);
-          await updateProfile(user, { photoURL: url });
+          try {
+            const ref = storageRef(storage, `profiles/${user.uid}/profile.jpg`);
+            const blob = await (await fetch(compressedData)).blob();
+            await uploadBytes(ref, blob);
+            const url = await getDownloadURL(ref);
+            await updateProfile(user, { photoURL: url });
+          } catch (e) {
+            console.warn('Failed to upload profile picture:', e);
+          }
         }
         localStorage.setItem('profilePic', compressedData);
       });
@@ -1323,7 +1332,11 @@ function setupSettings() {
       localStorage.setItem('userPin', pin);
       const user = auth.currentUser;
       if (user && navigator.onLine) {
-        await setDoc(doc(db, 'users', user.uid), { pin }, { merge: true });
+        try {
+          await setDoc(doc(db, 'users', user.uid), { pin }, { merge: true });
+        } catch (e) {
+          console.warn('Failed to save PIN:', e);
+        }
       }
     }
     showErrorBanner(i18next.t('success.settings_saved'));
@@ -1344,6 +1357,8 @@ function setupCalendar() {
       }))
     });
     calendar.render();
+  } else {
+    console.warn('Calendar element not found');
   }
 
   const toggleViewBtn = document.getElementById('toggle-view');
@@ -1359,12 +1374,13 @@ function setupCalendar() {
 
 // === Export/Import ===
 function setupExportImport() {
-  console.log('===Setting up Export/Import===');
+  console.log('=== Setting up Export/Import ===');
   const exportBtn = document.getElementById('exportDataBtn');
   const importBtn = document.getElementById('importDataBtn');
   const importInput = document.getElementById('importDataInput');
   const exportPDFBtn = document.getElementById('export-entries');
-  if (exportBtn) {  
+
+  if (exportBtn) {
     exportBtn.addEventListener('click', () => {
       const dataStr = JSON.stringify(entries);
       const blob = new Blob([dataStr], { type: 'application/json' });
@@ -1375,61 +1391,61 @@ function setupExportImport() {
       a.click();
       URL.revokeObjectURL(url);
     });
+  }
 
-    if (importBtn && importInput) {
-      importBtn.addEventListener('click', () => {
-        importInput.click();
-      });
+  if (importBtn && importInput) {
+    importBtn.addEventListener('click', () => {
+      importInput.click();
+    });
 
-      importInput.addEventListener('change', async () => {
-        const file = importInput.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = async e => {
-            try {
-              const importedEntries = JSON.parse(e.target.result);
-              entries = [...entries, ...importedEntries];
-              localStorage.setItem('entries', JSON.stringify(entries));
-              const user = auth.currentUser;
-              if (user && navigator.onLine) {
-                for (const entry of importedEntries) {
-                  await setDoc(doc(db, 'start', user.uid, 'diary entries', String(entry.id)), entry);
-                }
+    importInput.addEventListener('change', async () => {
+      const file = importInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = async e => {
+          try {
+            const importedEntries = JSON.parse(e.target.result);
+            entries = [...entries, ...importedEntries];
+            localStorage.setItem('entries', JSON.stringify(entries));
+            const user = auth.currentUser;
+            if (user && navigator.onLine) {
+              for (const entry of importedEntries) {
+                await setDoc(doc(db, 'start', user.uid, 'diary entries', String(entry.id)), entry);
               }
-              loadEntries();
-              showErrorBanner(i18next.t('success.imported'));
-            } catch (e) {
-              showErrorBanner('Import failed: ' + e.message);
             }
-          };
-          reader.readAsText(file);
+            loadEntries();
+            showErrorBanner(i18next.t('success.imported'));
+          } catch (e) {
+            showErrorBanner('Import failed: ' + e.message);
+          }
+        };
+        reader.readAsText(file);
+      }
+    });
+  }
+
+  if (exportPDFBtn) {
+    exportPDFBtn.addEventListener('click', () => {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF();
+      let y = 10;
+      entries.forEach((entry, i) => {
+        doc.text(`${entry.date}: ${entry.title}`, 10, y);
+        doc.text(entry.content.substring(0, 100), 10, y + 10);
+        y += 30;
+        if (y > 280) {
+          doc.addPage();
+          y = 10;
         }
       });
-    }
-
-    if (exportPDFBtn) {
-      exportPDFBtn.addEventListener('click', () => {
-        const { jsPDF } = window.jspdf;
-        const doc = new jsPDF();
-        let y = 10;
-        entries.forEach((entry, i) => {
-          doc.text(`${entry.date}: ${entry.title}`, 10, y);
-          doc.text(entry.content.substring(0, 100), 10, y + 10);
-          y += 30;
-          if (y > 280) {
-            doc.addPage();
-            y = 10;
-          }
-        });
-        doc.save('social_diary.pdf');
-      });
-    }
+      doc.save('social_diary.pdf');
+    });
   }
 }
 
 // === PWA ===
 function setupPWA() {
-  console.log('===Setting up PWA===');
+  console.log('=== Setting up PWA ===');
   window.addEventListener('beforeinstallprompt', e => {
     e.preventDefault();
     const installBtn = document.createElement('button');
@@ -1450,35 +1466,39 @@ function setupPWA() {
 // === Favorites Filter ===
 function setupFavoritesFilter() {
   const filterBtn = document.getElementById('filterFavoritesBtn');
-  filterBtn.addEventListener('click', () => {
-    loadEntries('', document.getElementById('sortSelect').value, true);
-  });
+  if (filterBtn) {
+    filterBtn.addEventListener('click', () => {
+      loadEntries('', document.getElementById('sortSelect').value, true);
+    });
+  }
 }
 
 // === Daily Reminder ===
 function setupDailyReminder() {
   const reminderTime = document.getElementById('reminderTime');
   const reminderToggle = document.getElementById('reminderToggle');
-  reminderToggle.addEventListener('change', () => {
-    if (reminderToggle.checked && reminderTime.value) {
-      const [hours, minutes] = reminderTime.value.split(':');
-      const now = new Date();
-      const reminder = new Date();
-      reminder.setHours(hours, minutes, 0, 0);
-      if (reminder < now) reminder.setDate(reminder.getDate() + 1);
-      const msUntilReminder = reminder - now;
-      setTimeout(() => {
-        if (Notification.permission === 'granted') {
-          new Notification(i18next.t('reminder.message'), { body: i18next.t('reminder.body') });
-        }
-        setInterval(() => {
+  if (reminderToggle && reminderTime) {
+    reminderToggle.addEventListener('change', () => {
+      if (reminderToggle.checked && reminderTime.value) {
+        const [hours, minutes] = reminderTime.value.split(':');
+        const now = new Date();
+        const reminder = new Date();
+        reminder.setHours(hours, minutes, 0, 0);
+        if (reminder < now) reminder.setDate(reminder.getDate() + 1);
+        const msUntilReminder = reminder - now;
+        setTimeout(() => {
           if (Notification.permission === 'granted') {
             new Notification(i18next.t('reminder.message'), { body: i18next.t('reminder.body') });
           }
-        }, 24 * 60 * 60 * 1000);
-      }, msUntilReminder);
-    }
-  });
+          setInterval(() => {
+            if (Notification.permission === 'granted') {
+              new Notification(i18next.t('reminder.message'), { body: i18next.t('reminder.body') });
+            }
+          }, 24 * 60 * 60 * 1000);
+        }, msUntilReminder);
+      }
+    });
+  }
 }
 
 // === Stickers ===
@@ -1487,42 +1507,48 @@ function setupStickers() {
   const emojiList = document.getElementById('emojiList');
   const emojis = ['😊', '🎉', '🌟', '💖', '🚀'];
 
-  toggleEmojiBtn.addEventListener('click', () => {
-    emojiList.style.display = emojiList.style.display === 'none' ? 'block' : 'none';
-    emojiList.setAttribute('aria-hidden', emojiList.style.display === 'none');
-    emojiList.innerHTML = emojis.map(e => `<span class="emoji">${e}</span>`).join('');
-    emojiList.querySelectorAll('.emoji').forEach(emoji => {
-      emoji.addEventListener('click', () => {
-        document.getElementById('entryContent').value += emoji.textContent;
-        emojiList.style.display = 'none';
+  if (toggleEmojiBtn && emojiList) {
+    toggleEmojiBtn.addEventListener('click', () => {
+      emojiList.style.display = emojiList.style.display === 'none' ? 'block' : 'none';
+      emojiList.setAttribute('aria-hidden', emojiList.style.display === 'none');
+      emojiList.innerHTML = emojis.map(e => `<span class="emoji">${e}</span>`).join('');
+      emojiList.querySelectorAll('.emoji').forEach(emoji => {
+        emoji.addEventListener('click', () => {
+          document.getElementById('entryContent').value += emoji.textContent;
+          emojiList.style.display = 'none';
+        });
       });
     });
-  });
+  }
 }
 
 // === Logout ===
 function setupLogout() {
   const logoutBtn = document.getElementById('logoutBtn');
-  logoutBtn.addEventListener('click', async () => {
-    try {
-      await auth.signOut();
-      localStorage.removeItem('loggedInUser');
-      localStorage.removeItem('pinUnlocked');
-      window.location.href = 'login.html';
-    } catch (e) {
-      showErrorBanner('Logout failed: ' + e.message);
-    }
-  });
+  if (logoutBtn) {
+    logoutBtn.addEventListener('click', async () => {
+      try {
+        await auth.signOut();
+        localStorage.removeItem('loggedInUser');
+        localStorage.removeItem('pinUnlocked');
+        window.location.href = 'login.html';
+      } catch (e) {
+        showErrorBanner('Logout failed: ' + e.message);
+      }
+    });
+  }
 }
 
 // === Search ===
 function setupSearch() {
   const searchInput = document.getElementById('searchInput');
   const sortSelect = document.getElementById('sortSelect');
-  searchInput.addEventListener('input', () => {
-    loadEntries(searchInput.value, sortSelect.value);
-  });
-  sortSelect.addEventListener('change', () => {
-    loadEntries(searchInput.value, sortSelect.value);
-  });
+  if (searchInput && sortSelect) {
+    searchInput.addEventListener('input', () => {
+      loadEntries(searchInput.value, sortSelect.value);
+    });
+    sortSelect.addEventListener('change', () => {
+      loadEntries(searchInput.value, sortSelect.value);
+    });
+  }
 }
