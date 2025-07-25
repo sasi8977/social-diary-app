@@ -106,8 +106,34 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 });
 
+// Define checkPinWithFirestore before setupEnhancedPinLock
+async function checkPinWithFirestore(pin) {
+  console.log('=== checkPinWithFirestore called with pin:', pin);
+  const user = auth.currentUser;
+  if (!user) {
+    console.error('No authenticated user in checkPinWithFirestore');
+    showErrorBanner('User not authenticated.');
+    return false;
+  }
+  try {
+    const userDoc = await getDoc(doc(db, 'users', user.uid));
+    if (userDoc.exists()) {
+      const savedPin = userDoc.data().pin ? String(userDoc.data().pin).trim() : null;
+      console.log('checkPinWithFirestore comparison:', { enteredPin: pin, savedPin, match: pin === savedPin });
+      return savedPin && pin === savedPin;
+    } else {
+      console.log('No user doc, creating with default PIN: 1234');
+      await setDoc(doc(db, 'users', user.uid), { pin: "1234" });
+      return pin === "1234";
+    }
+  } catch (e) {
+    console.error('Error checking PIN:', e);
+    showErrorBanner('Error checking PIN: ' + e.message);
+    return false;
+  }
+}
 
-// === Enhanced PIN Lock ===
+// Updated setupEnhancedPinLock
 function setupEnhancedPinLock(user) {
   console.log('=== Starting setupEnhancedPinLock with user:', user ? user.uid : 'null');
   if (!user) {
@@ -123,52 +149,65 @@ function setupEnhancedPinLock(user) {
   const pinError = document.getElementById("pinError");
   let retryCount = parseInt(localStorage.getItem('pinRetries')) || 0;
   const maxRetries = 3;
-  const lockoutTime = 60000; // 1 minute in ms
+  const lockoutTime = 120000; // 2 minutes in ms
 
-  console.log('Checking PIN lock elements:', { pinLock, pinInput, unlockBtn, pinError });
+  console.log('PIN lock elements:', { pinLock, pinInput, unlockBtn, pinError });
   if (!pinLock || !pinInput || !unlockBtn || !pinError) {
-    console.error('One or more PIN lock elements missing');
+    console.error('Missing PIN lock elements. Check index.html for IDs: pin-lock, unlockBtn, pinInput, pinError');
     showErrorBanner('PIN lock setup failed. Check DOM elements.');
+    pinLock.style.display = 'none';
     showSection("newEntrySection");
     return;
   }
 
-  const handleUnlock = async () => {
-    const enteredPin = pinInput.value.trim();
-    console.log('Unlock button clicked, entered PIN:', enteredPin);
-    const isValidPin = await checkPinWithFirestore(enteredPin);
-    console.log('PIN validation result:', isValidPin);
+  // Test button responsiveness
+  unlockBtn.addEventListener('click', () => console.log('Unlock button clicked (test listener)'));
 
-    if (isValidPin) {
-      pinLock.style.display = "none";
-      pinInput.value = "";
-      pinError.textContent = "";
-      localStorage.setItem('pinRetries', '0');
-      localStorage.setItem('pinUnlocked', 'true');
-      showSection("newEntrySection");
-      console.log('PIN validated, showing new entry section');
-    } else {
-      retryCount++;
-      localStorage.setItem('pinRetries', retryCount);
-      pinError.textContent = `Incorrect PIN. ${maxRetries - retryCount} attempts left.`;
-      console.log('Incorrect PIN, retries left:', maxRetries - retryCount);
-      if (retryCount >= maxRetries) {
-        pinInput.disabled = true;
-        pinError.textContent = 'Too many attempts. Please try again in 2 minutes.';
-        console.log('Max retries reached, locking PIN input');
-        setTimeout(() => {
-          retryCount = 0;
-          localStorage.setItem('pinRetries', retryCount);
-          pinInput.disabled = false;
-          pinError.textContent = '';
-          console.log('PIN lockout cleared');
-        }, lockoutTime);
+  const handleUnlock = async () => {
+    console.log('handleUnlock called, entered PIN:', pinInput.value);
+    const enteredPin = pinInput.value.trim();
+    if (!enteredPin) {
+      pinError.textContent = 'Please enter a PIN.';
+      console.log('No PIN entered');
+      return;
+    }
+    try {
+      const isValidPin = await checkPinWithFirestore(enteredPin);
+      console.log('PIN validation result:', isValidPin);
+      if (isValidPin) {
+        pinLock.style.display = "none";
+        pinInput.value = "";
+        pinError.textContent = "";
+        localStorage.setItem('pinRetries', '0');
+        localStorage.setItem('pinUnlocked', 'true');
+        showSection("newEntrySection");
+        console.log('PIN validated, showing new entry section');
+      } else {
+        retryCount++;
+        localStorage.setItem('pinRetries', retryCount);
+        pinError.textContent = `Incorrect PIN. ${maxRetries - retryCount} attempts left.`;
+        console.log('Incorrect PIN, retries left:', maxRetries - retryCount);
+        if (retryCount >= maxRetries) {
+          pinInput.disabled = true;
+          unlockBtn.disabled = true;
+          pinError.textContent = 'Too many attempts. Please try again in 2 minutes.';
+          console.log('Max retries reached, locking input and button');
+          setTimeout(() => {
+            retryCount = 0;
+            localStorage.setItem('pinRetries', retryCount);
+            pinInput.disabled = false;
+            unlockBtn.disabled = false;
+            pinError.textContent = '';
+            console.log('PIN lockout cleared');
+          }, lockoutTime);
+        }
       }
+    } catch (error) {
+      console.error('Error in handleUnlock:', error);
+      pinError.textContent = 'Error validating PIN. Please try again.';
     }
   };
 
-  // Remove existing listener to prevent duplicates
-  unlockBtn.removeEventListener('click', handleUnlock);
   const initializePinLock = async () => {
     const userId = user.uid;
     const userDocRef = doc(db, "users", userId);
@@ -181,6 +220,7 @@ function setupEnhancedPinLock(user) {
         if (savedPin) {
           pinLock.style.display = "flex";
           console.log('PIN lock screen displayed');
+          unlockBtn.removeEventListener('click', handleUnlock);
           unlockBtn.addEventListener('click', handleUnlock);
         } else {
           console.log('No saved PIN, setting default PIN: 1234');
