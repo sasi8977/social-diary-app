@@ -30,51 +30,82 @@ function showErrorBanner(message) {
 
 // === DOM Content Loaded ===
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('=== DOM Content Loaded ===');
-  onAuthStateChanged(auth, (user) => {
-    console.log('Authentication state changed, user:', user ? user.uid : 'null');
-    if (!user) {
-      window.location.href = 'login.html';
-      console.log('No user, redirecting to login.html');
-      return;
-    }
-
-    localStorage.setItem('loggedInUser', JSON.stringify(user)); // Optional
-    updateDateField();
-    setupEnhancedPinLock(user);
-    setupLocalization();
-    setupMoodPicker();
-    setupDiaryForm();
-    setupTags();
-    setupViewEntries();
-    setupFriends();
-    setupStats();
-    setupSettings();
-    setupCalendar();
-    setupChatbot();
-    setupExportImport();
-    setupPWA();
-    setupFavoritesFilter();
-    setupDailyReminder();
-    setupStickers();
-    setupLogout();
-    setupSearch();
-   
-    document.addEventListener('DOMContentLoaded', () => {
-  console.log('DOM fully loaded');
+  console.log('DOM fully loaded at', new Date().toISOString());
   const splash = document.getElementById('splashScreen');
   console.log('Splash element:', splash);
-  if (splash) {
-    console.log('Hiding splash screen in 2s');
-    setTimeout(() => {
-      console.log('Applying hide class');
-      splash.classList.add('hide');
-    }, 2000);
-  } else {
-    console.error('Splash screen element not found');
+  if (!splash) {
+    console.error('Splash screen element not found. Check index.html for id="splashScreen"');
+    return;
   }
-  });
+
+  try {
+    onAuthStateChanged(auth, (user) => {
+      console.log('Auth state checked, user:', user ? user.uid : 'null');
+      if (!user) {
+        console.log('No user, redirecting to login.html');
+        window.location.href = 'login.html';
+        return;
+      }
+      console.log('Setting up app features');
+      localStorage.setItem('loggedInUser', JSON.stringify(user));
+      try {
+        updateDateField();
+        console.log('Calling setupEnhancedPinLock');
+        setupEnhancedPinLock(user);
+        console.log('Calling setupLocalization');
+        setupLocalization();
+        console.log('Calling setupMoodPicker');
+        setupMoodPicker();
+        console.log('Calling setupDiaryForm');
+        setupDiaryForm();
+        console.log('Calling setupTags');
+        setupTags();
+        console.log('Calling setupViewEntries');
+        setupViewEntries();
+        console.log('Calling setupFriends');
+        setupFriends();
+        console.log('Calling setupStats');
+        setupStats();
+        console.log('Calling setupSettings');
+        setupSettings();
+        console.log('Calling setupCalendar');
+        setupCalendar();
+        console.log('Calling setupChatbot');
+        setupChatbot();
+        console.log('Calling setupExportImport');
+        setupExportImport();
+        console.log('Calling setupPWA');
+        setupPWA();
+        console.log('Calling setupFavoritesFilter');
+        setupFavoritesFilter();
+        console.log('Calling setupDailyReminder');
+        setupDailyReminder();
+        console.log('Calling setupStickers');
+        setupStickers();
+        console.log('Calling setupLogout');
+        setupLogout();
+        console.log('Calling setupSearch');
+        setupSearch();
+        console.log('All setup functions called');
+      } catch (e) {
+        console.error('Error in setup functions:', e);
+        showErrorBanner('Setup error: ' + e.message);
+      }
+      console.log('Scheduling splash screen hide');
+      setTimeout(() => {
+        console.log('Hiding splash screen');
+        splash.classList.add('hide');
+      }, 2000);
+    }, (error) => {
+      console.error('Auth state error:', error);
+      showErrorBanner('Authentication error: ' + error.message);
+    });
+  } catch (e) {
+    console.error('Error in DOMContentLoaded:', e);
+    showErrorBanner('Initialization error: ' + e.message);
+  }
 });
+
 
 // === Enhanced PIN Lock ===
 function setupEnhancedPinLock(user) {
