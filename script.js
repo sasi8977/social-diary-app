@@ -61,7 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Calling setupTags');
         setupTags();
         console.log('Calling setupViewEntries');
-        setupViewEntries();
+        loadEntries();
         console.log('Calling setupFriends');
         setupFriends();
         console.log('Calling setupStats');
@@ -115,16 +115,19 @@ async function checkPinWithFirestore(pin) {
     showErrorBanner('User not authenticated.');
     return false;
   }
-  try {
+   try {
     const userDoc = await getDoc(doc(db, 'users', user.uid));
+    console.log('User doc data:', userDoc.data()); // Debug log
     if (userDoc.exists()) {
       const savedPin = userDoc.data().pin ? String(userDoc.data().pin).trim() : null;
-      console.log('checkPinWithFirestore comparison:', { enteredPin: pin, savedPin, match: pin === savedPin });
-      return savedPin && pin === savedPin;
+      const enteredPin = String(pin).trim();
+      const isValid = savedPin && enteredPin === savedPin;
+      console.log('checkPinWithFirestore comparison:', { enteredPin, savedPin, isValid });
+      return isValid;
     } else {
       console.log('No user doc, creating with default PIN: 1234');
       await setDoc(doc(db, 'users', user.uid), { pin: "1234" });
-      return pin === "1234";
+      return String(pin).trim() === "1234";
     }
   } catch (e) {
     console.error('Error checking PIN:', e);
@@ -132,6 +135,7 @@ async function checkPinWithFirestore(pin) {
     return false;
   }
 }
+
 
 // Updated setupEnhancedPinLock
 function setupEnhancedPinLock(user) {
