@@ -108,21 +108,27 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Define checkPinWithFirestore before setupEnhancedPinLock
 async function checkPinWithFirestore(pin) {
-  console.log('=== checkPinWithFirestore called with pin:', pin);
+  console.log('=== checkPinWithFirestore called with pin:', pin, 'type:', typeof pin);
   const user = auth.currentUser;
   if (!user) {
     console.error('No authenticated user in checkPinWithFirestore');
     showErrorBanner('User not authenticated.');
     return false;
   }
-   try {
+  try {
     const userDoc = await getDoc(doc(db, 'users', user.uid));
-    console.log('User doc data:', userDoc.data()); // Debug log
+    console.log('User doc exists:', userDoc.exists(), 'data:', userDoc.data());
     if (userDoc.exists()) {
       const savedPin = userDoc.data().pin ? String(userDoc.data().pin).trim() : null;
       const enteredPin = String(pin).trim();
       const isValid = savedPin && enteredPin === savedPin;
       console.log('checkPinWithFirestore comparison:', { enteredPin, savedPin, isValid });
+      if (!savedPin) {
+        console.error('No PIN found in user document');
+        showErrorBanner('No PIN set for user. Setting default PIN.');
+        await setDoc(doc(db, 'users', user.uid), { pin: "1234" }, { merge: true });
+        return enteredPin === "1234";
+      }
       return isValid;
     } else {
       console.log('No user doc, creating with default PIN: 1234');
@@ -135,6 +141,7 @@ async function checkPinWithFirestore(pin) {
     return false;
   }
 }
+
 
 
 // Updated setupEnhancedPinLock
