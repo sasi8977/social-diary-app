@@ -116,7 +116,8 @@ async function checkPinWithFirestore(pin) {
   const docSnap = await getDoc(userDoc);
 
   if (docSnap.exists()) {
-    const storedPin = docSnap.data().pin;  // ✅ FIXED: now fetching the actual pin value
+    let storedPin = docSnap.data().pin;
+    storedPin = typeof storedPin === "string" ? storedPin.replace(/"/g, '') : storedPin;
     console.log("User doc exists: true data:", docSnap.data());
     console.log("Retrieved PIN:", storedPin);
     console.log("checkPinWithFirestore comparison:", typeof storedPin, storedPin, "===", typeof pin, pin);
