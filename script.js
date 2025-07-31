@@ -108,39 +108,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Define checkPinWithFirestore before setupEnhancedPinLock
 async function checkPinWithFirestore(pin) {
-  console.log('=== checkPinWithFirestore called with pin:', pin, 'type:', typeof pin);
+  console.log("=== checkPinWithFirestore called with pin:", pin, "type:", typeof pin);
   const user = auth.currentUser;
-  if (!user) {
-    console.error('No authenticated user in checkPinWithFirestore');
-    showErrorBanner('User not authenticated.');
-    return false;
-  }
-  try {
-    const userDoc = await getDoc(doc(db, 'users', user.uid));
-    console.log('User doc exists:', userDoc.exists(), 'data:', userDoc.data());
-    if (userDoc.exists()) {
-      const savedPin = userDoc.data().pin ? String(userDoc.data().pin).trim() : null;
-      const enteredPin = String(pin).trim();
-      const isValid = savedPin && enteredPin === savedPin;
-      console.log('checkPinWithFirestore comparison:', { enteredPin, savedPin, isValid });
-      if (!savedPin) {
-        console.error('No PIN found in user document');
-        showErrorBanner('No PIN set for user. Setting default PIN.');
-        await setDoc(doc(db, 'users', user.uid), { pin: "1234" }, { merge: true });
-        return enteredPin === "1234";
-      }
-      return isValid;
-    } else {
-      console.log('No user doc, creating with default PIN: 1234');
-      await setDoc(doc(db, 'users', user.uid), { pin: "1234" });
-      return String(pin).trim() === "1234";
-    }
-  } catch (e) {
-    console.error('Error checking PIN:', e);
-    showErrorBanner('Error checking PIN: ' + e.message);
+  if (!user) return false;
+
+  const userDoc = doc(db, "users", user.uid);
+  const docSnap = await getDoc(userDoc);
+
+  if (docSnap.exists()) {
+    const storedPin = docSnap.data().pin;  // ✅ FIXED: now fetching the actual pin value
+    console.log("User doc exists: true data:", docSnap.data());
+    console.log("Retrieved PIN:", storedPin);
+    console.log("checkPinWithFirestore comparison:", typeof storedPin, storedPin, "===", typeof pin, pin);
+    return pin === storedPin;
+  } else {
+    console.log("User doc not found");
     return false;
   }
 }
+
 
 
 
