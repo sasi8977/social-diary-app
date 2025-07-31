@@ -161,86 +161,42 @@ function setupEnhancedPinLock(user) {
   // Test button responsiveness
   unlockBtn.addEventListener('click', () => console.log('Unlock button clicked (test listener)'));
 
-  const handleUnlock = async () => {
-    console.log('handleUnlock called, entered PIN:', pinInput.value);
-    const enteredPin = pinInput.value.trim();
-    if (!enteredPin) {
-      pinError.textContent = 'Please enter a PIN.';
-      console.log('No PIN entered');
-      return;
-    }
-    try {
-      const isValidPin = await checkPinWithFirestore(enteredPin);
-      console.log('PIN validation result:', isValidPin);
-      if (isValidPin) {
-        pinLock.style.display = "none";
-        pinInput.value = "";
-        pinError.textContent = "";
-        localStorage.setItem('pinRetries', '0');
-        localStorage.setItem('pinUnlocked', 'true');
-        showSection("newEntrySection");
-        console.log('PIN validated, showing new entry section');
-      } else {
-        retryCount++;
-        localStorage.setItem('pinRetries', retryCount);
-        pinError.textContent = `Incorrect PIN. ${maxRetries - retryCount} attempts left.`;
-        console.log('Incorrect PIN, retries left:', maxRetries - retryCount);
-        if (retryCount >= maxRetries) {
-          pinInput.disabled = true;
-          unlockBtn.disabled = true;
-          pinError.textContent = 'Too many attempts. Please try again in 2 minutes.';
-          console.log('Max retries reached, locking input and button');
-          setTimeout(() => {
-            retryCount = 0;
-            localStorage.setItem('pinRetries', retryCount);
-            pinInput.disabled = false;
-            unlockBtn.disabled = false;
-            pinError.textContent = '';
-            console.log('PIN lockout cleared');
-          }, lockoutTime);
-        }
-      }
-    } catch (error) {
-      console.error('Error in handleUnlock:', error);
-      pinError.textContent = 'Error validating PIN. Please try again.';
-    }
-  };
+ const handleUnlock = async () => {
+  console.log("Unlock button clicked (test listener)");
+  const enteredPin = document.getElementById("pinInput").value;
+  console.log("handleUnlock called, entered PIN:", enteredPin);
 
-  const initializePinLock = async () => {
-    const userId = user.uid;
-    const userDocRef = doc(db, "users", userId);
-    try {
-      const userDoc = await getDoc(userDocRef);
-      console.log('User doc exists:', userDoc.exists());
-      if (userDoc.exists()) {
-        const savedPin = userDoc.data().pin ? String(userDoc.data().pin).trim() : null;
-        console.log('Retrieved PIN:', savedPin);
-        if (savedPin) {
-          pinLock.style.display = "flex";
-          console.log('PIN lock screen displayed');
-          unlockBtn.removeEventListener('click', handleUnlock);
-          unlockBtn.addEventListener('click', handleUnlock);
-        } else {
-          console.log('No saved PIN, setting default PIN: 1234');
-          await setDoc(userDocRef, { pin: "1234" }, { merge: true });
-          pinLock.style.display = "none";
-          showSection("newEntrySection");
-          console.log('Default PIN 1234 set, showing new entry section');
-        }
-      } else {
-        console.log('No user doc, creating with default PIN: 1234');
-        await setDoc(userDocRef, { pin: "1234" });
-        pinLock.style.display = "none";
-        showSection("newEntrySection");
-        console.log('User doc created, PIN: 1234');
+  try {
+    const isValid = await checkPinWithFirestore(enteredPin);
+    console.log("PIN validation result:", isValid);
+
+    if (isValid) {
+      // Hide PIN lock
+      document.getElementById("pin-lock").style.display = "none";
+
+      // Show the main app content
+      document.querySelector(".app").style.display = "flex";
+
+      // Show a default section (like New Entry)
+      document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+      document.getElementById("newEntrySection").classList.add("active");
+
+      console.log("✅ App unlocked and default section shown");
+    } else {
+      retryCount--;
+      document.getElementById("pinError").textContent = `Incorrect PIN, retries left: ${retryCount}`;
+      if (retryCount <= 0) {
+        document.getElementById("pinInput").disabled = true;
+        document.getElementById("unlockBtn").disabled = true;
+        document.getElementById("pinError").textContent = "Too many attempts. Please refresh the app.";
       }
-    } catch (error) {
-      console.error('Error initializing PIN lock:', error);
-      showErrorBanner('Failed to initialize PIN lock: ' + error.message);
-      pinLock.style.display = 'none';
-      showSection("newEntrySection");
     }
-  };
+  } catch (err) {
+    console.error("Error in handleUnlock:", err);
+    document.getElementById("pinError").textContent = "An error occurred while unlocking.";
+  }
+};
+
 
   initializePinLock();
 }
