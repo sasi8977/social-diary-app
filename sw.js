@@ -6,7 +6,6 @@ const urlsToCache = [
   '/signup.html',
   '/style.css',
   '/script.js',
-  '/offline.html',
   '/icons/icon-192.png',
   '/icons/icon-512.png',
   'https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.css',
@@ -21,10 +20,7 @@ const urlsToCache = [
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-functions.js',
   'https://www.gstatic.com/firebasejs/10.12.2/firebase-analytics.js',
-  '/languages/en.json',
-  '/languages/es.json',
-  '/languages/zh.json',
-  '/languages/hi.json'
+  
 ];
 
 // Install Event
