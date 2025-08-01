@@ -1,4 +1,4 @@
-/* Base Styles */
+/* Base Styles (Preserved) */
 body {
   margin: 0;
   font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -234,7 +234,7 @@ button[type="submit"]:hover {
 
 /* PIN Lock Screen */
 .pin-lock-screen {
-  display: flex;
+  display: none;
   position: fixed;
   top: 0;
   left: 0;
@@ -381,7 +381,7 @@ footer a {
   margin-bottom: 1rem;
 }
 
-/* Accessibility */
+/* Accessibility Enhancements */
 [aria-hidden="true"] {
   display: none;
 }
@@ -392,7 +392,7 @@ button:focus, input:focus, textarea:focus, select:focus {
   box-shadow: 0 0 0 2px #5e60ce;
 }
 
-/* Responsive */
+/* Responsive Design */
 @media (max-width: 768px) {
   .sidebar {
     width: 200px;
