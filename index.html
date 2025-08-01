@@ -1,26 +1,20 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
+  <meta charset="UTF-8"/>
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Social Diary</title>
   <link rel="stylesheet" href="style.css"/>
-
-  <!-- FullCalendar CSS -->
+  <!-- FullCalendar CSS for calendar view -->
   <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.css" rel="stylesheet">
-
-  <!-- Chart.js -->
+  <!-- Chart.js for mood analytics -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
-
-  <!-- i18next -->
+  <!-- i18next for localization -->
   <script src="https://cdn.jsdelivr.net/npm/i18next@21.9.2/dist/umd/i18next.min.js"></script>
-
-  <!-- jsPDF -->
+  <!-- jsPDF for PDF exports -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-  <!-- Swiper -->
+  <!-- Swiper for Image Sliders -->
   <script src="https://unpkg.com/swiper@8/swiper-bundle.min.js"></script>
-
   <!-- FullCalendar JS -->
   <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.5/main.min.js"></script>
 </head>
@@ -31,11 +25,11 @@
     <img src="icons/icon-192.png" alt="App Icon">
   </div>
 
-  <!-- PIN Lock -->
+  <!-- PIN Lock Screen -->
   <div id="pin-lock" class="pin-lock-screen">
     <input id="pinInput" type="password" placeholder="Enter PIN" />
     <button id="unlockBtn">Unlock</button>
-    <div id="pinError"></div>
+    <div id="pinError" class="error-msg"></div>
   </div>
 
   <!-- Header -->
@@ -49,7 +43,7 @@
     <div class="app-brand">Social Diary</div>
   </header>
 
-  <!-- App Layout -->
+  <!-- Main App -->
   <div class="app">
     <!-- Sidebar -->
     <aside class="sidebar">
@@ -70,41 +64,59 @@
       <!-- Sections -->
       <section id="newEntrySection" class="section active">
         <div class="diary-container">
+          <div class="diary-binding"></div>
           <h2>Write Today's Entry</h2>
           <p id="today-date"></p>
-          <div id="ai-prompt" class="ai-prompt"></div>
+          <div id="ai-prompt" class="ai-prompt" aria-live="polite"></div>
           <form id="diaryForm">
-            <input type="text" id="entryTitle" placeholder="Title" required>
-            <textarea id="entryContent" rows="5" placeholder="What's on your mind?" required></textarea>
-            <div class="mood-options">
-              <button type="button" class="mood-option" data-mood="Happy">😊</button>
-              <button type="button" class="mood-option" data-mood="Sad">😢</button>
-              <button type="button" class="mood-option" data-mood="Excited">🎉</button>
-              <button type="button" class="mood-option" data-mood="Angry">😣</button>
-              <button type="button" class="mood-option" data-mood="Calm">😌</button>
+            <div class="form-group">
+              <label for="entryTitle">Title</label>
+              <input type="text" id="entryTitle" required />
             </div>
-            <p id="selectedMood"></p>
-
-            <input type="file" id="imageInput" accept="image/*" multiple>
-            <input type="file" id="videoInput" accept="video/*">
-            <input type="file" id="voiceInput" accept="audio/*">
-            <button type="button" id="recordVoiceBtn">🎙️ Record</button>
-
-            <input type="text" id="tagsInput" placeholder="Tags">
-            <button type="button" id="addTagBtn">Add Tag</button>
-            <div id="tagsDisplay" class="tags-container"></div>
-
+            <div class="form-group">
+              <label for="entryContent">Your Thoughts</label>
+              <textarea id="entryContent" rows="5" required></textarea>
+            </div>
+            <div class="form-group">
+              <label>Mood</label>
+              <div class="mood-options">
+                <button type="button" class="mood-option" data-mood="Happy">😊</button>
+                <button type="button" class="mood-option" data-mood="Sad">😢</button>
+                <button type="button" class="mood-option" data-mood="Excited">🎉</button>
+                <button type="button" class="mood-option" data-mood="Angry">😣</button>
+                <button type="button" class="mood-option" data-mood="Calm">😌</button>
+              </div>
+              <p id="selectedMood"></p>
+            </div>
+            <div class="form-group">
+              <label for="imageInput">Add Photos</label>
+              <input type="file" id="imageInput" accept="image/*" multiple />
+              <input type="file" id="videoInput" accept="video/*" />
+              <input type="file" id="voiceInput" accept="audio/*" />
+              <button type="button" id="recordVoiceBtn">🎙️ Record</button>
+              <div id="previewImages"></div>
+              <button type="button" id="removeImageBtn">Remove Media</button>
+            </div>
+            <div class="form-group">
+              <label for="tagsInput">Tags</label>
+              <input type="text" id="tagsInput" />
+              <button type="button" id="addTagBtn">Add Tag</button>
+              <div id="tagsDisplay" class="tags-container"></div>
+              <div id="tagSuggestions"></div>
+            </div>
             <button type="submit">Save Entry</button>
             <div id="formError" class="error-msg"></div>
           </form>
-          <div id="emojiList" hidden></div>
+          <button id="toggleEmojiPicker">Add Emoji</button>
+          <div id="emojiList" aria-hidden="true"></div>
         </div>
       </section>
 
       <section id="viewEntriesSection" class="section">
         <div class="diary-container">
-          <h2>View Entries</h2>
-          <input type="text" id="searchInput" placeholder="Search entries...">
+          <button id="toggle-view">Switch to Calendar</button>
+          <div id="calendar" style="display: none;"></div>
+          <input type="text" id="searchInput" placeholder="Search entries..." />
           <select id="sortSelect">
             <option value="date-desc">Newest First</option>
             <option value="date-asc">Oldest First</option>
@@ -112,18 +124,52 @@
             <option value="mood">Mood</option>
           </select>
           <button id="filterFavoritesBtn">Show Favorites</button>
-          <button id="toggle-view">Calendar View</button>
-          <div id="calendar" style="display: none;"></div>
           <div id="entriesList"></div>
+        </div>
+      </section>
+
+      <section id="entryDetailSection" class="section">
+        <div class="diary-container">
+          <h2 id="detailTitle"></h2>
+          <p id="detailDate" class="entry-meta"></p>
+          <p id="detailMood" class="entry-meta"></p>
+          <div id="detailTags" class="entry-tags"></div>
+          <p id="detailContent" class="entry-content"></p>
+          <div id="imageSlider" class="image-slider"></div>
+          <button id="backToListBtn">Back</button>
+          <button id="deleteEntryBtn">Delete</button>
+          <form id="editEntryForm" class="edit-form">
+            <input type="text" id="editTitle" required />
+            <textarea id="editContent" rows="5" required></textarea>
+            <select id="editMood">
+              <option value="Happy">Happy</option>
+              <option value="Sad">Sad</option>
+              <option value="Excited">Excited</option>
+              <option value="Angry">Angry</option>
+              <option value="Calm">Calm</option>
+            </select>
+            <input type="file" id="editImageInput" accept="image/*" multiple />
+            <input type="file" id="editVideoInput" accept="video/*" />
+            <input type="file" id="editVoiceInput" accept="audio/*" />
+            <div id="editImages"></div>
+            <button type="button" id="removeEditImages">Remove Media</button>
+            <input type="text" id="editTagsInput" placeholder="Add tags" />
+            <button type="button" id="editAddTagBtn">Add Tag</button>
+            <div id="editTagsDisplay" class="tags-container"></div>
+            <button type="submit">Save Changes</button>
+            <div id="editFormError" class="edit-error"></div>
+          </form>
         </div>
       </section>
 
       <section id="friendsSection" class="section">
         <div class="diary-container">
           <h2>Friends</h2>
+          <button id="create-group" class="action-btn">Create Group Diary</button>
+          <div id="group-list"></div>
           <form class="friend-form">
-            <input type="text" id="friendNameInput" placeholder="Friend's Name">
-            <input type="text" id="friendEmojiInput" placeholder="Emoji" maxlength="2">
+            <input type="text" id="friendNameInput" placeholder="Friend's Name" />
+            <input type="text" id="friendEmojiInput" placeholder="Emoji" maxlength="2" />
             <button type="button" id="addFriendBtn">Add Friend</button>
           </form>
           <div id="friendList"></div>
@@ -141,6 +187,7 @@
       <section id="settingsSection" class="section">
         <div class="diary-container">
           <h2>Settings</h2>
+          <img id="profilePic" class="avatar-img" src="icons/icon-192.png" alt="Profile Picture">
           <input type="file" id="profilePicInput" accept="image/*">
           <select id="themeSelect">
             <option value="light">Light</option>
@@ -155,7 +202,7 @@
           <select id="language-select">
             <option value="en">English</option>
             <option value="es">Spanish</option>
-            <option value="zh">Chinese</option>
+            <option value="zh">Mandarin</option>
             <option value="hi">Hindi</option>
           </select>
           <button id="saveSettingsBtn">Save Settings</button>
@@ -180,9 +227,12 @@
   <!-- Footer -->
   <footer>
     <a href="privacy.html">Privacy Policy</a> |
-    <a href="https://play.google.com/store">Google Play</a> |
-    <a href="https://www.apple.com/app-store/">App Store</a>
+    <a href="https://play.google.com/store">Get on Google Play</a> |
+    <a href="https://www.apple.com/app-store/">Get on App Store</a>
   </footer>
+
+  <!-- reCAPTCHA container -->
+  <div id="recaptcha-container"></div>
 
   <script>
     if ('serviceWorker' in navigator) {
@@ -191,7 +241,6 @@
         .catch(err => console.error('Service Worker registration failed:', err));
     }
   </script>
-
   <script type="module" src="firebase-config.js"></script>
   <script type="module" src="script.js"></script>
 </body>
