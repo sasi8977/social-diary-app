@@ -49,44 +49,33 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('Setting up app features');
       localStorage.setItem('loggedInUser', JSON.stringify(user));
       try {
-        updateDateField();
-        console.log('Calling setupEnhancedPinLock');
         setupEnhancedPinLock(user);
-        console.log('Calling setupLocalization');
         setupLocalization();
-        console.log('Calling setupMoodPicker');
-        setupMoodPicker();
-        console.log('Calling setupDiaryForm');
-        setupDiaryForm();
-        console.log('Calling setupTags');
-        setupTags();
-        console.log('Calling setupViewEntries');
-        loadEntries();
-        console.log('Calling setupFriends');
-        setupFriends();
-        console.log('Calling setupStats');
-        setupStats();
-        console.log('Calling setupSettings');
-        setupSettings();
-        console.log('Calling setupCalendar');
-        setupCalendar();
-        console.log('Calling setupChatbot');
-        setupChatbot();
-        console.log('Calling setupExportImport');
-        setupExportImport();
-        console.log('Calling setupPWA');
-        setupPWA();
-        console.log('Calling setupFavoritesFilter');
-        setupFavoritesFilter();
-        console.log('Calling setupDailyReminder');
-        setupDailyReminder();
-        console.log('Calling setupStickers');
-        setupStickers();
-        console.log('Calling setupLogout');
-        setupLogout();
-        console.log('Calling setupSearch');
-        setupSearch();
-        console.log('All setup functions called');
+        function setupAppFeaturesAfterUnlock() {
+  console.log("🔧 Running setup after unlock");
+
+  updateDateField();
+  setupMoodPicker();
+  setupDiaryForm();
+  setupTags();
+  loadEntries();
+  setupFriends();
+  setupStats();
+  setupSettings();
+  setupCalendar();
+  setupChatbot();
+  setupExportImport();
+  setupPWA();
+  setupFavoritesFilter();
+  setupDailyReminder();
+  setupStickers();
+  setupLogout();
+  setupSearch();
+
+  console.log("✅ All features set up");
+}
+        
+        
       } catch (e) {
         console.error('Error in setup functions:', e);
         showErrorBanner('Setup error: ' + e.message);
