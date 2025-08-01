@@ -132,20 +132,6 @@ async function checkPinWithFirestore(pin) {
 
 
 // Updated setupEnhancedPinLock
-let retryCount = 3;
-
-const initializePinLock = () => {
-  const pinLock = document.getElementById("pin-lock");
-  const pinInput = document.getElementById("pinInput");
-  const unlockBtn = document.getElementById("unlockBtn");
-  const pinError = document.getElementById("pinError");
-
-  unlockBtn.addEventListener("click", handleUnlock);
-  pinLock.style.display = "flex";
-  pinInput.value = "";
-  pinError.textContent = "";
-};
-
 function setupEnhancedPinLock(user) {
   console.log('=== Starting setupEnhancedPinLock with user:', user ? user.uid : 'null');
   if (!user) {
@@ -209,6 +195,17 @@ function setupEnhancedPinLock(user) {
     console.error("Error in handleUnlock:", err);
     document.getElementById("pinError").textContent = "An error occurred while unlocking.";
   }
+};
+const initializePinLock = () => {
+  const pinLock = document.getElementById("pin-lock");
+  const pinInput = document.getElementById("pinInput");
+  const unlockBtn = document.getElementById("unlockBtn");
+  const pinError = document.getElementById("pinError");
+
+  unlockBtn.addEventListener("click", handleUnlock);  // ✅ Now handleUnlock is defined
+  pinLock.style.display = "flex";
+  pinInput.value = "";
+  pinError.textContent = "";
 };
 
 
