@@ -170,6 +170,7 @@ function setupEnhancedPinLock(user) {
       document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
       document.getElementById("newEntrySection").classList.add("active");
       setupAppFeaturesAfterUnlock();
+      setupSectionNavigation();
       console.log("✅ App unlocked and default section shown");
     } else {
       retryCount--;
